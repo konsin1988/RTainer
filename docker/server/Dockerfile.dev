@@ -1,0 +1,16 @@
+FROM golang:1.25-alpine
+
+WORKDIR /app
+
+RUN apk add --no-cache git curl && \ 
+	go install github.com/air-verse/air@latest 
+
+COPY ./api/go.mod /app/ 
+RUN go mod download
+
+COPY ./api .
+
+EXPOSE 8013
+
+CMD ["air", "/app"]
+

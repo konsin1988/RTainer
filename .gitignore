@@ -1,0 +1,68 @@
+# =========================
+# OS / Editor
+# =========================
+/**/.DS_Store
+/**/Thumbs.db
+/**/*.swp
+/**/*.swo
+/**/.vscode/
+.idea/
+info/
+volumes/
+
+# =========================
+# Node / Vite (frontend)
+# =========================
+/**/node_modules/
+/**/dist/
+/**/dist-ssr/
+*.local
+
+# Vite cache (sometimes created by plugins)
+/**/.vite/
+
+# Logs
+/**/npm-debug.log*
+/**/yarn-debug.log*
+/**/yarn-error.log*
+/**/pnpm-debug.log*
+
+# env files
+/**/.env
+/**/.env.local
+/**/.env.*.local
+/**/.env.production
+/**/.env.development
+
+# =========================
+# Go (backend/server)
+# =========================
+# Binaries
+/**/*.exe
+/**/*.exe~
+/**/*.dll
+/**/*.so
+/**/*.dylib
+
+# Go build output
+/**/bin/
+/**/build/
+/**/*.out
+
+# Test binaries
+/**/*.test
+
+# Go coverage
+/**/*.cov
+
+# Go workspace file (if used)
+go.work
+go.work.sum
+
+# Module download cache (optional if inside repo)
+/**/vendor/
+
+# =========================
+# Logs / misc
+# =========================
+/**/*.log

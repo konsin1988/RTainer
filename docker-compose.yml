@@ -1,0 +1,73 @@
+services:
+  # --------------------------
+  # POSTGRES
+  # ---------------------------
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    env_file: .env
+    healthcheck:
+      test: >
+        pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} &&
+        psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c "SELECT 1;" -q
+      interval: 20s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    volumes:
+      - ./volumes/postgres_data:/var/lib/postgresql/data
+    networks:
+      - rtainer 
+
+  # ---------------------------
+  # Dev 
+  # --------------------------
+  api:
+    build:
+      context: .
+      dockerfile: ./docker/server/Dockerfile.dev
+    image: konsin1988/${PROJECT_NAME}-dev:${PROJECT_VERSION}
+    container_name: ${PROJECT_NAME}-dev 
+    env_file: .env
+    ports:
+      - "${CONTAINER_PORT}:8013"
+    volumes:
+      - ./api:/app
+      - /app/tmp
+    command: air /app
+    profiles:
+      - dev
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - rtainer 
+
+  # -------------------------
+  # Prod
+  # --------------------------
+  api-prod:
+    build:
+      context: .
+      dockerfile: ./docker/server/Dockerfile
+    image: konsin1988/${PROJECT_NAME}:${PROJECT_VERSION}
+    container_name: ${PROJECT_NAME} 
+    env_file: .env
+    ports:
+      - "${CONTAINER_PORT}:8013"
+    profiles:
+      - prod
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - rtainer
+
+networks:
+  rtainer:
+    name: rtainer 
+    external: True
