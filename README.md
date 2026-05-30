@@ -1,5 +1,4 @@
-"""
-# ⚙️ InfraHub (Go + React)
+# RTainer 
 
 A lightweight container and infrastructure management platform
 
