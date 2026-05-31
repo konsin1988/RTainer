@@ -5,6 +5,7 @@ endif
 
 dev:
 	cd ~/keycloak && docker compose up -d; 
+	progress_bar 10;
 	COMPOSE_PROFILES=dev docker compose up -d;
 	cd app && npm run dev
 

@@ -8,7 +8,7 @@ export default function AuthCallback() {
 
   useEffect(() => {
     if (auth.isAuthenticated) {
-      navigate("/dashboard");
+      navigate("/user/dashboard");
     }
   }, [auth, navigate]);
   return <div> Signing in...</div>;
