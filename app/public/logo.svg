@@ -1,0 +1,62 @@
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 180 64"
+    fill="none"
+>
+    <!-- Container background -->
+    <rect
+        x="4"
+        y="4"
+        width="56"
+        height="56"
+        rx="12"
+        fill="#717178"
+    />
+
+    <!-- Inner frame -->
+    <rect
+        x="10"
+        y="10"
+        width="44"
+        height="44"
+        rx="8"
+        stroke="#ba9477"
+        stroke-width="2"
+    />
+
+    <!-- R -->
+    <path
+        d="M18 20H32C38 20 42 24 42 29C42 33 39 36 35 37L42 44"
+        stroke="#ba9477"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
+
+    <!-- T -->
+    <path
+        d="M44 20H22"
+        stroke="white"
+        stroke-width="4"
+        stroke-linecap="round"
+    />
+
+    <path
+        d="M33 20V44"
+        stroke="white"
+        stroke-width="4"
+        stroke-linecap="round"
+    />
+
+    <!-- Small suffix -->
+    <text
+        x="68"
+        y="38"
+        font-family="Segoe UI, Arial, sans-serif"
+        font-size="22"
+        font-weight="600"
+        fill="#ba9477"
+    >
+        ainer
+    </text>
+</svg>

@@ -5,7 +5,9 @@ export default function LoginPage() {
   const auth = useAuth();
 
   return (
-    <button onClick={() => auth.signinRedirect()}>
+    <button 
+      className="z-10000"
+      onClick={() => auth.signinRedirect()}>
       Login with Keycloak
     </button>
   );
