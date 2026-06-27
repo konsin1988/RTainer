@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package agent;
+
+option go_package = "/agent/proto";
+
+service AgentService {
+  rpc ListContainers(ListContainersRequest) returns (ListContainersResponse);
+  rpc ListImages(ListImagesRequest) returns (ListImagesResponse);
+  rpc StopContainer(StopContainerRequest) returns (StopContainerResponse);
+}
+
+// ----------------------------
+// LIST CONTAINERS 
+// ----------------------------
+message ListContainersRequest {}
+
+message Container {
+  string id = 1;
+  string name = 2;
+  string image = 3;
+  string status = 4;
+}
+
+message ListContainersResponse {
+  repeated Container containers = 1;
+}
+
+
+// ----------------------------
+// LIST IMAGES 
+// ----------------------------
+message ListImagesRequest {}
+
+message Image {
+  string id = 1;
+  string repo_tags = 2;
+  int64 size = 3;
+  int64 created = 4;
+}
+
+message ListImagesResponse {
+  repeated Image images = 1;
+}
+
+
+// ------------------------------
+// STOP CONTAINER BY ID
+// -----------------------------
+message StopContainerRequest {
+  string id = 1;
+  int64 timeout = 2; // optional (seconds)
+}
+
+message StopContainerResponse {
+  bool success = 1;
+}
