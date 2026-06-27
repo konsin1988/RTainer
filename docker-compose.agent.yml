@@ -1,0 +1,25 @@
+services:
+  agent:
+    build:
+      context: .
+      dockerfile: ./docker/agent/Dockerfile
+    image: konsin1988/${PROJECT_NAME}-agent:${PROJECT_VERSION}
+    container_name: ${PROJECT_NAME}-agent
+    ports:
+      - "50051:50051"
+    env_file: .env
+    healthcheck:
+      test: ["CMD", "grpc-health-probe", "-addr=:50051"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    networks:
+      - rtainer
+
+networks:
+  rtainer:
+    name: rtainer
+    external: true

@@ -26,17 +26,16 @@ func main() {
 	healthService := health.NewService(healthRepo)
   healthHandler := http_t.NewHealthHandler(healthService)
 
-	//api := http.NewServeMux()
-	//
-	//api.Handle("/containers", containerHandler)
+	api := http.NewServeMux()
+	
+	//api.HandleFunc("GET /containers", containerHandler.ListContainers)
 	//api.Handle("/nodes", nodeHandler)
 	
-	root := http.NewServeMux()
 	
-	root.Handle("/health", healthHandler)
+	api.Handle("/health", healthHandler)
 	//root.Handle("/api/", auth.Middleware(api))
 
   log.Println("Server started on :8013")
-	log.Fatal(http.ListenAndServe("0.0.0.0:8013", root))
+	log.Fatal(http.ListenAndServe("0.0.0.0:8013", api))
 }
 
