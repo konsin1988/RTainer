@@ -324,30 +324,29 @@ func (x *ListImagesResponse) GetImages() []*Image {
 }
 
 // ------------------------------
-// STOP CONTAINER BY ID
+// STOP, START EXISTING CONTAINER BY ID
 // -----------------------------
-type StopContainerRequest struct {
+type ContainerRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Timeout       int64                  `protobuf:"varint,2,opt,name=timeout,proto3" json:"timeout,omitempty"` // optional (seconds)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *StopContainerRequest) Reset() {
-	*x = StopContainerRequest{}
+func (x *ContainerRequest) Reset() {
+	*x = ContainerRequest{}
 	mi := &file_proto_agent_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *StopContainerRequest) String() string {
+func (x *ContainerRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*StopContainerRequest) ProtoMessage() {}
+func (*ContainerRequest) ProtoMessage() {}
 
-func (x *StopContainerRequest) ProtoReflect() protoreflect.Message {
+func (x *ContainerRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_agent_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -359,46 +358,38 @@ func (x *StopContainerRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StopContainerRequest.ProtoReflect.Descriptor instead.
-func (*StopContainerRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use ContainerRequest.ProtoReflect.Descriptor instead.
+func (*ContainerRequest) Descriptor() ([]byte, []int) {
 	return file_proto_agent_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *StopContainerRequest) GetId() string {
+func (x *ContainerRequest) GetId() string {
 	if x != nil {
 		return x.Id
 	}
 	return ""
 }
 
-func (x *StopContainerRequest) GetTimeout() int64 {
-	if x != nil {
-		return x.Timeout
-	}
-	return 0
-}
-
-type StopContainerResponse struct {
+type ContainerResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *StopContainerResponse) Reset() {
-	*x = StopContainerResponse{}
+func (x *ContainerResponse) Reset() {
+	*x = ContainerResponse{}
 	mi := &file_proto_agent_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *StopContainerResponse) String() string {
+func (x *ContainerResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*StopContainerResponse) ProtoMessage() {}
+func (*ContainerResponse) ProtoMessage() {}
 
-func (x *StopContainerResponse) ProtoReflect() protoreflect.Message {
+func (x *ContainerResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_agent_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -410,14 +401,70 @@ func (x *StopContainerResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StopContainerResponse.ProtoReflect.Descriptor instead.
-func (*StopContainerResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use ContainerResponse.ProtoReflect.Descriptor instead.
+func (*ContainerResponse) Descriptor() ([]byte, []int) {
 	return file_proto_agent_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *StopContainerResponse) GetSuccess() bool {
+// -------------------------------
+// REMOVE CONTAINER
+// ------------------------------
+type RemoveContainerRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Force         bool                   `protobuf:"varint,2,opt,name=force,proto3" json:"force,omitempty"`
+	RemoveVolumes bool                   `protobuf:"varint,3,opt,name=remove_volumes,json=removeVolumes,proto3" json:"remove_volumes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RemoveContainerRequest) Reset() {
+	*x = RemoveContainerRequest{}
+	mi := &file_proto_agent_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RemoveContainerRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RemoveContainerRequest) ProtoMessage() {}
+
+func (x *RemoveContainerRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_agent_proto_msgTypes[8]
 	if x != nil {
-		return x.Success
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RemoveContainerRequest.ProtoReflect.Descriptor instead.
+func (*RemoveContainerRequest) Descriptor() ([]byte, []int) {
+	return file_proto_agent_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *RemoveContainerRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *RemoveContainerRequest) GetForce() bool {
+	if x != nil {
+		return x.Force
+	}
+	return false
+}
+
+func (x *RemoveContainerRequest) GetRemoveVolumes() bool {
+	if x != nil {
+		return x.RemoveVolumes
 	}
 	return false
 }
@@ -444,17 +491,21 @@ const file_proto_agent_proto_rawDesc = "" +
 	"\x04size\x18\x03 \x01(\x03R\x04size\x12\x18\n" +
 	"\acreated\x18\x04 \x01(\x03R\acreated\":\n" +
 	"\x12ListImagesResponse\x12$\n" +
-	"\x06images\x18\x01 \x03(\v2\f.agent.ImageR\x06images\"@\n" +
-	"\x14StopContainerRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x18\n" +
-	"\atimeout\x18\x02 \x01(\x03R\atimeout\"1\n" +
-	"\x15StopContainerResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess2\xec\x01\n" +
+	"\x06images\x18\x01 \x03(\v2\f.agent.ImageR\x06images\"\"\n" +
+	"\x10ContainerRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\x13\n" +
+	"\x11ContainerResponse\"e\n" +
+	"\x16RemoveContainerRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x05force\x18\x02 \x01(\bR\x05force\x12%\n" +
+	"\x0eremove_volumes\x18\x03 \x01(\bR\rremoveVolumes2\xf5\x02\n" +
 	"\fAgentService\x12M\n" +
 	"\x0eListContainers\x12\x1c.agent.ListContainersRequest\x1a\x1d.agent.ListContainersResponse\x12A\n" +
 	"\n" +
-	"ListImages\x12\x18.agent.ListImagesRequest\x1a\x19.agent.ListImagesResponse\x12J\n" +
-	"\rStopContainer\x12\x1b.agent.StopContainerRequest\x1a\x1c.agent.StopContainerResponseB\x0eZ\f/agent/protob\x06proto3"
+	"ListImages\x12\x18.agent.ListImagesRequest\x1a\x19.agent.ListImagesResponse\x12B\n" +
+	"\rStopContainer\x12\x17.agent.ContainerRequest\x1a\x18.agent.ContainerResponse\x12C\n" +
+	"\x0eStartContainer\x12\x17.agent.ContainerRequest\x1a\x18.agent.ContainerResponse\x12J\n" +
+	"\x0fRemoveContainer\x12\x1d.agent.RemoveContainerRequest\x1a\x18.agent.ContainerResponseB\x0eZ\f/agent/protob\x06proto3"
 
 var (
 	file_proto_agent_proto_rawDescOnce sync.Once
@@ -468,7 +519,7 @@ func file_proto_agent_proto_rawDescGZIP() []byte {
 	return file_proto_agent_proto_rawDescData
 }
 
-var file_proto_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_proto_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_proto_agent_proto_goTypes = []any{
 	(*ListContainersRequest)(nil),  // 0: agent.ListContainersRequest
 	(*Container)(nil),              // 1: agent.Container
@@ -476,20 +527,25 @@ var file_proto_agent_proto_goTypes = []any{
 	(*ListImagesRequest)(nil),      // 3: agent.ListImagesRequest
 	(*Image)(nil),                  // 4: agent.Image
 	(*ListImagesResponse)(nil),     // 5: agent.ListImagesResponse
-	(*StopContainerRequest)(nil),   // 6: agent.StopContainerRequest
-	(*StopContainerResponse)(nil),  // 7: agent.StopContainerResponse
+	(*ContainerRequest)(nil),       // 6: agent.ContainerRequest
+	(*ContainerResponse)(nil),      // 7: agent.ContainerResponse
+	(*RemoveContainerRequest)(nil), // 8: agent.RemoveContainerRequest
 }
 var file_proto_agent_proto_depIdxs = []int32{
 	1, // 0: agent.ListContainersResponse.containers:type_name -> agent.Container
 	4, // 1: agent.ListImagesResponse.images:type_name -> agent.Image
 	0, // 2: agent.AgentService.ListContainers:input_type -> agent.ListContainersRequest
 	3, // 3: agent.AgentService.ListImages:input_type -> agent.ListImagesRequest
-	6, // 4: agent.AgentService.StopContainer:input_type -> agent.StopContainerRequest
-	2, // 5: agent.AgentService.ListContainers:output_type -> agent.ListContainersResponse
-	5, // 6: agent.AgentService.ListImages:output_type -> agent.ListImagesResponse
-	7, // 7: agent.AgentService.StopContainer:output_type -> agent.StopContainerResponse
-	5, // [5:8] is the sub-list for method output_type
-	2, // [2:5] is the sub-list for method input_type
+	6, // 4: agent.AgentService.StopContainer:input_type -> agent.ContainerRequest
+	6, // 5: agent.AgentService.StartContainer:input_type -> agent.ContainerRequest
+	8, // 6: agent.AgentService.RemoveContainer:input_type -> agent.RemoveContainerRequest
+	2, // 7: agent.AgentService.ListContainers:output_type -> agent.ListContainersResponse
+	5, // 8: agent.AgentService.ListImages:output_type -> agent.ListImagesResponse
+	7, // 9: agent.AgentService.StopContainer:output_type -> agent.ContainerResponse
+	7, // 10: agent.AgentService.StartContainer:output_type -> agent.ContainerResponse
+	7, // 11: agent.AgentService.RemoveContainer:output_type -> agent.ContainerResponse
+	7, // [7:12] is the sub-list for method output_type
+	2, // [2:7] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
 	2, // [2:2] is the sub-list for extension extendee
 	0, // [0:2] is the sub-list for field type_name
@@ -506,7 +562,7 @@ func file_proto_agent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_agent_proto_rawDesc), len(file_proto_agent_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

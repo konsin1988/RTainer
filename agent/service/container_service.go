@@ -46,13 +46,25 @@ func (s *ContainerService) ListContainers(ctx context.Context) ([]Container, err
 func (s *ContainerService) StopContainer(
     ctx context.Context,
     id string,
-    timeout int,
 ) error {
 
-    var t *int
-    if timeout > 0 {
-        t = &timeout
-    }
+    return s.docker.StopContainer(ctx, id)
+}
 
-    return s.docker.StopContainer(ctx, id, t)
+
+func (s *ContainerService) StartContainer(
+    ctx context.Context,
+    id string,
+) error {
+
+    return s.docker.StartContainer(ctx, id)
+}
+
+func (s *ContainerService) RemoveContainer(
+		ctx context.Context,
+		id string,
+		force bool,
+		removeVolumes bool,
+) error {
+    return s.docker.RemoveContainer(ctx, id, force, removeVolumes)
 }

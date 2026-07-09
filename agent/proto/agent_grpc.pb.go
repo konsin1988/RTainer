@@ -19,9 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AgentService_ListContainers_FullMethodName = "/agent.AgentService/ListContainers"
-	AgentService_ListImages_FullMethodName     = "/agent.AgentService/ListImages"
-	AgentService_StopContainer_FullMethodName  = "/agent.AgentService/StopContainer"
+	AgentService_ListContainers_FullMethodName  = "/agent.AgentService/ListContainers"
+	AgentService_ListImages_FullMethodName      = "/agent.AgentService/ListImages"
+	AgentService_StopContainer_FullMethodName   = "/agent.AgentService/StopContainer"
+	AgentService_StartContainer_FullMethodName  = "/agent.AgentService/StartContainer"
+	AgentService_RemoveContainer_FullMethodName = "/agent.AgentService/RemoveContainer"
 )
 
 // AgentServiceClient is the client API for AgentService service.
@@ -30,7 +32,9 @@ const (
 type AgentServiceClient interface {
 	ListContainers(ctx context.Context, in *ListContainersRequest, opts ...grpc.CallOption) (*ListContainersResponse, error)
 	ListImages(ctx context.Context, in *ListImagesRequest, opts ...grpc.CallOption) (*ListImagesResponse, error)
-	StopContainer(ctx context.Context, in *StopContainerRequest, opts ...grpc.CallOption) (*StopContainerResponse, error)
+	StopContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
+	StartContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
+	RemoveContainer(ctx context.Context, in *RemoveContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 }
 
 type agentServiceClient struct {
@@ -61,10 +65,30 @@ func (c *agentServiceClient) ListImages(ctx context.Context, in *ListImagesReque
 	return out, nil
 }
 
-func (c *agentServiceClient) StopContainer(ctx context.Context, in *StopContainerRequest, opts ...grpc.CallOption) (*StopContainerResponse, error) {
+func (c *agentServiceClient) StopContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(StopContainerResponse)
+	out := new(ContainerResponse)
 	err := c.cc.Invoke(ctx, AgentService_StopContainer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentServiceClient) StartContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ContainerResponse)
+	err := c.cc.Invoke(ctx, AgentService_StartContainer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentServiceClient) RemoveContainer(ctx context.Context, in *RemoveContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ContainerResponse)
+	err := c.cc.Invoke(ctx, AgentService_RemoveContainer_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +101,9 @@ func (c *agentServiceClient) StopContainer(ctx context.Context, in *StopContaine
 type AgentServiceServer interface {
 	ListContainers(context.Context, *ListContainersRequest) (*ListContainersResponse, error)
 	ListImages(context.Context, *ListImagesRequest) (*ListImagesResponse, error)
-	StopContainer(context.Context, *StopContainerRequest) (*StopContainerResponse, error)
+	StopContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
+	StartContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
+	RemoveContainer(context.Context, *RemoveContainerRequest) (*ContainerResponse, error)
 	mustEmbedUnimplementedAgentServiceServer()
 }
 
@@ -94,8 +120,14 @@ func (UnimplementedAgentServiceServer) ListContainers(context.Context, *ListCont
 func (UnimplementedAgentServiceServer) ListImages(context.Context, *ListImagesRequest) (*ListImagesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListImages not implemented")
 }
-func (UnimplementedAgentServiceServer) StopContainer(context.Context, *StopContainerRequest) (*StopContainerResponse, error) {
+func (UnimplementedAgentServiceServer) StopContainer(context.Context, *ContainerRequest) (*ContainerResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method StopContainer not implemented")
+}
+func (UnimplementedAgentServiceServer) StartContainer(context.Context, *ContainerRequest) (*ContainerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method StartContainer not implemented")
+}
+func (UnimplementedAgentServiceServer) RemoveContainer(context.Context, *RemoveContainerRequest) (*ContainerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RemoveContainer not implemented")
 }
 func (UnimplementedAgentServiceServer) mustEmbedUnimplementedAgentServiceServer() {}
 func (UnimplementedAgentServiceServer) testEmbeddedByValue()                      {}
@@ -155,7 +187,7 @@ func _AgentService_ListImages_Handler(srv interface{}, ctx context.Context, dec 
 }
 
 func _AgentService_StopContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StopContainerRequest)
+	in := new(ContainerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -167,7 +199,43 @@ func _AgentService_StopContainer_Handler(srv interface{}, ctx context.Context, d
 		FullMethod: AgentService_StopContainer_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServiceServer).StopContainer(ctx, req.(*StopContainerRequest))
+		return srv.(AgentServiceServer).StopContainer(ctx, req.(*ContainerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentService_StartContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ContainerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).StartContainer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_StartContainer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).StartContainer(ctx, req.(*ContainerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentService_RemoveContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveContainerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).RemoveContainer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_RemoveContainer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).RemoveContainer(ctx, req.(*RemoveContainerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -190,6 +258,14 @@ var AgentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "StopContainer",
 			Handler:    _AgentService_StopContainer_Handler,
+		},
+		{
+			MethodName: "StartContainer",
+			Handler:    _AgentService_StartContainer_Handler,
+		},
+		{
+			MethodName: "RemoveContainer",
+			Handler:    _AgentService_RemoveContainer_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
