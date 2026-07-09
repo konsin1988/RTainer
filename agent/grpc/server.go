@@ -82,17 +82,47 @@ func (s *Server) ListImages(
 // ------------------------------------
 func (s *Server) StopContainer(
     ctx context.Context,
-    req *pb.StopContainerRequest,
-) (*pb.StopContainerResponse, error) {
+    req *pb.ContainerRequest,
+) (*pb.ContainerResponse, error) {
 
-    err := s.containerSvc.StopContainer(ctx, req.Id, int(req.Timeout))
+    err := s.containerSvc.StopContainer(ctx, req.Id )
     if err != nil {
-        return &pb.StopContainerResponse{
-            Success: false,
-        }, err
+        return &pb.ContainerResponse{}, err
     }
 
-    return &pb.StopContainerResponse{
-        Success: true,
-    }, nil
+    return &pb.ContainerResponse{}, nil
+}
+
+
+// ------------------------------------
+// START CONTAINER
+// ------------------------------------
+func (s *Server) StartContainer(
+    ctx context.Context,
+    req *pb.ContainerRequest,
+) (*pb.ContainerResponse, error) {
+
+    err := s.containerSvc.StartContainer(ctx, req.Id )
+    if err != nil {
+        return &pb.ContainerResponse{}, err
+    }
+
+    return &pb.ContainerResponse{}, nil
+}
+
+
+// ------------------------------------
+// REMOVE CONTAINER
+// ------------------------------------
+func (s *Server) RemoveContainer(
+    ctx context.Context,
+    req *pb.RemoveContainerRequest,
+) (*pb.ContainerResponse, error) {
+
+    err := s.containerSvc.RemoveContainer(ctx, req.Id, req.Force, req.RemoveVolumes)
+    if err != nil {
+        return &pb.ContainerResponse{}, err
+    }
+
+    return &pb.ContainerResponse{}, nil
 }

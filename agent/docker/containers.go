@@ -51,15 +51,8 @@ func (c *Client) ListContainers(
 func (c *Client) StopContainer(
     ctx context.Context,
     id string,
-    timeout *int,
 ) error {
-
-		t := 10 // default timeout
-
-    if timeout != nil {
-				t = *timeout
-    }
-
+		t := 10 
     return c.cli.ContainerStop(
         ctx,
         id,
@@ -67,4 +60,33 @@ func (c *Client) StopContainer(
             Timeout: &t,
         },
     )
+}
+
+
+func (c *Client) StartContainer(
+    ctx context.Context,
+    id string,
+) error {
+    return c.cli.ContainerStart(
+        ctx,
+        id,
+        container.StartOptions{},
+    )
+}
+
+func (c *Client) RemoveContainer(
+	ctx context.Context,
+	id string,
+	force bool,
+	removeVolumes bool,
+) error {
+
+	return c.cli.ContainerRemove(
+		ctx,
+		id,
+		container.RemoveOptions{
+			Force:         force,
+			RemoveVolumes: removeVolumes,
+		},
+	)
 }

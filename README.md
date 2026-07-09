@@ -2,7 +2,7 @@
 
 A lightweight container and infrastructure management platform
 
-Built with:
+### Built with:
 - Go (backend API)
 - React (Vite frontend)
 - PostgreSQL (database)
@@ -10,7 +10,7 @@ Built with:
 - JWT authentication
 - Database migrations (golang-migrate)
 
-🚀 Features (MVP)
+### Features 
 
 - User authentication (JWT-based)
 - Role-based access control (RBAC)
@@ -21,7 +21,7 @@ Built with:
 - PostgreSQL-backed persistence
 - Auto database migrations on startup
 
-🏗️ Architecture
+### Architecture
 
 React (Vite)
 ↓
@@ -31,7 +31,7 @@ PostgreSQL
 ↓
 Docker Engine (via API)
 
-📦 Tech Stack
+### Tech Stack
 
 Backend
 - Go 1.22+
@@ -51,7 +51,7 @@ Infra
 - Docker
 - Docker Compose
 
-📁 Project Structure
+### Project Structure
 
 /config
   config.go
@@ -70,7 +70,7 @@ Infra
 
 main.go
 
-🗄️ Database Schema
+### Database Schema
 
 Core entities:
 - users
@@ -82,15 +82,19 @@ Core entities:
 
 Migrations run automatically on startup.
 
-🐳 Docker Integration
+### Docker Integration
 
 Capabilities:
 - List containers
-- Start/stop containers
+- List images
+- Stop container by ID
+- Start container by ID
+- Delete container by ID
+- Run container (with options)
 - View logs (planned)
 - Execute commands (planned)
 
-📡 API Endpoints
+### API Endpoints
 
 GET /health
 
@@ -101,7 +105,7 @@ POST /containers/:id/stop
 POST /auth/login
 POST /auth/register
 
-🧠 Design Principles
+### Design Principles
 
 - Migration-based schema (no auto ORM sync)
 - Clean layered architecture
@@ -109,23 +113,3 @@ POST /auth/register
 - PostgreSQL relational model
 - Extensible agent-based future design
 
-📈 Roadmap
-
-MVP
-- DB setup
-- Migrations
-- Auth foundation
-- Basic API structure
-
-Next
-- Container management
-- WebSocket logs
-- Docker stats streaming
-- React dashboard
-
-Future
-- Multi-node agents
-- Kubernetes support
-- Keycloak integration
-- Redis event bus
-- GraphQL (optional)
