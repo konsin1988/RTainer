@@ -62,8 +62,7 @@ Core entities:
 
 Migrations run automatically on startup.
 
-### Docker Integration
-
+### Docker Integration (gRPC agent endpoint)
 
 #### CONTAINERS 
 
@@ -114,10 +113,66 @@ grpcurl -plaintext localhost:50051 list
 
 > grpcurl -plaintext -d '{"container_id":"abc123","follow":true}' localhost:50051 agent.AgentService/ViewLogs
 
+
+```inspect container```
+> grpcurl -plaintext -d '{"id":"cbae295e09a0f533d2e1b9a1060de036df854b9730e7a19183cb4da377dad5ca"}' localhost:50051 agent.AgentService/InspectContainer
+
+##### response: 
+> {
+>   "id": "cbae295e09a0f533d2e1b9a1060de036df854b9730e7a19183cb4da377dad5ca",
+>   "name": "/my-test-nginx",
+>   "image": "sha256:a97d82f709e2e0ef35e48a697aec860e12cbf2a0ffbfd95d7701976e81d470ed",
+>   "status": "running",
+>   "ports": [
+>     {
+>       "containerPort": "80/tcp",
+>       "hostIp": "0.0.0.0",
+>       "hostPort": "8019"
+>     },
+>     {
+>       "containerPort": "80/tcp",
+>       "hostIp": "::",
+>       "hostPort": "8019"
+>     }
+>   ],
+>   "mounts": [
+>     {
+>       "source": "/tmp",
+>       "target": "/tmp"
+>     }
+>   ],
+>   "env": [
+>     "ENV=dev",
+>     "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+>     "NGINX_VERSION=1.28.0",
+>     "PKG_RELEASE=1",
+>     "DYNPKG_RELEASE=1",
+>     "NJS_VERSION=0.8.10",
+>     "NJS_RELEASE=1"
+>   ]
+> }
+
+
+```container stats```
+> grpcurl -plaintext -d '{"id":"cbae295e09a0f533d2e1b9a1060de036df854b9730e7a19183cb4da377dad5ca"}' localhost:50051 agent.AgentService/ContainerStats
+
+##### response:
+>{
+>  "memoryUsage": "17657856",
+>  "memoryLimit": "16081117184",
+>  "networkRx": "16799",
+>  "networkTx": "126",
+>  "pids": 13
+>}
+
 #### IMAGES 
 
 ```list```
 > grpcurl -plaintext -d '{}' localhost:50051 agent.AgentService/ListImages
+
+
+```remove```
+> grpcurl -plaintext -d '{"id":"sha256:a97d82f709e2e0ef35e48a697aec860e12cbf2a0ffbfd95d7701976e81d470ed", "force":true }' localhost:50051 agent.AgentService/RemoveImage
 
 
 ### API Endpoints

@@ -99,3 +99,27 @@ func (s *ContainerService) ViewLogs(
     	},
     )
 }
+
+// ------------------------ INSPECT CONTAINER ---------------------
+func (s *ContainerService) InspectContainer(
+    ctx context.Context,
+    req *proto.ContainerRequest,
+) (docker.ContainerInspect, error) {
+
+    return s.docker.InspectContainer(
+        ctx,
+        req.Id,
+    )
+}
+
+// ------------------------ CONTAINER STATS ----------------------
+func (s *ContainerService) ContainerStats(
+    ctx context.Context,
+    req *proto.ContainerRequest,
+) (io.ReadCloser, error) {
+
+    return s.docker.ContainerStats(
+        ctx,
+        req.Id,
+    )
+}

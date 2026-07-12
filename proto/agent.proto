@@ -7,9 +7,14 @@ option go_package = "/agent/proto";
 service AgentService {
   // images
   rpc ListImages(ListImagesRequest) returns (ListImagesResponse);
+  rpc RemoveImage(RemoveImageRequest) returns (RemoveImageResponse);
 
   // containers
   rpc ListContainers(ListContainersRequest) returns (ListContainersResponse);
+  rpc InspectContainer(ContainerRequest) returns (InspectContainerResponse);
+  rpc ContainerStats(ContainerRequest) returns (stream ContainerStatsResponse);
+
+  // containers movements 
   rpc StopContainer(ContainerRequest) returns (ContainerResponse);
   rpc StartContainer(ContainerRequest) returns (ContainerResponse);
   rpc RemoveContainer(RemoveContainerRequest) returns (ContainerResponse);
@@ -53,6 +58,16 @@ message ListImagesResponse {
 }
 
 
+// -------------------------------
+// REMOVE IMAGE 
+// -------------------------------
+message RemoveImageRequest {
+    string id = 1;
+    bool force = 2;
+}
+message RemoveImageResponse {}
+
+
 // ------------------------------
 // STOP, START EXISTING CONTAINER BY ID
 // -----------------------------
@@ -86,7 +101,8 @@ message RunContainerRequest {
 
 message PortBinding {
   string container_port = 1;    // "80/tcp"
-  string host_port = 2;         // "8080"
+  string host_ip = 2;
+  string host_port = 3;         // "8080"
 }
 
 message VolumeBinding {
@@ -114,4 +130,45 @@ enum LogStream {
 message LogMessage {
     string line = 1;
     LogStream stream = 2;
+}
+
+
+// -------------------------------------
+// INSPECT CONTAINER
+// ------------------------------------
+message InspectContainerResponse {
+    string id = 1;
+    string name = 2;
+    string image = 3;
+    string status = 4;
+
+    repeated PortBinding ports = 5;
+    repeated VolumeBinding mounts = 6;
+    repeated string env = 7;
+
+    HealthStatus health = 8;
+}
+
+message HealthStatus {
+    string status = 1;
+    int32 failing_streak = 2;
+    repeated string logs = 3;
+}
+
+// ---------------------------------------
+// CONTAINER STATS
+// ---------------------------------------
+message ContainerStatsResponse {
+  double cpu_percent = 1;
+
+  uint64 memory_usage = 2;
+  uint64 memory_limit = 3;
+
+  uint64 network_rx = 4;
+  uint64 network_tx = 5;
+
+  uint64 block_read = 6;
+  uint64 block_write = 7;
+
+  uint32 pids = 8;
 }
