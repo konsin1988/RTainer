@@ -23,5 +23,5 @@ down:
 
 
 re:
-	-docker image rm konsin1988/rtainer-agent:0.0.1;
+	-docker image rm konsin1988/$(PROJECT_NAME)-agent:$(PROJECT_VERSION);
 	docker compose -f docker-compose.agent.yml build;

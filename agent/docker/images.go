@@ -33,3 +33,22 @@ func (c *Client) ListImages(ctx context.Context) ([]Image, error) {
 
     return result, nil
 }
+
+
+// --------------------------- REMOVE IMAGE ------------------------------
+func (c *Client) RemoveImage(
+    ctx context.Context,
+    id string,
+    force bool,
+) error {
+
+    _, err := c.cli.ImageRemove(
+        ctx,
+        id,
+        image.RemoveOptions{
+            Force: force,
+        },
+    )
+
+    return err
+}

@@ -4,6 +4,7 @@ import (
     "context"
 
     "konsin1988/agent/docker"
+		"konsin1988/agent/proto"
 )
 
 type ImageService struct {
@@ -21,6 +22,7 @@ type Image struct {
     Created   int64
 }
 
+// ----------------------------- LIST IMAGES -------------------------------
 func (s *ImageService) ListImages(ctx context.Context) ([]Image, error) {
     images, err := s.docker.ListImages(ctx)
     if err != nil {
@@ -30,13 +32,22 @@ func (s *ImageService) ListImages(ctx context.Context) ([]Image, error) {
     filtered := make([]Image, 0, len(images))
 
     for _, c := range images {
-        // example rule: ignore dead containers
-        //if c.Status == "Dead" {
-        //    continue
-        //}
-
         filtered = append(filtered, Image(c))
     }
 
     return filtered, nil
+}
+
+
+// -------------------------------- REMOVE IMAGE ----------------------------
+func (s *ImageService) RemoveImage(
+    ctx context.Context,
+    req *proto.RemoveImageRequest,
+) error {
+
+    return s.docker.RemoveImage(
+        ctx,
+        req.Id,
+        req.Force,
+    )
 }
