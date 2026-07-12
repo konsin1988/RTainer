@@ -29,6 +29,9 @@ const (
 	AgentService_RemoveContainer_FullMethodName  = "/agent.AgentService/RemoveContainer"
 	AgentService_RunContainer_FullMethodName     = "/agent.AgentService/RunContainer"
 	AgentService_ViewLogs_FullMethodName         = "/agent.AgentService/ViewLogs"
+	AgentService_ListNetworks_FullMethodName     = "/agent.AgentService/ListNetworks"
+	AgentService_CreateNetwork_FullMethodName    = "/agent.AgentService/CreateNetwork"
+	AgentService_RemoveNetwork_FullMethodName    = "/agent.AgentService/RemoveNetwork"
 )
 
 // AgentServiceClient is the client API for AgentService service.
@@ -49,6 +52,10 @@ type AgentServiceClient interface {
 	RunContainer(ctx context.Context, in *RunContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 	// logs
 	ViewLogs(ctx context.Context, in *ViewLogsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error)
+	// network
+	ListNetworks(ctx context.Context, in *ListNetworksRequest, opts ...grpc.CallOption) (*ListNetworksResponse, error)
+	CreateNetwork(ctx context.Context, in *CreateNetworkRequest, opts ...grpc.CallOption) (*CreateNetworkResponse, error)
+	RemoveNetwork(ctx context.Context, in *RemoveNetworkRequest, opts ...grpc.CallOption) (*RemoveNetworkResponse, error)
 }
 
 type agentServiceClient struct {
@@ -177,6 +184,36 @@ func (c *agentServiceClient) ViewLogs(ctx context.Context, in *ViewLogsRequest, 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type AgentService_ViewLogsClient = grpc.ServerStreamingClient[LogMessage]
 
+func (c *agentServiceClient) ListNetworks(ctx context.Context, in *ListNetworksRequest, opts ...grpc.CallOption) (*ListNetworksResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListNetworksResponse)
+	err := c.cc.Invoke(ctx, AgentService_ListNetworks_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentServiceClient) CreateNetwork(ctx context.Context, in *CreateNetworkRequest, opts ...grpc.CallOption) (*CreateNetworkResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateNetworkResponse)
+	err := c.cc.Invoke(ctx, AgentService_CreateNetwork_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentServiceClient) RemoveNetwork(ctx context.Context, in *RemoveNetworkRequest, opts ...grpc.CallOption) (*RemoveNetworkResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RemoveNetworkResponse)
+	err := c.cc.Invoke(ctx, AgentService_RemoveNetwork_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AgentServiceServer is the server API for AgentService service.
 // All implementations must embed UnimplementedAgentServiceServer
 // for forward compatibility.
@@ -195,6 +232,10 @@ type AgentServiceServer interface {
 	RunContainer(context.Context, *RunContainerRequest) (*ContainerResponse, error)
 	// logs
 	ViewLogs(*ViewLogsRequest, grpc.ServerStreamingServer[LogMessage]) error
+	// network
+	ListNetworks(context.Context, *ListNetworksRequest) (*ListNetworksResponse, error)
+	CreateNetwork(context.Context, *CreateNetworkRequest) (*CreateNetworkResponse, error)
+	RemoveNetwork(context.Context, *RemoveNetworkRequest) (*RemoveNetworkResponse, error)
 	mustEmbedUnimplementedAgentServiceServer()
 }
 
@@ -234,6 +275,15 @@ func (UnimplementedAgentServiceServer) RunContainer(context.Context, *RunContain
 }
 func (UnimplementedAgentServiceServer) ViewLogs(*ViewLogsRequest, grpc.ServerStreamingServer[LogMessage]) error {
 	return status.Error(codes.Unimplemented, "method ViewLogs not implemented")
+}
+func (UnimplementedAgentServiceServer) ListNetworks(context.Context, *ListNetworksRequest) (*ListNetworksResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListNetworks not implemented")
+}
+func (UnimplementedAgentServiceServer) CreateNetwork(context.Context, *CreateNetworkRequest) (*CreateNetworkResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateNetwork not implemented")
+}
+func (UnimplementedAgentServiceServer) RemoveNetwork(context.Context, *RemoveNetworkRequest) (*RemoveNetworkResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RemoveNetwork not implemented")
 }
 func (UnimplementedAgentServiceServer) mustEmbedUnimplementedAgentServiceServer() {}
 func (UnimplementedAgentServiceServer) testEmbeddedByValue()                      {}
@@ -422,6 +472,60 @@ func _AgentService_ViewLogs_Handler(srv interface{}, stream grpc.ServerStream) e
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type AgentService_ViewLogsServer = grpc.ServerStreamingServer[LogMessage]
 
+func _AgentService_ListNetworks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListNetworksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).ListNetworks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_ListNetworks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).ListNetworks(ctx, req.(*ListNetworksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentService_CreateNetwork_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateNetworkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).CreateNetwork(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_CreateNetwork_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).CreateNetwork(ctx, req.(*CreateNetworkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentService_RemoveNetwork_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveNetworkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).RemoveNetwork(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_RemoveNetwork_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).RemoveNetwork(ctx, req.(*RemoveNetworkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AgentService_ServiceDesc is the grpc.ServiceDesc for AgentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -460,6 +564,18 @@ var AgentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RunContainer",
 			Handler:    _AgentService_RunContainer_Handler,
+		},
+		{
+			MethodName: "ListNetworks",
+			Handler:    _AgentService_ListNetworks_Handler,
+		},
+		{
+			MethodName: "CreateNetwork",
+			Handler:    _AgentService_CreateNetwork_Handler,
+		},
+		{
+			MethodName: "RemoveNetwork",
+			Handler:    _AgentService_RemoveNetwork_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
