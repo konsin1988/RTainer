@@ -1,13 +1,18 @@
 package grpcserver
 
 import (
-    "context"
-    "google.golang.org/grpc"
-		"strings"
 		"bufio"
+    "context"
+		"io"
+		"log"
+		"strings"
+		"sync"
 
     pb "konsin1988/agent/proto"
     "konsin1988/agent/service"
+
+		"github.com/docker/docker/pkg/stdcopy"
+    "google.golang.org/grpc"
 )
 
 type Server struct {
@@ -148,6 +153,12 @@ func (s *Server) RunContainer(
 // --------------------------------------
 // VIEW LOGS 
 // ---------------------------------------
+
+type logEntry struct {
+    line   string
+    stream pb.LogStream
+}
+
 func (s *Server) ViewLogs(
     req *pb.ViewLogsRequest,
     stream pb.AgentService_ViewLogsServer,
@@ -159,15 +170,82 @@ func (s *Server) ViewLogs(
     }
     defer reader.Close()
 
-    scanner := bufio.NewScanner(reader)
+		stdoutReader, stdoutWriter := io.Pipe()
+		stderrReader, stderrWriter := io.Pipe()
 
-    for scanner.Scan() {
-        if err := stream.Send(&pb.LogMessage{
-            Line: scanner.Text(),
-        }); err != nil {
-            return err
-        }
-    }
+		logs := make(chan logEntry)
 
-    return scanner.Err()
+		var wg sync.WaitGroup
+		wg.Add(2)
+
+		go func() {
+		    defer stdoutWriter.Close()
+		    defer stderrWriter.Close()
+		
+		    _, err := stdcopy.StdCopy(stdoutWriter, stderrWriter, reader)
+		    if err != nil {
+		        stdoutWriter.CloseWithError(err)
+		        stderrWriter.CloseWithError(err)
+		    }
+		}()
+
+		go func() {
+				defer wg.Done()
+
+		    scanner := bufio.NewScanner(stdoutReader)
+		
+		    for scanner.Scan() {
+						select {
+						    case logs <- logEntry{
+						        line:   scanner.Text(),
+						        stream: pb.LogStream_STDOUT,
+						    }:
+						    case <-stream.Context().Done():
+						        return
+						    }
+		    }
+
+				if err := scanner.Err(); err != nil && stream.Context().Err() == nil {
+				    log.Printf("stdout scanner error: %v", err)
+				}
+		}()
+
+		go func() {
+				defer wg.Done()
+
+				scanner := bufio.NewScanner(stderrReader)
+
+				for scanner.Scan() {
+						select {
+						case logs <- logEntry{
+						    line: scanner.Text(),
+						    stream: pb.LogStream_STDERR,
+						}:
+						case <-stream.Context().Done():
+						    return
+						}
+    		}
+
+				if err := scanner.Err(); err != nil && stream.Context().Err() == nil {
+				    log.Printf("stderr scanner error: %v", err)
+				}
+		}()
+
+
+		go func() {
+		    wg.Wait()
+		    close(logs)
+		}()
+
+		for entry := range logs {
+		    err := stream.Send(&pb.LogMessage{
+		        Line:   entry.line,
+		        Stream: entry.stream,
+		    })
+		    if err != nil {
+		        return err
+		    }
+		}
+
+		return nil
 }

@@ -105,6 +105,13 @@ message ViewLogsRequest {
   bool timestamps = 4;
 }
 
+enum LogStream {
+    LOG_STREAM_UNSPECIFIED = 0;
+    STDOUT = 1;
+    STDERR = 2;
+}
+
 message LogMessage {
-  string line = 1;
+    string line = 1;
+    LogStream stream = 2;
 }

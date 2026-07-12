@@ -21,6 +21,55 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type LogStream int32
+
+const (
+	LogStream_LOG_STREAM_UNSPECIFIED LogStream = 0
+	LogStream_STDOUT                 LogStream = 1
+	LogStream_STDERR                 LogStream = 2
+)
+
+// Enum value maps for LogStream.
+var (
+	LogStream_name = map[int32]string{
+		0: "LOG_STREAM_UNSPECIFIED",
+		1: "STDOUT",
+		2: "STDERR",
+	}
+	LogStream_value = map[string]int32{
+		"LOG_STREAM_UNSPECIFIED": 0,
+		"STDOUT":                 1,
+		"STDERR":                 2,
+	}
+)
+
+func (x LogStream) Enum() *LogStream {
+	p := new(LogStream)
+	*p = x
+	return p
+}
+
+func (x LogStream) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (LogStream) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_agent_proto_enumTypes[0].Descriptor()
+}
+
+func (LogStream) Type() protoreflect.EnumType {
+	return &file_proto_agent_proto_enumTypes[0]
+}
+
+func (x LogStream) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use LogStream.Descriptor instead.
+func (LogStream) EnumDescriptor() ([]byte, []int) {
+	return file_proto_agent_proto_rawDescGZIP(), []int{0}
+}
+
 // ----------------------------
 // LIST CONTAINERS
 // ----------------------------
@@ -750,6 +799,7 @@ func (x *ViewLogsRequest) GetTimestamps() bool {
 type LogMessage struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Line          string                 `protobuf:"bytes,1,opt,name=line,proto3" json:"line,omitempty"`
+	Stream        LogStream              `protobuf:"varint,2,opt,name=stream,proto3,enum=agent.LogStream" json:"stream,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -789,6 +839,13 @@ func (x *LogMessage) GetLine() string {
 		return x.Line
 	}
 	return ""
+}
+
+func (x *LogMessage) GetStream() LogStream {
+	if x != nil {
+		return x.Stream
+	}
+	return LogStream_LOG_STREAM_UNSPECIFIED
 }
 
 var File_proto_agent_proto protoreflect.FileDescriptor
@@ -842,10 +899,17 @@ const file_proto_agent_proto_rawDesc = "" +
 	"\x04tail\x18\x03 \x01(\rR\x04tail\x12\x1e\n" +
 	"\n" +
 	"timestamps\x18\x04 \x01(\bR\n" +
-	"timestamps\" \n" +
+	"timestamps\"J\n" +
 	"\n" +
 	"LogMessage\x12\x12\n" +
-	"\x04line\x18\x01 \x01(\tR\x04line2\xf4\x03\n" +
+	"\x04line\x18\x01 \x01(\tR\x04line\x12(\n" +
+	"\x06stream\x18\x02 \x01(\x0e2\x10.agent.LogStreamR\x06stream*?\n" +
+	"\tLogStream\x12\x1a\n" +
+	"\x16LOG_STREAM_UNSPECIFIED\x10\x00\x12\n" +
+	"\n" +
+	"\x06STDOUT\x10\x01\x12\n" +
+	"\n" +
+	"\x06STDERR\x10\x022\xf4\x03\n" +
 	"\fAgentService\x12A\n" +
 	"\n" +
 	"ListImages\x12\x18.agent.ListImagesRequest\x1a\x19.agent.ListImagesResponse\x12M\n" +
@@ -868,47 +932,50 @@ func file_proto_agent_proto_rawDescGZIP() []byte {
 	return file_proto_agent_proto_rawDescData
 }
 
+var file_proto_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_proto_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_proto_agent_proto_goTypes = []any{
-	(*ListContainersRequest)(nil),  // 0: agent.ListContainersRequest
-	(*Container)(nil),              // 1: agent.Container
-	(*ListContainersResponse)(nil), // 2: agent.ListContainersResponse
-	(*ListImagesRequest)(nil),      // 3: agent.ListImagesRequest
-	(*Image)(nil),                  // 4: agent.Image
-	(*ListImagesResponse)(nil),     // 5: agent.ListImagesResponse
-	(*ContainerRequest)(nil),       // 6: agent.ContainerRequest
-	(*ContainerResponse)(nil),      // 7: agent.ContainerResponse
-	(*RemoveContainerRequest)(nil), // 8: agent.RemoveContainerRequest
-	(*RunContainerRequest)(nil),    // 9: agent.RunContainerRequest
-	(*PortBinding)(nil),            // 10: agent.PortBinding
-	(*VolumeBinding)(nil),          // 11: agent.VolumeBinding
-	(*ViewLogsRequest)(nil),        // 12: agent.ViewLogsRequest
-	(*LogMessage)(nil),             // 13: agent.LogMessage
+	(LogStream)(0),                 // 0: agent.LogStream
+	(*ListContainersRequest)(nil),  // 1: agent.ListContainersRequest
+	(*Container)(nil),              // 2: agent.Container
+	(*ListContainersResponse)(nil), // 3: agent.ListContainersResponse
+	(*ListImagesRequest)(nil),      // 4: agent.ListImagesRequest
+	(*Image)(nil),                  // 5: agent.Image
+	(*ListImagesResponse)(nil),     // 6: agent.ListImagesResponse
+	(*ContainerRequest)(nil),       // 7: agent.ContainerRequest
+	(*ContainerResponse)(nil),      // 8: agent.ContainerResponse
+	(*RemoveContainerRequest)(nil), // 9: agent.RemoveContainerRequest
+	(*RunContainerRequest)(nil),    // 10: agent.RunContainerRequest
+	(*PortBinding)(nil),            // 11: agent.PortBinding
+	(*VolumeBinding)(nil),          // 12: agent.VolumeBinding
+	(*ViewLogsRequest)(nil),        // 13: agent.ViewLogsRequest
+	(*LogMessage)(nil),             // 14: agent.LogMessage
 }
 var file_proto_agent_proto_depIdxs = []int32{
-	1,  // 0: agent.ListContainersResponse.containers:type_name -> agent.Container
-	4,  // 1: agent.ListImagesResponse.images:type_name -> agent.Image
-	10, // 2: agent.RunContainerRequest.ports:type_name -> agent.PortBinding
-	11, // 3: agent.RunContainerRequest.volumes:type_name -> agent.VolumeBinding
-	3,  // 4: agent.AgentService.ListImages:input_type -> agent.ListImagesRequest
-	0,  // 5: agent.AgentService.ListContainers:input_type -> agent.ListContainersRequest
-	6,  // 6: agent.AgentService.StopContainer:input_type -> agent.ContainerRequest
-	6,  // 7: agent.AgentService.StartContainer:input_type -> agent.ContainerRequest
-	8,  // 8: agent.AgentService.RemoveContainer:input_type -> agent.RemoveContainerRequest
-	9,  // 9: agent.AgentService.RunContainer:input_type -> agent.RunContainerRequest
-	12, // 10: agent.AgentService.ViewLogs:input_type -> agent.ViewLogsRequest
-	5,  // 11: agent.AgentService.ListImages:output_type -> agent.ListImagesResponse
-	2,  // 12: agent.AgentService.ListContainers:output_type -> agent.ListContainersResponse
-	7,  // 13: agent.AgentService.StopContainer:output_type -> agent.ContainerResponse
-	7,  // 14: agent.AgentService.StartContainer:output_type -> agent.ContainerResponse
-	7,  // 15: agent.AgentService.RemoveContainer:output_type -> agent.ContainerResponse
-	7,  // 16: agent.AgentService.RunContainer:output_type -> agent.ContainerResponse
-	13, // 17: agent.AgentService.ViewLogs:output_type -> agent.LogMessage
-	11, // [11:18] is the sub-list for method output_type
-	4,  // [4:11] is the sub-list for method input_type
-	4,  // [4:4] is the sub-list for extension type_name
-	4,  // [4:4] is the sub-list for extension extendee
-	0,  // [0:4] is the sub-list for field type_name
+	2,  // 0: agent.ListContainersResponse.containers:type_name -> agent.Container
+	5,  // 1: agent.ListImagesResponse.images:type_name -> agent.Image
+	11, // 2: agent.RunContainerRequest.ports:type_name -> agent.PortBinding
+	12, // 3: agent.RunContainerRequest.volumes:type_name -> agent.VolumeBinding
+	0,  // 4: agent.LogMessage.stream:type_name -> agent.LogStream
+	4,  // 5: agent.AgentService.ListImages:input_type -> agent.ListImagesRequest
+	1,  // 6: agent.AgentService.ListContainers:input_type -> agent.ListContainersRequest
+	7,  // 7: agent.AgentService.StopContainer:input_type -> agent.ContainerRequest
+	7,  // 8: agent.AgentService.StartContainer:input_type -> agent.ContainerRequest
+	9,  // 9: agent.AgentService.RemoveContainer:input_type -> agent.RemoveContainerRequest
+	10, // 10: agent.AgentService.RunContainer:input_type -> agent.RunContainerRequest
+	13, // 11: agent.AgentService.ViewLogs:input_type -> agent.ViewLogsRequest
+	6,  // 12: agent.AgentService.ListImages:output_type -> agent.ListImagesResponse
+	3,  // 13: agent.AgentService.ListContainers:output_type -> agent.ListContainersResponse
+	8,  // 14: agent.AgentService.StopContainer:output_type -> agent.ContainerResponse
+	8,  // 15: agent.AgentService.StartContainer:output_type -> agent.ContainerResponse
+	8,  // 16: agent.AgentService.RemoveContainer:output_type -> agent.ContainerResponse
+	8,  // 17: agent.AgentService.RunContainer:output_type -> agent.ContainerResponse
+	14, // 18: agent.AgentService.ViewLogs:output_type -> agent.LogMessage
+	12, // [12:19] is the sub-list for method output_type
+	5,  // [5:12] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_proto_agent_proto_init() }
@@ -921,13 +988,14 @@ func file_proto_agent_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_agent_proto_rawDesc), len(file_proto_agent_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_proto_agent_proto_goTypes,
 		DependencyIndexes: file_proto_agent_proto_depIdxs,
+		EnumInfos:         file_proto_agent_proto_enumTypes,
 		MessageInfos:      file_proto_agent_proto_msgTypes,
 	}.Build()
 	File_proto_agent_proto = out.File
