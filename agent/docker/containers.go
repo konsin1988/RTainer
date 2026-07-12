@@ -181,12 +181,18 @@ func (c *Client) ContainerLogs(
 		req LogsRequest,
 ) (io.ReadCloser, error) {
 
+		tail := "all"
+		
+		if req.Tail > 0 {
+		    tail = strconv.Itoa(req.Tail)
+		}
+
     return c.cli.ContainerLogs(ctx, req.ContainerID, 
 		container.LogsOptions{
             ShowStdout: true,
             ShowStderr: true,
             Follow:     req.Follow,
-            Tail:       strconv.Itoa(req.Tail),
+            Tail:       tail,
             Timestamps: req.Timestamps,
         })
 }
