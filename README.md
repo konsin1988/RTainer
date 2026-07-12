@@ -49,26 +49,6 @@ Frontend
 
 Infra
 - Docker
-- Docker Compose
-
-### Project Structure
-
-/config
-  config.go
-
-/db
-  postgres.go
-  migrate.go
-  health
-
-/migrations
-  000001_init_schema.up.sql
-  000001_init_schema.down.sql
-
-/transport
-  handlers.go
-
-main.go
 
 ### Database Schema
 
@@ -84,15 +64,61 @@ Migrations run automatically on startup.
 
 ### Docker Integration
 
+
+#### CONTAINERS 
+
+grpcurl -plaintext localhost:50051 list   
+
+> list
+grpcurl -plaintext -d '{}' localhost:50051 agent.AgentService/ListContainers
+
+> start / stop
+grpcurl -plaintext -d '{"id":"<container_id>"}' localhost:50051 agent.AgentService/StopContainer
+
+> delete
+grpcurl -plaintext -d '{"id":"5ad2dd0ea57b152ded0be23a713d2d10a8cdff0953f87110d0a68dc628039d93", "force": "true", "remove_volumes": "false"}' localhost:50051 agent.AgentService/RemoveContainer
+
+> run
+grpcurl -plaintext -d '{"image_id":"5ad2dd0ea57b152ded0be23a713d2d10a8cdff0953f87110d0a68dc628039d93","name":"my-test-container"}' localhost:50051 agent.AgentService/RunContainer
+
+>grpcurl -plaintext -d '{
+>  "image_id": "sha256:a97d82f709e2e0ef35e48a697aec860e12cbf2a0ffbfd95d7701976e81d470ed",
+>  "name": "my-test-nginx",
+>  "command": [
+>    "nginx",
+>    "-g", 
+>    "daemon off;"
+>  ],
+>  "env": [
+>    "ENV=dev"
+>  ],
+>  "ports": [
+>    {
+>      "container_port": "80/tcp",
+>      "host_port": "8019"
+>    }
+>  ],
+>  "volumes": [
+>    {
+>      "source": "/tmp",
+>      "target": "/tmp"
+>    }
+>  ],
+>  "tty": false,
+>  "detach": true
+>}' localhost:50051 agent.AgentService/RunContainer
+
+
+> logs
+grpcurl -plaintext -d '{"container_id":"abc123","tail":20}' localhost:50051 agent.AgentService/ViewLogs
+grpcurl -plaintext -d '{"container_id":"abc123","follow":true}' localhost:50051 agent.AgentService/ViewLogs
+
+#### IMAGES 
+
+> list
+grpcurl -plaintext -d '{}' localhost:50051 agent.AgentService/ListImages
 Capabilities:
-- List containers
-- List images
-- Stop container by ID
-- Start container by ID
-- Delete container by ID
-- Run container (with options)
-- View logs (planned)
-- Execute commands (planned)
+
 
 ### API Endpoints
 

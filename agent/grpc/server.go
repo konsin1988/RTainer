@@ -4,6 +4,7 @@ import (
     "context"
     "google.golang.org/grpc"
 		"strings"
+		"bufio"
 
     pb "konsin1988/agent/proto"
     "konsin1988/agent/service"
@@ -125,4 +126,48 @@ func (s *Server) RemoveContainer(
     }
 
     return &pb.ContainerResponse{}, nil
+}
+
+
+// ------------------------------------
+// RUN CONTAINER
+// ------------------------------------
+func (s *Server) RunContainer(
+    ctx context.Context,
+    req *pb.RunContainerRequest,
+) (*pb.ContainerResponse, error) {
+
+    err := s.containerSvc.RunContainer(ctx, req)
+    if err != nil {
+        return &pb.ContainerResponse{}, err
+    }
+
+    return &pb.ContainerResponse{}, nil
+}
+
+// --------------------------------------
+// VIEW LOGS 
+// ---------------------------------------
+func (s *Server) ViewLogs(
+    req *pb.ViewLogsRequest,
+    stream pb.AgentService_ViewLogsServer,
+) error {
+
+    reader, err := s.containerSvc.ViewLogs(stream.Context(), req)
+    if err != nil {
+        return err
+    }
+    defer reader.Close()
+
+    scanner := bufio.NewScanner(reader)
+
+    for scanner.Scan() {
+        if err := stream.Send(&pb.LogMessage{
+            Line: scanner.Text(),
+        }); err != nil {
+            return err
+        }
+    }
+
+    return scanner.Err()
 }

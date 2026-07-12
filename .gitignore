@@ -10,6 +10,8 @@
 info/
 volumes/
 TODO.md
+AGENT_CONTEXT.md
+opencode.json
 
 # =========================
 # Node / Vite (frontend)

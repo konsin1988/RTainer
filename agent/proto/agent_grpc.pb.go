@@ -19,22 +19,29 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AgentService_ListContainers_FullMethodName  = "/agent.AgentService/ListContainers"
 	AgentService_ListImages_FullMethodName      = "/agent.AgentService/ListImages"
+	AgentService_ListContainers_FullMethodName  = "/agent.AgentService/ListContainers"
 	AgentService_StopContainer_FullMethodName   = "/agent.AgentService/StopContainer"
 	AgentService_StartContainer_FullMethodName  = "/agent.AgentService/StartContainer"
 	AgentService_RemoveContainer_FullMethodName = "/agent.AgentService/RemoveContainer"
+	AgentService_RunContainer_FullMethodName    = "/agent.AgentService/RunContainer"
+	AgentService_ViewLogs_FullMethodName        = "/agent.AgentService/ViewLogs"
 )
 
 // AgentServiceClient is the client API for AgentService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AgentServiceClient interface {
-	ListContainers(ctx context.Context, in *ListContainersRequest, opts ...grpc.CallOption) (*ListContainersResponse, error)
+	// images
 	ListImages(ctx context.Context, in *ListImagesRequest, opts ...grpc.CallOption) (*ListImagesResponse, error)
+	// containers
+	ListContainers(ctx context.Context, in *ListContainersRequest, opts ...grpc.CallOption) (*ListContainersResponse, error)
 	StopContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 	StartContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 	RemoveContainer(ctx context.Context, in *RemoveContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
+	RunContainer(ctx context.Context, in *RunContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
+	// logs
+	ViewLogs(ctx context.Context, in *ViewLogsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error)
 }
 
 type agentServiceClient struct {
@@ -45,20 +52,20 @@ func NewAgentServiceClient(cc grpc.ClientConnInterface) AgentServiceClient {
 	return &agentServiceClient{cc}
 }
 
-func (c *agentServiceClient) ListContainers(ctx context.Context, in *ListContainersRequest, opts ...grpc.CallOption) (*ListContainersResponse, error) {
+func (c *agentServiceClient) ListImages(ctx context.Context, in *ListImagesRequest, opts ...grpc.CallOption) (*ListImagesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListContainersResponse)
-	err := c.cc.Invoke(ctx, AgentService_ListContainers_FullMethodName, in, out, cOpts...)
+	out := new(ListImagesResponse)
+	err := c.cc.Invoke(ctx, AgentService_ListImages_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *agentServiceClient) ListImages(ctx context.Context, in *ListImagesRequest, opts ...grpc.CallOption) (*ListImagesResponse, error) {
+func (c *agentServiceClient) ListContainers(ctx context.Context, in *ListContainersRequest, opts ...grpc.CallOption) (*ListContainersResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListImagesResponse)
-	err := c.cc.Invoke(ctx, AgentService_ListImages_FullMethodName, in, out, cOpts...)
+	out := new(ListContainersResponse)
+	err := c.cc.Invoke(ctx, AgentService_ListContainers_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -95,15 +102,49 @@ func (c *agentServiceClient) RemoveContainer(ctx context.Context, in *RemoveCont
 	return out, nil
 }
 
+func (c *agentServiceClient) RunContainer(ctx context.Context, in *RunContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ContainerResponse)
+	err := c.cc.Invoke(ctx, AgentService_RunContainer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentServiceClient) ViewLogs(ctx context.Context, in *ViewLogsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &AgentService_ServiceDesc.Streams[0], AgentService_ViewLogs_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[ViewLogsRequest, LogMessage]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type AgentService_ViewLogsClient = grpc.ServerStreamingClient[LogMessage]
+
 // AgentServiceServer is the server API for AgentService service.
 // All implementations must embed UnimplementedAgentServiceServer
 // for forward compatibility.
 type AgentServiceServer interface {
-	ListContainers(context.Context, *ListContainersRequest) (*ListContainersResponse, error)
+	// images
 	ListImages(context.Context, *ListImagesRequest) (*ListImagesResponse, error)
+	// containers
+	ListContainers(context.Context, *ListContainersRequest) (*ListContainersResponse, error)
 	StopContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
 	StartContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
 	RemoveContainer(context.Context, *RemoveContainerRequest) (*ContainerResponse, error)
+	RunContainer(context.Context, *RunContainerRequest) (*ContainerResponse, error)
+	// logs
+	ViewLogs(*ViewLogsRequest, grpc.ServerStreamingServer[LogMessage]) error
 	mustEmbedUnimplementedAgentServiceServer()
 }
 
@@ -114,11 +155,11 @@ type AgentServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAgentServiceServer struct{}
 
-func (UnimplementedAgentServiceServer) ListContainers(context.Context, *ListContainersRequest) (*ListContainersResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method ListContainers not implemented")
-}
 func (UnimplementedAgentServiceServer) ListImages(context.Context, *ListImagesRequest) (*ListImagesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListImages not implemented")
+}
+func (UnimplementedAgentServiceServer) ListContainers(context.Context, *ListContainersRequest) (*ListContainersResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListContainers not implemented")
 }
 func (UnimplementedAgentServiceServer) StopContainer(context.Context, *ContainerRequest) (*ContainerResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method StopContainer not implemented")
@@ -128,6 +169,12 @@ func (UnimplementedAgentServiceServer) StartContainer(context.Context, *Containe
 }
 func (UnimplementedAgentServiceServer) RemoveContainer(context.Context, *RemoveContainerRequest) (*ContainerResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RemoveContainer not implemented")
+}
+func (UnimplementedAgentServiceServer) RunContainer(context.Context, *RunContainerRequest) (*ContainerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RunContainer not implemented")
+}
+func (UnimplementedAgentServiceServer) ViewLogs(*ViewLogsRequest, grpc.ServerStreamingServer[LogMessage]) error {
+	return status.Error(codes.Unimplemented, "method ViewLogs not implemented")
 }
 func (UnimplementedAgentServiceServer) mustEmbedUnimplementedAgentServiceServer() {}
 func (UnimplementedAgentServiceServer) testEmbeddedByValue()                      {}
@@ -150,24 +197,6 @@ func RegisterAgentServiceServer(s grpc.ServiceRegistrar, srv AgentServiceServer)
 	s.RegisterService(&AgentService_ServiceDesc, srv)
 }
 
-func _AgentService_ListContainers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListContainersRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServiceServer).ListContainers(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AgentService_ListContainers_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServiceServer).ListContainers(ctx, req.(*ListContainersRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _AgentService_ListImages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListImagesRequest)
 	if err := dec(in); err != nil {
@@ -182,6 +211,24 @@ func _AgentService_ListImages_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AgentServiceServer).ListImages(ctx, req.(*ListImagesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentService_ListContainers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListContainersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).ListContainers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_ListContainers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).ListContainers(ctx, req.(*ListContainersRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -240,6 +287,35 @@ func _AgentService_RemoveContainer_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AgentService_RunContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RunContainerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).RunContainer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_RunContainer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).RunContainer(ctx, req.(*RunContainerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentService_ViewLogs_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ViewLogsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(AgentServiceServer).ViewLogs(m, &grpc.GenericServerStream[ViewLogsRequest, LogMessage]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type AgentService_ViewLogsServer = grpc.ServerStreamingServer[LogMessage]
+
 // AgentService_ServiceDesc is the grpc.ServiceDesc for AgentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -248,12 +324,12 @@ var AgentService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AgentServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "ListContainers",
-			Handler:    _AgentService_ListContainers_Handler,
-		},
-		{
 			MethodName: "ListImages",
 			Handler:    _AgentService_ListImages_Handler,
+		},
+		{
+			MethodName: "ListContainers",
+			Handler:    _AgentService_ListContainers_Handler,
 		},
 		{
 			MethodName: "StopContainer",
@@ -267,7 +343,17 @@ var AgentService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "RemoveContainer",
 			Handler:    _AgentService_RemoveContainer_Handler,
 		},
+		{
+			MethodName: "RunContainer",
+			Handler:    _AgentService_RunContainer_Handler,
+		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "ViewLogs",
+			Handler:       _AgentService_ViewLogs_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "proto/agent.proto",
 }
