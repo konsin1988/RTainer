@@ -13,6 +13,10 @@ service AgentService {
   rpc StopContainer(ContainerRequest) returns (ContainerResponse);
   rpc StartContainer(ContainerRequest) returns (ContainerResponse);
   rpc RemoveContainer(RemoveContainerRequest) returns (ContainerResponse);
+  rpc RunContainer(RunContainerRequest) returns (ContainerResponse);
+
+  // logs
+  rpc ViewLogs(ViewLogsRequest) returns (stream LogMessage);
 }
 
 // ----------------------------
@@ -65,4 +69,42 @@ message RemoveContainerRequest {
     bool remove_volumes = 3;
 }
 
+// --------------------------------
+// RUN CONTAINER
+// ---------------------------------
+message RunContainerRequest {
+  string image_id = 1;
 
+  string name = 2;
+  repeated string command = 3;
+  repeated string env = 4;      // ["KEY=value"]
+  repeated PortBinding ports = 5;
+  repeated VolumeBinding volumes = 6;
+  bool tty = 7;
+  bool detach = 8;
+}
+
+message PortBinding {
+  string container_port = 1;    // "80/tcp"
+  string host_port = 2;         // "8080"
+}
+
+message VolumeBinding {
+  string source = 1;
+  string target = 2;
+}
+
+// ------------------------------------
+// VIEW LOGS
+// --------------------------------------
+message ViewLogsRequest {
+  string container_id = 1;
+
+  bool follow = 2;            // like docker logs -f
+  uint32 tail = 3;            // last N lines (0 = all)
+  bool timestamps = 4;
+}
+
+message LogMessage {
+  string line = 1;
+}

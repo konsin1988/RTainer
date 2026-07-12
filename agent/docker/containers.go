@@ -2,8 +2,14 @@ package docker
 
 import (
     "context"
+		"strconv"
+		"strings"
+		"io"
 
 		"github.com/docker/docker/api/types/container"
+		"github.com/docker/go-connections/nat"
+		
+		"konsin1988/agent/proto"
 )
 
 
@@ -62,7 +68,7 @@ func (c *Client) StopContainer(
     )
 }
 
-
+// -----------------------------------START CONTAINER ----------------
 func (c *Client) StartContainer(
     ctx context.Context,
     id string,
@@ -74,6 +80,7 @@ func (c *Client) StartContainer(
     )
 }
 
+// ------------------------------- REMOVE CONTAINER ---------------
 func (c *Client) RemoveContainer(
 	ctx context.Context,
 	id string,
@@ -89,4 +96,97 @@ func (c *Client) RemoveContainer(
 			RemoveVolumes: removeVolumes,
 		},
 	)
+}
+
+
+// -------------------------------- RUN CONTAINER ---------------------
+func (c *Client) RunContainer(
+    ctx context.Context,
+    req *proto.RunContainerRequest,
+) error {
+
+		exposedPorts := nat.PortSet{}
+		portBindings := nat.PortMap{}
+		
+		for _, p := range req.Ports {
+				containerPort := p.ContainerPort
+				if !strings.Contains(containerPort, "/") {
+				    containerPort += "/tcp"
+				}
+		    port := nat.Port(p.ContainerPort) // e.g. "80/tcp"
+		
+		    exposedPorts[port] = struct{}{}
+		
+		    portBindings[port] = []nat.PortBinding{
+		        {
+		            HostIP:   "",
+		            HostPort: p.HostPort,
+		        },
+		    }
+		}
+
+		binds := make([]string, 0, len(req.Volumes))
+		
+		for _, v := range req.Volumes {
+		    binds = append(binds, v.Source+":"+v.Target)
+		}
+
+    cfg := &container.Config{
+        Image: req.ImageId,
+        Cmd:   req.Command,
+        Env:   req.Env,
+        Tty:   req.Tty,
+				ExposedPorts: exposedPorts,
+    }
+
+    hostCfg := &container.HostConfig{
+			PortBindings: portBindings,
+			Binds:        binds,
+		}
+
+    resp, err := c.cli.ContainerCreate(
+        ctx,
+        cfg,
+        hostCfg,
+        nil,
+        nil,
+        req.Name,
+    )
+    if err != nil {
+        return err
+    }
+
+    err = c.cli.ContainerStart(
+        ctx,
+        resp.ID,
+        container.StartOptions{},
+    )
+    if err != nil {
+        return err
+    }
+
+    return  nil
+}
+
+// -------------------------------- VIEW LOGS ----------------
+type LogsRequest struct {
+    ContainerID string
+    Follow      bool
+    Tail        int
+    Timestamps  bool
+}
+
+func (c *Client) ContainerLogs(
+    ctx context.Context,
+		req LogsRequest,
+) (io.ReadCloser, error) {
+
+    return c.cli.ContainerLogs(ctx, req.ContainerID, 
+		container.LogsOptions{
+            ShowStdout: true,
+            ShowStderr: true,
+            Follow:     req.Follow,
+            Tail:       strconv.Itoa(req.Tail),
+            Timestamps: req.Timestamps,
+        })
 }
