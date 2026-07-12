@@ -62,7 +62,7 @@ Core entities:
 
 Migrations run automatically on startup.
 
-### Docker Integration (gRPC agent endpoint)
+### Docker Integration (gRPC agent endpoints)
 
 #### CONTAINERS 
 
@@ -173,6 +173,57 @@ grpcurl -plaintext localhost:50051 list
 
 ```remove```
 > grpcurl -plaintext -d '{"id":"sha256:a97d82f709e2e0ef35e48a697aec860e12cbf2a0ffbfd95d7701976e81d470ed", "force":true }' localhost:50051 agent.AgentService/RemoveImage
+
+#### NETWORKS 
+
+```list```
+> grpcurl -plaintext -d '{}' localhost:50051 agent.AgentService/ListNetworks
+
+##### response: 
+>{
+>  "networks": [
+>    {
+>      "id": "d0fd8f8a4c998c2cfed8610a19862ddf4733c7836c8338715dec17d38cdcab10",
+>      "name": "none",
+>      "driver": "null",
+>      "scope": "local"
+>    },
+>    {
+>      "id": "d322401759b1a25b698253deba793673c6246b5bb289428951d94f6e16611cd8",
+>      "name": "rtainer",
+>      "driver": "bridge",
+>      "scope": "local",
+>      "containers": [
+>        {
+>          "id": "ae89ee158e15e6ad502ea635845909f1a790850bc16987e4730cd538be6a9632",
+>          "name": "postgres",
+>          "ipv4Address": "172.22.0.3/16"
+>        },
+>        {
+>          "id": "d982b751aef9d3c9177945f3afdf22f9445649bb66add464bda1d10c5b1eedf7",
+>          "name": "keycloak",
+>          "ipv4Address": "172.22.0.2/16"
+>        },
+>        {
+>          "id": "e2ba9fe693b6f3d317225d350469cbd4c76c8b92d91de3294c631580cbd998ec",
+>          "name": "rtainer-agent",
+>          "ipv4Address": "172.22.0.5/16"
+>        },
+>        {
+>          "id": "fabcc775a2fae80f65ceea5b4dc323d7cc2e601df76cd4027c494b2923a5292e",
+>          "name": "rtainer-dev",
+>          "ipv4Address": "172.22.0.4/16"
+>        }
+>      ]
+>    },
+>...
+>}
+
+```create```
+> grpcurl -plaintext -d '{ "name":"my-test-network", "driver":"bridge" }' localhost:50051 agent.AgentService/CreateNetwork
+
+``` remove```
+> grpcurl -plaintext -d '{ "id":"8e4f5f..." }' localhost:50051 agent.AgentService/RemoveNetwork
 
 
 ### API Endpoints

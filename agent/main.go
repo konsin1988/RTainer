@@ -26,7 +26,8 @@ func main() {
 
 		containerSvc := service.NewContainerService(dockerClient);
 		imageSvc := service.NewImageService(dockerClient);
-		handler := grpcserver.New(containerSvc, imageSvc);
+		networkSvc := service.NewNetworkService(dockerClient);
+		handler := grpcserver.New(containerSvc, imageSvc, networkSvc);
 
     listener, err := net.Listen("tcp", ":"+cfg.GRPCPort)
     if err != nil {

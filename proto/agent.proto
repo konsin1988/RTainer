@@ -22,6 +22,11 @@ service AgentService {
 
   // logs
   rpc ViewLogs(ViewLogsRequest) returns (stream LogMessage);
+
+  // network
+  rpc ListNetworks(ListNetworksRequest) returns (ListNetworksResponse);
+  rpc CreateNetwork(CreateNetworkRequest) returns (CreateNetworkResponse);
+  rpc RemoveNetwork(RemoveNetworkRequest) returns (RemoveNetworkResponse);
 }
 
 // ----------------------------
@@ -172,3 +177,49 @@ message ContainerStatsResponse {
 
   uint32 pids = 8;
 }
+
+// ---------------------------------------
+// LIST NETWORKS
+// -------------------------------------
+message NetContainer {
+  string id = 1;
+	string name = 2;
+  string ipv4_address = 3; 
+}
+
+message Network {
+  string id = 1;
+  string name = 2;
+  string driver = 3;
+  string scope = 4;
+
+  repeated NetContainer containers = 5;
+}
+
+message ListNetworksRequest {}
+
+message ListNetworksResponse {
+  repeated Network networks = 1;
+}
+
+
+
+// -----------------------------------
+// CREATE AND REMOVE NETWORK
+// ------------------------------------
+message CreateNetworkRequest {
+  string name = 1;
+
+  string driver = 2;       // bridge, overlay, host...
+  bool internal = 3;
+}
+
+message CreateNetworkResponse {
+  string id = 1;
+}
+
+message RemoveNetworkRequest {
+    string id = 1;
+}
+
+message RemoveNetworkResponse {}
