@@ -9,19 +9,18 @@ service AgentService {
   rpc ListImages(ListImagesRequest) returns (ListImagesResponse);
   rpc RemoveImage(RemoveImageRequest) returns (RemoveImageResponse);
 
-  // containers
-  rpc ListContainers(ListContainersRequest) returns (ListContainersResponse);
-  rpc InspectContainer(ContainerRequest) returns (InspectContainerResponse);
-  rpc ContainerStats(ContainerRequest) returns (stream ContainerStatsResponse);
-
   // containers movements 
+  rpc ListContainers(ListContainersRequest) returns (ListContainersResponse);
   rpc StopContainer(ContainerRequest) returns (ContainerResponse);
   rpc StartContainer(ContainerRequest) returns (ContainerResponse);
   rpc RemoveContainer(RemoveContainerRequest) returns (ContainerResponse);
   rpc RunContainer(RunContainerRequest) returns (ContainerResponse);
 
-  // logs
+  // data / other 
   rpc ViewLogs(ViewLogsRequest) returns (stream LogMessage);
+  rpc InspectContainer(ContainerRequest) returns (InspectContainerResponse);
+  rpc ContainerStats(ContainerRequest) returns (stream ContainerStatsResponse);
+  rpc ExecuteCommand(ExecuteCommandRequest) returns (stream LogMessage);
 
   // network
   rpc ListNetworks(ListNetworksRequest) returns (ListNetworksResponse);
@@ -137,6 +136,15 @@ message LogMessage {
     LogStream stream = 2;
 }
 
+// --------------------------------------
+// EXECUTE COMMAND
+// --------------------------------------
+message ExecuteCommandRequest {
+    string id = 1;
+    repeated string command = 2;
+    bool tty = 3;
+}
+
 
 // -------------------------------------
 // INSPECT CONTAINER
@@ -223,3 +231,4 @@ message RemoveNetworkRequest {
 }
 
 message RemoveNetworkResponse {}
+

@@ -2,9 +2,7 @@ package docker
 
 import (
     "context"
-		"strconv"
 		"strings"
-		"io"
 
 		"github.com/docker/docker/api/types/container"
 		"github.com/docker/go-connections/nat"
@@ -166,35 +164,6 @@ func (c *Client) RunContainer(
     }
 
     return  nil
-}
-
-// -------------------------------- VIEW LOGS ----------------
-type LogsRequest struct {
-    ContainerID string
-    Follow      bool
-    Tail        int
-    Timestamps  bool
-}
-
-func (c *Client) ContainerLogs(
-    ctx context.Context,
-		req LogsRequest,
-) (io.ReadCloser, error) {
-
-		tail := "all"
-		
-		if req.Tail > 0 {
-		    tail = strconv.Itoa(req.Tail)
-		}
-
-    return c.cli.ContainerLogs(ctx, req.ContainerID, 
-		container.LogsOptions{
-            ShowStdout: true,
-            ShowStderr: true,
-            Follow:     req.Follow,
-            Tail:       tail,
-            Timestamps: req.Timestamps,
-        })
 }
 
 

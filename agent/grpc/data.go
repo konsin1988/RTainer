@@ -15,107 +15,6 @@ import (
     pb "konsin1988/agent/proto"
 )
 
-// --------------------------------------
-// VIEW LOGS 
-// ---------------------------------------
-
-type logEntry struct {
-    line   string
-    stream pb.LogStream
-}
-
-func (s *Server) ViewLogs(
-    req *pb.ViewLogsRequest,
-    stream pb.AgentService_ViewLogsServer,
-) error {
-
-    reader, err := s.containerSvc.ViewLogs(stream.Context(), req)
-    if err != nil {
-        return err
-    }
-    defer reader.Close()
-
-		stdoutReader, stdoutWriter := io.Pipe()
-		stderrReader, stderrWriter := io.Pipe()
-
-		logs := make(chan logEntry)
-
-		var wg sync.WaitGroup
-		wg.Add(2)
-
-		go func() {
-		    defer stdoutWriter.Close()
-		    defer stderrWriter.Close()
-		
-		    _, err := stdcopy.StdCopy(stdoutWriter, stderrWriter, reader)
-		    if err != nil {
-		        stdoutWriter.CloseWithError(err)
-		        stderrWriter.CloseWithError(err)
-		    }
-		}()
-
-		go func() {
-				defer wg.Done()
-
-		    scanner := bufio.NewScanner(stdoutReader)
-		
-		    for scanner.Scan() {
-						select {
-						    case logs <- logEntry{
-						        line:   scanner.Text(),
-						        stream: pb.LogStream_STDOUT,
-						    }:
-						    case <-stream.Context().Done():
-						        return
-						    }
-		    }
-
-				if err := scanner.Err(); err != nil && stream.Context().Err() == nil {
-				    log.Printf("stdout scanner error: %v", err)
-				}
-		}()
-
-		go func() {
-				defer wg.Done()
-
-				scanner := bufio.NewScanner(stderrReader)
-
-				for scanner.Scan() {
-						select {
-						case logs <- logEntry{
-						    line: scanner.Text(),
-						    stream: pb.LogStream_STDERR,
-						}:
-						case <-stream.Context().Done():
-						    return
-						}
-    		}
-
-				if err := scanner.Err(); err != nil && stream.Context().Err() == nil {
-				    log.Printf("stderr scanner error: %v", err)
-				}
-		}()
-
-
-		go func() {
-		    wg.Wait()
-		    close(logs)
-		}()
-
-		for entry := range logs {
-		    err := stream.Send(&pb.LogMessage{
-		        Line:   entry.line,
-		        Stream: entry.stream,
-		    })
-		    if err != nil {
-		        return err
-		    }
-		}
-
-		return nil
-}
-
-
 // ----------------------------------------
 // INSPECT CONTAINER 
 // ---------------------------------------------
@@ -280,4 +179,152 @@ func (s *Server) ContainerStats(
             return err
         }
     }
+}
+
+
+// --------------------------------------
+// VIEW LOGS AND EXECUTE COMMAND HELPER
+// ---------------------------------------
+
+type logEntry struct {
+    line   string
+    stream pb.LogStream
+}
+
+func (s *Server) streamLogMessages(
+    ctx context.Context,
+    reader io.Reader,
+    tty bool,
+    send func(*pb.LogMessage) error,
+) error {
+
+    // TTY: stdout/stderr are merged.
+    if tty {
+        scanner := bufio.NewScanner(reader)
+
+        for scanner.Scan() {
+            if err := send(&pb.LogMessage{
+                Line:   scanner.Text(),
+                Stream: pb.LogStream_STDOUT,
+            }); err != nil {
+                return err
+            }
+        }
+
+        return scanner.Err()
+    }
+
+    stdoutReader, stdoutWriter := io.Pipe()
+    stderrReader, stderrWriter := io.Pipe()
+
+    logs := make(chan logEntry)
+
+    var wg sync.WaitGroup
+    wg.Add(2)
+
+    go func() {
+        defer stdoutWriter.Close()
+        defer stderrWriter.Close()
+
+        _, err := stdcopy.StdCopy(stdoutWriter, stderrWriter, reader)
+        if err != nil {
+            stdoutWriter.CloseWithError(err)
+            stderrWriter.CloseWithError(err)
+        }
+    }()
+
+    scan := func(
+        r io.Reader,
+        streamType pb.LogStream,
+    ) {
+        defer wg.Done()
+
+        scanner := bufio.NewScanner(r)
+
+        for scanner.Scan() {
+            select {
+            case logs <- logEntry{
+                line:   scanner.Text(),
+                stream: streamType,
+            }:
+            case <-ctx.Done():
+                return
+            }
+        }
+
+        if err := scanner.Err(); err != nil && ctx.Err() == nil {
+            log.Printf("scanner error: %v", err)
+        }
+    }
+
+    go scan(stdoutReader, pb.LogStream_STDOUT)
+    go scan(stderrReader, pb.LogStream_STDERR)
+
+    go func() {
+        wg.Wait()
+        close(logs)
+    }()
+
+    for entry := range logs {
+        if err := send(&pb.LogMessage{
+            Line:   entry.line,
+            Stream: entry.stream,
+        }); err != nil {
+            return err
+        }
+    }
+
+    return nil
+}
+
+// --------------------------------------
+// EXECUTE COMMAND 
+// ---------------------------------------
+
+func (s *Server) ExecuteCommand(
+    req *pb.ExecuteCommandRequest,
+    stream pb.AgentService_ExecuteCommandServer,
+) error {
+
+    result, err := s.containerSvc.ExecuteCommand(
+        stream.Context(),
+        req,
+    )
+    if err != nil {
+        return err
+    }
+    defer result.Close()
+
+    return s.streamLogMessages(
+        stream.Context(),
+        result.Reader,
+        req.Tty,
+        stream.Send,
+    )
+}
+
+
+// --------------------------------------
+// VIEW LOGS 
+// ---------------------------------------
+func (s *Server) ViewLogs(
+    req *pb.ViewLogsRequest,
+    stream pb.AgentService_ViewLogsServer,
+) error {
+
+    reader, err := s.containerSvc.ViewLogs(
+        stream.Context(),
+        req,
+    )
+    if err != nil {
+        return err
+    }
+    defer reader.Close()
+
+    return s.streamLogMessages(
+        stream.Context(),
+        reader,
+        false, // Docker logs are always multiplexed
+        stream.Send,
+    )
 }
