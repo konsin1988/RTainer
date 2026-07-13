@@ -123,3 +123,20 @@ func (s *ContainerService) ContainerStats(
         req.Id,
     )
 }
+
+
+// ----------------- EXECUTE COMMAND -------------------------
+func (s *ContainerService) ExecuteCommand(
+    ctx context.Context,
+    req *proto.ExecuteCommandRequest,
+) (docker.ExecResult, error) {
+
+    return s.docker.ExecuteCommand(
+        ctx,
+        docker.ExecRequest{
+            ContainerID: req.Id,
+            Command:     req.Command,
+            Tty:         req.Tty,
+        },
+    )
+}
