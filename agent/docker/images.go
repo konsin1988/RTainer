@@ -13,7 +13,27 @@ type Image struct {
     Created   int64
 }
 
+type ImageInfo struct {
+    ID            string
+    RepoTags      []string
+    RepoDigests   []string
 
+    Size          int64
+    Created       int64
+
+    OS            string
+    Architecture  string
+
+    Env           []string
+    Cmd           []string
+    Entrypoint    []string
+
+    Labels        map[string]string
+
+    ExposedPorts  []string
+}
+
+// ------------------------ LIST IMAGE ----------------------------
 func (c *Client) ListImages(ctx context.Context) ([]Image, error) {
     imgs, err := c.cli.ImageList(ctx, image.ListOptions{})
     if err != nil {
@@ -51,4 +71,42 @@ func (c *Client) RemoveImage(
     )
 
     return err
+}
+
+
+// ----------------------------- INSPECT IMAGE -----------------------------
+func (c *Client) InspectImage(
+    ctx context.Context,
+    id string,
+) (ImageInfo, error) {
+
+    img, err := c.cli.ImageInspect(ctx, id)
+    if err != nil {
+        return ImageInfo{}, err
+    }
+
+    info := ImageInfo{
+        ID:           img.ID,
+        RepoTags:     img.RepoTags,
+        RepoDigests:  img.RepoDigests,
+        Size:         img.Size,
+        OS:           img.Os,
+        Architecture: img.Architecture,
+        Labels:       img.Config.Labels,
+    }
+
+    if img.Config != nil {
+        info.Env = img.Config.Env
+        info.Cmd = img.Config.Cmd
+        info.Entrypoint = img.Config.Entrypoint
+
+        for p := range img.Config.ExposedPorts {
+            info.ExposedPorts = append(
+                info.ExposedPorts,
+                string(p),
+            )
+        }
+    }
+
+    return info, nil
 }

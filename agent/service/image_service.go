@@ -51,3 +51,12 @@ func (s *ImageService) RemoveImage(
         req.Force,
     )
 }
+
+// ---------------------- INSPECT IMAGE ---------------------------
+func (s *ImageService) InspectImage(
+    ctx context.Context,
+    id string,
+) (docker.ImageInfo, error) {
+
+    return s.docker.InspectImage(ctx, id)
+}

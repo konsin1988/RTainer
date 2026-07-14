@@ -8,6 +8,7 @@ service AgentService {
   // images
   rpc ListImages(ListImagesRequest) returns (ListImagesResponse);
   rpc RemoveImage(RemoveImageRequest) returns (RemoveImageResponse);
+  rpc InspectImage(ImageRequest) returns (InspectImageResponse);
 
   // containers movements 
   rpc ListContainers(ListContainersRequest) returns (ListContainersResponse);
@@ -15,6 +16,7 @@ service AgentService {
   rpc StartContainer(ContainerRequest) returns (ContainerResponse);
   rpc RemoveContainer(RemoveContainerRequest) returns (ContainerResponse);
   rpc RunContainer(RunContainerRequest) returns (ContainerResponse);
+  rpc RestartContainer(ContainerRequest) returns (ContainerResponse);
 
   // data / other 
   rpc ViewLogs(ViewLogsRequest) returns (stream LogMessage);
@@ -25,7 +27,11 @@ service AgentService {
   // network
   rpc ListNetworks(ListNetworksRequest) returns (ListNetworksResponse);
   rpc CreateNetwork(CreateNetworkRequest) returns (CreateNetworkResponse);
-  rpc RemoveNetwork(RemoveNetworkRequest) returns (RemoveNetworkResponse);
+  rpc RemoveNetwork(NetworkRequest) returns (NetworkResponse);
+  rpc InspectNetwork(NetworkRequest) returns (InspectNetworkResponse);
+
+  // volumes
+  rpc ListVolumes(ListVolumesRequest) returns (ListVolumesResponse);
 }
 
 // ----------------------------
@@ -71,6 +77,34 @@ message RemoveImageRequest {
 }
 message RemoveImageResponse {}
 
+
+// ---------------------------------
+// INSPECT IMAGE
+// ---------------------------------
+message ImageRequest {
+  string id = 1;
+}
+
+message InspectImageResponse {
+  string id = 1;
+
+  repeated string repo_tags = 2;
+  repeated string repo_digests = 3;
+
+  int64 size = 4;
+  int64 created = 5;
+
+  string os = 6;
+  string architecture = 7;
+
+  repeated string env = 8;
+  repeated string cmd = 9;
+  repeated string entrypoint = 10;
+
+  map<string, string> labels = 11;
+
+  repeated string exposed_ports = 12;
+}
 
 // ------------------------------
 // STOP, START EXISTING CONTAINER BY ID
@@ -226,9 +260,62 @@ message CreateNetworkResponse {
   string id = 1;
 }
 
-message RemoveNetworkRequest {
+message NetworkRequest {
     string id = 1;
 }
 
-message RemoveNetworkResponse {}
+message NetworkResponse {}
 
+
+// -------------------------------------
+// INSPECT NETWORK 
+// -------------------------------------
+message IPAMConfig {
+    string subnet = 1;
+    string gateway = 2;
+    string ip_range = 3;
+}
+
+message NetworkContainer {
+    string id = 1;
+    string name = 2;
+    string ipv4_address = 3;
+}
+
+message InspectNetworkResponse {
+    string id = 1;
+    string name = 2;
+
+    string driver = 3;
+    string scope = 4;
+
+    bool internal = 5;
+    bool attachable = 6;
+    bool ingress = 7;
+
+    repeated IPAMConfig ipam = 8;
+
+    map<string, string> options = 9;
+    map<string, string> labels = 10;
+
+    repeated NetworkContainer containers = 11;
+}
+
+// --------------------------------------
+// VOLUMES 
+// -------------------------------------
+message ListVolumesRequest {}
+
+message Volume {
+    string name = 1;
+    string driver = 2;
+    string mountpoint = 3;
+
+    map<string, string> labels = 4;
+
+    string scope = 5;
+}
+
+message ListVolumesResponse {
+    repeated Volume volumes = 1;
+}

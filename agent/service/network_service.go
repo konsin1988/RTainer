@@ -50,11 +50,21 @@ func (s *NetworkService) CreateNetwork(
 // ------------------------ REMOVE NETWORK -------------------
 func (s *NetworkService) RemoveNetwork(
     ctx context.Context,
-    req *proto.RemoveNetworkRequest,
+    req *proto.NetworkRequest,
 ) error {
 
     return s.docker.RemoveNetwork(
         ctx,
         req.Id,
     )
+}
+
+
+// ------------------ INSPECT NETWORK ----------------------
+func (s *NetworkService) InspectNetwork(
+    ctx context.Context,
+    id string,
+) (docker.NetworkInfo, error) {
+
+    return s.docker.InspectNetwork(ctx, id)
 }
