@@ -149,3 +149,10 @@ func (s *ContainerService) ExecuteCommand(
     )
 }
 
+
+// ------------------------------------------- DOCKER INFO
+func (s *ContainerService) DockerInfo(
+    ctx context.Context,
+) (docker.DockerInfo, error) {
+    return s.docker.DockerInfo(ctx)
+}

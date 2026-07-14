@@ -37,6 +37,9 @@ const (
 	AgentService_RemoveNetwork_FullMethodName    = "/agent.AgentService/RemoveNetwork"
 	AgentService_InspectNetwork_FullMethodName   = "/agent.AgentService/InspectNetwork"
 	AgentService_ListVolumes_FullMethodName      = "/agent.AgentService/ListVolumes"
+	AgentService_CreateVolume_FullMethodName     = "/agent.AgentService/CreateVolume"
+	AgentService_RemoveVolume_FullMethodName     = "/agent.AgentService/RemoveVolume"
+	AgentService_DockerInfo_FullMethodName       = "/agent.AgentService/DockerInfo"
 )
 
 // AgentServiceClient is the client API for AgentService service.
@@ -66,6 +69,10 @@ type AgentServiceClient interface {
 	InspectNetwork(ctx context.Context, in *NetworkRequest, opts ...grpc.CallOption) (*InspectNetworkResponse, error)
 	// volumes
 	ListVolumes(ctx context.Context, in *ListVolumesRequest, opts ...grpc.CallOption) (*ListVolumesResponse, error)
+	CreateVolume(ctx context.Context, in *CreateVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error)
+	RemoveVolume(ctx context.Context, in *RemoveVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error)
+	// docker info
+	DockerInfo(ctx context.Context, in *DockerInfoRequest, opts ...grpc.CallOption) (*DockerInfoResponse, error)
 }
 
 type agentServiceClient struct {
@@ -283,6 +290,36 @@ func (c *agentServiceClient) ListVolumes(ctx context.Context, in *ListVolumesReq
 	return out, nil
 }
 
+func (c *agentServiceClient) CreateVolume(ctx context.Context, in *CreateVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(VolumeResponse)
+	err := c.cc.Invoke(ctx, AgentService_CreateVolume_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentServiceClient) RemoveVolume(ctx context.Context, in *RemoveVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(VolumeResponse)
+	err := c.cc.Invoke(ctx, AgentService_RemoveVolume_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentServiceClient) DockerInfo(ctx context.Context, in *DockerInfoRequest, opts ...grpc.CallOption) (*DockerInfoResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DockerInfoResponse)
+	err := c.cc.Invoke(ctx, AgentService_DockerInfo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AgentServiceServer is the server API for AgentService service.
 // All implementations must embed UnimplementedAgentServiceServer
 // for forward compatibility.
@@ -310,6 +347,10 @@ type AgentServiceServer interface {
 	InspectNetwork(context.Context, *NetworkRequest) (*InspectNetworkResponse, error)
 	// volumes
 	ListVolumes(context.Context, *ListVolumesRequest) (*ListVolumesResponse, error)
+	CreateVolume(context.Context, *CreateVolumeRequest) (*VolumeResponse, error)
+	RemoveVolume(context.Context, *RemoveVolumeRequest) (*VolumeResponse, error)
+	// docker info
+	DockerInfo(context.Context, *DockerInfoRequest) (*DockerInfoResponse, error)
 	mustEmbedUnimplementedAgentServiceServer()
 }
 
@@ -373,6 +414,15 @@ func (UnimplementedAgentServiceServer) InspectNetwork(context.Context, *NetworkR
 }
 func (UnimplementedAgentServiceServer) ListVolumes(context.Context, *ListVolumesRequest) (*ListVolumesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListVolumes not implemented")
+}
+func (UnimplementedAgentServiceServer) CreateVolume(context.Context, *CreateVolumeRequest) (*VolumeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateVolume not implemented")
+}
+func (UnimplementedAgentServiceServer) RemoveVolume(context.Context, *RemoveVolumeRequest) (*VolumeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RemoveVolume not implemented")
+}
+func (UnimplementedAgentServiceServer) DockerInfo(context.Context, *DockerInfoRequest) (*DockerInfoResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DockerInfo not implemented")
 }
 func (UnimplementedAgentServiceServer) mustEmbedUnimplementedAgentServiceServer() {}
 func (UnimplementedAgentServiceServer) testEmbeddedByValue()                      {}
@@ -698,6 +748,60 @@ func _AgentService_ListVolumes_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AgentService_CreateVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateVolumeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).CreateVolume(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_CreateVolume_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).CreateVolume(ctx, req.(*CreateVolumeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentService_RemoveVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveVolumeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).RemoveVolume(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_RemoveVolume_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).RemoveVolume(ctx, req.(*RemoveVolumeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentService_DockerInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DockerInfoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).DockerInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_DockerInfo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).DockerInfo(ctx, req.(*DockerInfoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AgentService_ServiceDesc is the grpc.ServiceDesc for AgentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -764,6 +868,18 @@ var AgentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListVolumes",
 			Handler:    _AgentService_ListVolumes_Handler,
+		},
+		{
+			MethodName: "CreateVolume",
+			Handler:    _AgentService_CreateVolume_Handler,
+		},
+		{
+			MethodName: "RemoveVolume",
+			Handler:    _AgentService_RemoveVolume_Handler,
+		},
+		{
+			MethodName: "DockerInfo",
+			Handler:    _AgentService_DockerInfo_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

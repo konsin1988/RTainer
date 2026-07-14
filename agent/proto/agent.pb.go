@@ -70,9 +70,7 @@ func (LogStream) EnumDescriptor() ([]byte, []int) {
 	return file_proto_agent_proto_rawDescGZIP(), []int{0}
 }
 
-// ----------------------------
-// LIST CONTAINERS
-// ----------------------------
+// ----------------------------------- LIST CONTAINERS
 type ListContainersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -221,9 +219,7 @@ func (x *ListContainersResponse) GetContainers() []*Container {
 	return nil
 }
 
-// ----------------------------
-// LIST IMAGES
-// ----------------------------
+// ------------------------------------ LIST IMAGES
 type ListImagesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -372,9 +368,7 @@ func (x *ListImagesResponse) GetImages() []*Image {
 	return nil
 }
 
-// -------------------------------
-// REMOVE IMAGE
-// -------------------------------
+// -------------------------------------- REMOVE IMAGE
 type RemoveImageRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -463,9 +457,7 @@ func (*RemoveImageResponse) Descriptor() ([]byte, []int) {
 	return file_proto_agent_proto_rawDescGZIP(), []int{7}
 }
 
-// ---------------------------------
-// INSPECT IMAGE
-// ---------------------------------
+// --------------------------------------- INSPECT IMAGE
 type ImageRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -642,9 +634,7 @@ func (x *InspectImageResponse) GetExposedPorts() []string {
 	return nil
 }
 
-// ------------------------------
-// STOP, START EXISTING CONTAINER BY ID
-// -----------------------------
+// ----------------------------------------- STOP, START EXISTING CONTAINER BY ID
 type ContainerRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -725,9 +715,7 @@ func (*ContainerResponse) Descriptor() ([]byte, []int) {
 	return file_proto_agent_proto_rawDescGZIP(), []int{11}
 }
 
-// -------------------------------
-// REMOVE CONTAINER
-// ------------------------------
+// ----------------------------------------- REMOVE CONTAINER
 type RemoveContainerRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -788,9 +776,7 @@ func (x *RemoveContainerRequest) GetRemoveVolumes() bool {
 	return false
 }
 
-// --------------------------------
-// RUN CONTAINER
-// ---------------------------------
+// ------------------------------------------ RUN CONTAINER
 type RunContainerRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ImageId       string                 `protobuf:"bytes,1,opt,name=image_id,json=imageId,proto3" json:"image_id,omitempty"`
@@ -893,9 +879,9 @@ func (x *RunContainerRequest) GetDetach() bool {
 
 type PortBinding struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ContainerPort string                 `protobuf:"bytes,1,opt,name=container_port,json=containerPort,proto3" json:"container_port,omitempty"` // "80/tcp"
+	ContainerPort string                 `protobuf:"bytes,1,opt,name=container_port,json=containerPort,proto3" json:"container_port,omitempty"`
 	HostIp        string                 `protobuf:"bytes,2,opt,name=host_ip,json=hostIp,proto3" json:"host_ip,omitempty"`
-	HostPort      string                 `protobuf:"bytes,3,opt,name=host_port,json=hostPort,proto3" json:"host_port,omitempty"` // "8080"
+	HostPort      string                 `protobuf:"bytes,3,opt,name=host_port,json=hostPort,proto3" json:"host_port,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1003,14 +989,12 @@ func (x *VolumeBinding) GetTarget() string {
 	return ""
 }
 
-// ------------------------------------
-// VIEW LOGS
-// --------------------------------------
+// -------------------------------------------- VIEW LOGS
 type ViewLogsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ContainerId   string                 `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
-	Follow        bool                   `protobuf:"varint,2,opt,name=follow,proto3" json:"follow,omitempty"` // like docker logs -f
-	Tail          uint32                 `protobuf:"varint,3,opt,name=tail,proto3" json:"tail,omitempty"`     // last N lines (0 = all)
+	Follow        bool                   `protobuf:"varint,2,opt,name=follow,proto3" json:"follow,omitempty"`
+	Tail          uint32                 `protobuf:"varint,3,opt,name=tail,proto3" json:"tail,omitempty"`
 	Timestamps    bool                   `protobuf:"varint,4,opt,name=timestamps,proto3" json:"timestamps,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1126,9 +1110,7 @@ func (x *LogMessage) GetStream() LogStream {
 	return LogStream_LOG_STREAM_UNSPECIFIED
 }
 
-// --------------------------------------
-// EXECUTE COMMAND
-// --------------------------------------
+// ------------------------------------------- EXECUTE COMMAND
 type ExecuteCommandRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -1189,9 +1171,7 @@ func (x *ExecuteCommandRequest) GetTty() bool {
 	return false
 }
 
-// -------------------------------------
-// INSPECT CONTAINER
-// ------------------------------------
+// ------------------------------------------- INSPECT CONTAINER
 type InspectContainerResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -1352,9 +1332,7 @@ func (x *HealthStatus) GetLogs() []string {
 	return nil
 }
 
-// ---------------------------------------
-// CONTAINER STATS
-// ---------------------------------------
+// --------------------------------------------- CONTAINER STATS
 type ContainerStatsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CpuPercent    float64                `protobuf:"fixed64,1,opt,name=cpu_percent,json=cpuPercent,proto3" json:"cpu_percent,omitempty"`
@@ -1455,9 +1433,7 @@ func (x *ContainerStatsResponse) GetPids() uint32 {
 	return 0
 }
 
-// ---------------------------------------
-// LIST NETWORKS
-// -------------------------------------
+// --------------------------------------------- LIST NETWORKS
 type NetContainer struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -1674,9 +1650,7 @@ func (x *ListNetworksResponse) GetNetworks() []*Network {
 	return nil
 }
 
-// -----------------------------------
-// CREATE AND REMOVE NETWORK
-// ------------------------------------
+// ------------------------------------------CREATE AND REMOVE NETWORK
 type CreateNetworkRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -1861,9 +1835,7 @@ func (*NetworkResponse) Descriptor() ([]byte, []int) {
 	return file_proto_agent_proto_rawDescGZIP(), []int{29}
 }
 
-// -------------------------------------
-// INSPECT NETWORK
-// -------------------------------------
+// -------------------------------------------- INSPECT NETWORK
 type IPAMConfig struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Subnet        string                 `protobuf:"bytes,1,opt,name=subnet,proto3" json:"subnet,omitempty"`
@@ -2110,7 +2082,7 @@ func (x *InspectNetworkResponse) GetContainers() []*NetworkContainer {
 
 // --------------------------------------
 // VOLUMES
-// -------------------------------------
+// ----------------------------------------------- LIST VOLUMES
 type ListVolumesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -2265,6 +2237,373 @@ func (x *ListVolumesResponse) GetVolumes() []*Volume {
 		return x.Volumes
 	}
 	return nil
+}
+
+// -------------------------------------- ---------CREATE VOLUME
+type CreateVolumeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Driver        string                 `protobuf:"bytes,2,opt,name=driver,proto3" json:"driver,omitempty"`
+	Labels        map[string]string      `protobuf:"bytes,3,rep,name=labels,proto3" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Options       map[string]string      `protobuf:"bytes,4,rep,name=options,proto3" json:"options,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateVolumeRequest) Reset() {
+	*x = CreateVolumeRequest{}
+	mi := &file_proto_agent_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateVolumeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateVolumeRequest) ProtoMessage() {}
+
+func (x *CreateVolumeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_agent_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateVolumeRequest.ProtoReflect.Descriptor instead.
+func (*CreateVolumeRequest) Descriptor() ([]byte, []int) {
+	return file_proto_agent_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *CreateVolumeRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CreateVolumeRequest) GetDriver() string {
+	if x != nil {
+		return x.Driver
+	}
+	return ""
+}
+
+func (x *CreateVolumeRequest) GetLabels() map[string]string {
+	if x != nil {
+		return x.Labels
+	}
+	return nil
+}
+
+func (x *CreateVolumeRequest) GetOptions() map[string]string {
+	if x != nil {
+		return x.Options
+	}
+	return nil
+}
+
+type VolumeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VolumeResponse) Reset() {
+	*x = VolumeResponse{}
+	mi := &file_proto_agent_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VolumeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VolumeResponse) ProtoMessage() {}
+
+func (x *VolumeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_agent_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VolumeResponse.ProtoReflect.Descriptor instead.
+func (*VolumeResponse) Descriptor() ([]byte, []int) {
+	return file_proto_agent_proto_rawDescGZIP(), []int{37}
+}
+
+// ----------------------------------------------- REMOVE VOLUME
+type RemoveVolumeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Force         bool                   `protobuf:"varint,2,opt,name=force,proto3" json:"force,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RemoveVolumeRequest) Reset() {
+	*x = RemoveVolumeRequest{}
+	mi := &file_proto_agent_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RemoveVolumeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RemoveVolumeRequest) ProtoMessage() {}
+
+func (x *RemoveVolumeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_agent_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RemoveVolumeRequest.ProtoReflect.Descriptor instead.
+func (*RemoveVolumeRequest) Descriptor() ([]byte, []int) {
+	return file_proto_agent_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *RemoveVolumeRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *RemoveVolumeRequest) GetForce() bool {
+	if x != nil {
+		return x.Force
+	}
+	return false
+}
+
+// ------------------------------------------------ DOCKER INFO
+type DockerInfoRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DockerInfoRequest) Reset() {
+	*x = DockerInfoRequest{}
+	mi := &file_proto_agent_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DockerInfoRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DockerInfoRequest) ProtoMessage() {}
+
+func (x *DockerInfoRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_agent_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DockerInfoRequest.ProtoReflect.Descriptor instead.
+func (*DockerInfoRequest) Descriptor() ([]byte, []int) {
+	return file_proto_agent_proto_rawDescGZIP(), []int{39}
+}
+
+type DockerInfoResponse struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	ServerVersion     string                 `protobuf:"bytes,1,opt,name=server_version,json=serverVersion,proto3" json:"server_version,omitempty"`
+	ApiVersion        string                 `protobuf:"bytes,2,opt,name=api_version,json=apiVersion,proto3" json:"api_version,omitempty"`
+	OperatingSystem   string                 `protobuf:"bytes,3,opt,name=operating_system,json=operatingSystem,proto3" json:"operating_system,omitempty"`
+	Architecture      string                 `protobuf:"bytes,4,opt,name=architecture,proto3" json:"architecture,omitempty"`
+	KernelVersion     string                 `protobuf:"bytes,5,opt,name=kernel_version,json=kernelVersion,proto3" json:"kernel_version,omitempty"`
+	Containers        int32                  `protobuf:"varint,6,opt,name=containers,proto3" json:"containers,omitempty"`
+	ContainersRunning int32                  `protobuf:"varint,7,opt,name=containers_running,json=containersRunning,proto3" json:"containers_running,omitempty"`
+	ContainersPaused  int32                  `protobuf:"varint,8,opt,name=containers_paused,json=containersPaused,proto3" json:"containers_paused,omitempty"`
+	ContainersStopped int32                  `protobuf:"varint,9,opt,name=containers_stopped,json=containersStopped,proto3" json:"containers_stopped,omitempty"`
+	Images            int32                  `protobuf:"varint,10,opt,name=images,proto3" json:"images,omitempty"`
+	Volumes           int32                  `protobuf:"varint,11,opt,name=volumes,proto3" json:"volumes,omitempty"`
+	Driver            string                 `protobuf:"bytes,12,opt,name=driver,proto3" json:"driver,omitempty"`
+	MemTotal          int64                  `protobuf:"varint,13,opt,name=mem_total,json=memTotal,proto3" json:"mem_total,omitempty"`
+	Ncpu              int32                  `protobuf:"varint,14,opt,name=ncpu,proto3" json:"ncpu,omitempty"`
+	DockerRootDir     string                 `protobuf:"bytes,15,opt,name=docker_root_dir,json=dockerRootDir,proto3" json:"docker_root_dir,omitempty"`
+	Name              string                 `protobuf:"bytes,16,opt,name=name,proto3" json:"name,omitempty"`
+	Id                string                 `protobuf:"bytes,17,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *DockerInfoResponse) Reset() {
+	*x = DockerInfoResponse{}
+	mi := &file_proto_agent_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DockerInfoResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DockerInfoResponse) ProtoMessage() {}
+
+func (x *DockerInfoResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_agent_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DockerInfoResponse.ProtoReflect.Descriptor instead.
+func (*DockerInfoResponse) Descriptor() ([]byte, []int) {
+	return file_proto_agent_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *DockerInfoResponse) GetServerVersion() string {
+	if x != nil {
+		return x.ServerVersion
+	}
+	return ""
+}
+
+func (x *DockerInfoResponse) GetApiVersion() string {
+	if x != nil {
+		return x.ApiVersion
+	}
+	return ""
+}
+
+func (x *DockerInfoResponse) GetOperatingSystem() string {
+	if x != nil {
+		return x.OperatingSystem
+	}
+	return ""
+}
+
+func (x *DockerInfoResponse) GetArchitecture() string {
+	if x != nil {
+		return x.Architecture
+	}
+	return ""
+}
+
+func (x *DockerInfoResponse) GetKernelVersion() string {
+	if x != nil {
+		return x.KernelVersion
+	}
+	return ""
+}
+
+func (x *DockerInfoResponse) GetContainers() int32 {
+	if x != nil {
+		return x.Containers
+	}
+	return 0
+}
+
+func (x *DockerInfoResponse) GetContainersRunning() int32 {
+	if x != nil {
+		return x.ContainersRunning
+	}
+	return 0
+}
+
+func (x *DockerInfoResponse) GetContainersPaused() int32 {
+	if x != nil {
+		return x.ContainersPaused
+	}
+	return 0
+}
+
+func (x *DockerInfoResponse) GetContainersStopped() int32 {
+	if x != nil {
+		return x.ContainersStopped
+	}
+	return 0
+}
+
+func (x *DockerInfoResponse) GetImages() int32 {
+	if x != nil {
+		return x.Images
+	}
+	return 0
+}
+
+func (x *DockerInfoResponse) GetVolumes() int32 {
+	if x != nil {
+		return x.Volumes
+	}
+	return 0
+}
+
+func (x *DockerInfoResponse) GetDriver() string {
+	if x != nil {
+		return x.Driver
+	}
+	return ""
+}
+
+func (x *DockerInfoResponse) GetMemTotal() int64 {
+	if x != nil {
+		return x.MemTotal
+	}
+	return 0
+}
+
+func (x *DockerInfoResponse) GetNcpu() int32 {
+	if x != nil {
+		return x.Ncpu
+	}
+	return 0
+}
+
+func (x *DockerInfoResponse) GetDockerRootDir() string {
+	if x != nil {
+		return x.DockerRootDir
+	}
+	return ""
+}
+
+func (x *DockerInfoResponse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *DockerInfoResponse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
 }
 
 var File_proto_agent_proto protoreflect.FileDescriptor
@@ -2449,14 +2788,51 @@ const file_proto_agent_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\">\n" +
 	"\x13ListVolumesResponse\x12'\n" +
-	"\avolumes\x18\x01 \x03(\v2\r.agent.VolumeR\avolumes*?\n" +
+	"\avolumes\x18\x01 \x03(\v2\r.agent.VolumeR\avolumes\"\xbb\x02\n" +
+	"\x13CreateVolumeRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
+	"\x06driver\x18\x02 \x01(\tR\x06driver\x12>\n" +
+	"\x06labels\x18\x03 \x03(\v2&.agent.CreateVolumeRequest.LabelsEntryR\x06labels\x12A\n" +
+	"\aoptions\x18\x04 \x03(\v2'.agent.CreateVolumeRequest.OptionsEntryR\aoptions\x1a9\n" +
+	"\vLabelsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a:\n" +
+	"\fOptionsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x10\n" +
+	"\x0eVolumeResponse\"?\n" +
+	"\x13RemoveVolumeRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
+	"\x05force\x18\x02 \x01(\bR\x05force\"\x13\n" +
+	"\x11DockerInfoRequest\"\xc4\x04\n" +
+	"\x12DockerInfoResponse\x12%\n" +
+	"\x0eserver_version\x18\x01 \x01(\tR\rserverVersion\x12\x1f\n" +
+	"\vapi_version\x18\x02 \x01(\tR\n" +
+	"apiVersion\x12)\n" +
+	"\x10operating_system\x18\x03 \x01(\tR\x0foperatingSystem\x12\"\n" +
+	"\farchitecture\x18\x04 \x01(\tR\farchitecture\x12%\n" +
+	"\x0ekernel_version\x18\x05 \x01(\tR\rkernelVersion\x12\x1e\n" +
+	"\n" +
+	"containers\x18\x06 \x01(\x05R\n" +
+	"containers\x12-\n" +
+	"\x12containers_running\x18\a \x01(\x05R\x11containersRunning\x12+\n" +
+	"\x11containers_paused\x18\b \x01(\x05R\x10containersPaused\x12-\n" +
+	"\x12containers_stopped\x18\t \x01(\x05R\x11containersStopped\x12\x16\n" +
+	"\x06images\x18\n" +
+	" \x01(\x05R\x06images\x12\x18\n" +
+	"\avolumes\x18\v \x01(\x05R\avolumes\x12\x16\n" +
+	"\x06driver\x18\f \x01(\tR\x06driver\x12\x1b\n" +
+	"\tmem_total\x18\r \x01(\x03R\bmemTotal\x12\x12\n" +
+	"\x04ncpu\x18\x0e \x01(\x05R\x04ncpu\x12&\n" +
+	"\x0fdocker_root_dir\x18\x0f \x01(\tR\rdockerRootDir\x12\x12\n" +
+	"\x04name\x18\x10 \x01(\tR\x04name\x12\x0e\n" +
+	"\x02id\x18\x11 \x01(\tR\x02id*?\n" +
 	"\tLogStream\x12\x1a\n" +
 	"\x16LOG_STREAM_UNSPECIFIED\x10\x00\x12\n" +
 	"\n" +
 	"\x06STDOUT\x10\x01\x12\n" +
 	"\n" +
-	"\x06STDERR\x10\x022\x85\n" +
-	"\n" +
+	"\x06STDERR\x10\x022\xce\v\n" +
 	"\fAgentService\x12A\n" +
 	"\n" +
 	"ListImages\x12\x18.agent.ListImagesRequest\x1a\x19.agent.ListImagesResponse\x12D\n" +
@@ -2476,7 +2852,11 @@ const file_proto_agent_proto_rawDesc = "" +
 	"\rCreateNetwork\x12\x1b.agent.CreateNetworkRequest\x1a\x1c.agent.CreateNetworkResponse\x12>\n" +
 	"\rRemoveNetwork\x12\x15.agent.NetworkRequest\x1a\x16.agent.NetworkResponse\x12F\n" +
 	"\x0eInspectNetwork\x12\x15.agent.NetworkRequest\x1a\x1d.agent.InspectNetworkResponse\x12D\n" +
-	"\vListVolumes\x12\x19.agent.ListVolumesRequest\x1a\x1a.agent.ListVolumesResponseB\x0eZ\f/agent/protob\x06proto3"
+	"\vListVolumes\x12\x19.agent.ListVolumesRequest\x1a\x1a.agent.ListVolumesResponse\x12A\n" +
+	"\fCreateVolume\x12\x1a.agent.CreateVolumeRequest\x1a\x15.agent.VolumeResponse\x12A\n" +
+	"\fRemoveVolume\x12\x1a.agent.RemoveVolumeRequest\x1a\x15.agent.VolumeResponse\x12A\n" +
+	"\n" +
+	"DockerInfo\x12\x18.agent.DockerInfoRequest\x1a\x19.agent.DockerInfoResponseB\x0eZ\f/agent/protob\x06proto3"
 
 var (
 	file_proto_agent_proto_rawDescOnce sync.Once
@@ -2491,7 +2871,7 @@ func file_proto_agent_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 40)
+var file_proto_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 47)
 var file_proto_agent_proto_goTypes = []any{
 	(LogStream)(0),                   // 0: agent.LogStream
 	(*ListContainersRequest)(nil),    // 1: agent.ListContainersRequest
@@ -2530,15 +2910,22 @@ var file_proto_agent_proto_goTypes = []any{
 	(*ListVolumesRequest)(nil),       // 34: agent.ListVolumesRequest
 	(*Volume)(nil),                   // 35: agent.Volume
 	(*ListVolumesResponse)(nil),      // 36: agent.ListVolumesResponse
-	nil,                              // 37: agent.InspectImageResponse.LabelsEntry
-	nil,                              // 38: agent.InspectNetworkResponse.OptionsEntry
-	nil,                              // 39: agent.InspectNetworkResponse.LabelsEntry
-	nil,                              // 40: agent.Volume.LabelsEntry
+	(*CreateVolumeRequest)(nil),      // 37: agent.CreateVolumeRequest
+	(*VolumeResponse)(nil),           // 38: agent.VolumeResponse
+	(*RemoveVolumeRequest)(nil),      // 39: agent.RemoveVolumeRequest
+	(*DockerInfoRequest)(nil),        // 40: agent.DockerInfoRequest
+	(*DockerInfoResponse)(nil),       // 41: agent.DockerInfoResponse
+	nil,                              // 42: agent.InspectImageResponse.LabelsEntry
+	nil,                              // 43: agent.InspectNetworkResponse.OptionsEntry
+	nil,                              // 44: agent.InspectNetworkResponse.LabelsEntry
+	nil,                              // 45: agent.Volume.LabelsEntry
+	nil,                              // 46: agent.CreateVolumeRequest.LabelsEntry
+	nil,                              // 47: agent.CreateVolumeRequest.OptionsEntry
 }
 var file_proto_agent_proto_depIdxs = []int32{
 	2,  // 0: agent.ListContainersResponse.containers:type_name -> agent.Container
 	5,  // 1: agent.ListImagesResponse.images:type_name -> agent.Image
-	37, // 2: agent.InspectImageResponse.labels:type_name -> agent.InspectImageResponse.LabelsEntry
+	42, // 2: agent.InspectImageResponse.labels:type_name -> agent.InspectImageResponse.LabelsEntry
 	15, // 3: agent.RunContainerRequest.ports:type_name -> agent.PortBinding
 	16, // 4: agent.RunContainerRequest.volumes:type_name -> agent.VolumeBinding
 	0,  // 5: agent.LogMessage.stream:type_name -> agent.LogStream
@@ -2548,52 +2935,60 @@ var file_proto_agent_proto_depIdxs = []int32{
 	23, // 9: agent.Network.containers:type_name -> agent.NetContainer
 	24, // 10: agent.ListNetworksResponse.networks:type_name -> agent.Network
 	31, // 11: agent.InspectNetworkResponse.ipam:type_name -> agent.IPAMConfig
-	38, // 12: agent.InspectNetworkResponse.options:type_name -> agent.InspectNetworkResponse.OptionsEntry
-	39, // 13: agent.InspectNetworkResponse.labels:type_name -> agent.InspectNetworkResponse.LabelsEntry
+	43, // 12: agent.InspectNetworkResponse.options:type_name -> agent.InspectNetworkResponse.OptionsEntry
+	44, // 13: agent.InspectNetworkResponse.labels:type_name -> agent.InspectNetworkResponse.LabelsEntry
 	32, // 14: agent.InspectNetworkResponse.containers:type_name -> agent.NetworkContainer
-	40, // 15: agent.Volume.labels:type_name -> agent.Volume.LabelsEntry
+	45, // 15: agent.Volume.labels:type_name -> agent.Volume.LabelsEntry
 	35, // 16: agent.ListVolumesResponse.volumes:type_name -> agent.Volume
-	4,  // 17: agent.AgentService.ListImages:input_type -> agent.ListImagesRequest
-	7,  // 18: agent.AgentService.RemoveImage:input_type -> agent.RemoveImageRequest
-	9,  // 19: agent.AgentService.InspectImage:input_type -> agent.ImageRequest
-	1,  // 20: agent.AgentService.ListContainers:input_type -> agent.ListContainersRequest
-	11, // 21: agent.AgentService.StopContainer:input_type -> agent.ContainerRequest
-	11, // 22: agent.AgentService.StartContainer:input_type -> agent.ContainerRequest
-	13, // 23: agent.AgentService.RemoveContainer:input_type -> agent.RemoveContainerRequest
-	14, // 24: agent.AgentService.RunContainer:input_type -> agent.RunContainerRequest
-	11, // 25: agent.AgentService.RestartContainer:input_type -> agent.ContainerRequest
-	17, // 26: agent.AgentService.ViewLogs:input_type -> agent.ViewLogsRequest
-	11, // 27: agent.AgentService.InspectContainer:input_type -> agent.ContainerRequest
-	11, // 28: agent.AgentService.ContainerStats:input_type -> agent.ContainerRequest
-	19, // 29: agent.AgentService.ExecuteCommand:input_type -> agent.ExecuteCommandRequest
-	25, // 30: agent.AgentService.ListNetworks:input_type -> agent.ListNetworksRequest
-	27, // 31: agent.AgentService.CreateNetwork:input_type -> agent.CreateNetworkRequest
-	29, // 32: agent.AgentService.RemoveNetwork:input_type -> agent.NetworkRequest
-	29, // 33: agent.AgentService.InspectNetwork:input_type -> agent.NetworkRequest
-	34, // 34: agent.AgentService.ListVolumes:input_type -> agent.ListVolumesRequest
-	6,  // 35: agent.AgentService.ListImages:output_type -> agent.ListImagesResponse
-	8,  // 36: agent.AgentService.RemoveImage:output_type -> agent.RemoveImageResponse
-	10, // 37: agent.AgentService.InspectImage:output_type -> agent.InspectImageResponse
-	3,  // 38: agent.AgentService.ListContainers:output_type -> agent.ListContainersResponse
-	12, // 39: agent.AgentService.StopContainer:output_type -> agent.ContainerResponse
-	12, // 40: agent.AgentService.StartContainer:output_type -> agent.ContainerResponse
-	12, // 41: agent.AgentService.RemoveContainer:output_type -> agent.ContainerResponse
-	12, // 42: agent.AgentService.RunContainer:output_type -> agent.ContainerResponse
-	12, // 43: agent.AgentService.RestartContainer:output_type -> agent.ContainerResponse
-	18, // 44: agent.AgentService.ViewLogs:output_type -> agent.LogMessage
-	20, // 45: agent.AgentService.InspectContainer:output_type -> agent.InspectContainerResponse
-	22, // 46: agent.AgentService.ContainerStats:output_type -> agent.ContainerStatsResponse
-	18, // 47: agent.AgentService.ExecuteCommand:output_type -> agent.LogMessage
-	26, // 48: agent.AgentService.ListNetworks:output_type -> agent.ListNetworksResponse
-	28, // 49: agent.AgentService.CreateNetwork:output_type -> agent.CreateNetworkResponse
-	30, // 50: agent.AgentService.RemoveNetwork:output_type -> agent.NetworkResponse
-	33, // 51: agent.AgentService.InspectNetwork:output_type -> agent.InspectNetworkResponse
-	36, // 52: agent.AgentService.ListVolumes:output_type -> agent.ListVolumesResponse
-	35, // [35:53] is the sub-list for method output_type
-	17, // [17:35] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	46, // 17: agent.CreateVolumeRequest.labels:type_name -> agent.CreateVolumeRequest.LabelsEntry
+	47, // 18: agent.CreateVolumeRequest.options:type_name -> agent.CreateVolumeRequest.OptionsEntry
+	4,  // 19: agent.AgentService.ListImages:input_type -> agent.ListImagesRequest
+	7,  // 20: agent.AgentService.RemoveImage:input_type -> agent.RemoveImageRequest
+	9,  // 21: agent.AgentService.InspectImage:input_type -> agent.ImageRequest
+	1,  // 22: agent.AgentService.ListContainers:input_type -> agent.ListContainersRequest
+	11, // 23: agent.AgentService.StopContainer:input_type -> agent.ContainerRequest
+	11, // 24: agent.AgentService.StartContainer:input_type -> agent.ContainerRequest
+	13, // 25: agent.AgentService.RemoveContainer:input_type -> agent.RemoveContainerRequest
+	14, // 26: agent.AgentService.RunContainer:input_type -> agent.RunContainerRequest
+	11, // 27: agent.AgentService.RestartContainer:input_type -> agent.ContainerRequest
+	17, // 28: agent.AgentService.ViewLogs:input_type -> agent.ViewLogsRequest
+	11, // 29: agent.AgentService.InspectContainer:input_type -> agent.ContainerRequest
+	11, // 30: agent.AgentService.ContainerStats:input_type -> agent.ContainerRequest
+	19, // 31: agent.AgentService.ExecuteCommand:input_type -> agent.ExecuteCommandRequest
+	25, // 32: agent.AgentService.ListNetworks:input_type -> agent.ListNetworksRequest
+	27, // 33: agent.AgentService.CreateNetwork:input_type -> agent.CreateNetworkRequest
+	29, // 34: agent.AgentService.RemoveNetwork:input_type -> agent.NetworkRequest
+	29, // 35: agent.AgentService.InspectNetwork:input_type -> agent.NetworkRequest
+	34, // 36: agent.AgentService.ListVolumes:input_type -> agent.ListVolumesRequest
+	37, // 37: agent.AgentService.CreateVolume:input_type -> agent.CreateVolumeRequest
+	39, // 38: agent.AgentService.RemoveVolume:input_type -> agent.RemoveVolumeRequest
+	40, // 39: agent.AgentService.DockerInfo:input_type -> agent.DockerInfoRequest
+	6,  // 40: agent.AgentService.ListImages:output_type -> agent.ListImagesResponse
+	8,  // 41: agent.AgentService.RemoveImage:output_type -> agent.RemoveImageResponse
+	10, // 42: agent.AgentService.InspectImage:output_type -> agent.InspectImageResponse
+	3,  // 43: agent.AgentService.ListContainers:output_type -> agent.ListContainersResponse
+	12, // 44: agent.AgentService.StopContainer:output_type -> agent.ContainerResponse
+	12, // 45: agent.AgentService.StartContainer:output_type -> agent.ContainerResponse
+	12, // 46: agent.AgentService.RemoveContainer:output_type -> agent.ContainerResponse
+	12, // 47: agent.AgentService.RunContainer:output_type -> agent.ContainerResponse
+	12, // 48: agent.AgentService.RestartContainer:output_type -> agent.ContainerResponse
+	18, // 49: agent.AgentService.ViewLogs:output_type -> agent.LogMessage
+	20, // 50: agent.AgentService.InspectContainer:output_type -> agent.InspectContainerResponse
+	22, // 51: agent.AgentService.ContainerStats:output_type -> agent.ContainerStatsResponse
+	18, // 52: agent.AgentService.ExecuteCommand:output_type -> agent.LogMessage
+	26, // 53: agent.AgentService.ListNetworks:output_type -> agent.ListNetworksResponse
+	28, // 54: agent.AgentService.CreateNetwork:output_type -> agent.CreateNetworkResponse
+	30, // 55: agent.AgentService.RemoveNetwork:output_type -> agent.NetworkResponse
+	33, // 56: agent.AgentService.InspectNetwork:output_type -> agent.InspectNetworkResponse
+	36, // 57: agent.AgentService.ListVolumes:output_type -> agent.ListVolumesResponse
+	38, // 58: agent.AgentService.CreateVolume:output_type -> agent.VolumeResponse
+	38, // 59: agent.AgentService.RemoveVolume:output_type -> agent.VolumeResponse
+	41, // 60: agent.AgentService.DockerInfo:output_type -> agent.DockerInfoResponse
+	40, // [40:61] is the sub-list for method output_type
+	19, // [19:40] is the sub-list for method input_type
+	19, // [19:19] is the sub-list for extension type_name
+	19, // [19:19] is the sub-list for extension extendee
+	0,  // [0:19] is the sub-list for field type_name
 }
 
 func init() { file_proto_agent_proto_init() }
@@ -2607,7 +3002,7 @@ func file_proto_agent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_agent_proto_rawDesc), len(file_proto_agent_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   40,
+			NumMessages:   47,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

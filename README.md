@@ -341,6 +341,25 @@ grpcurl -plaintext -d '{ "container_id":"2eeebdcd26c91ac36cde73609b6991538d51172
 }
 ```
 
+##### create 
+> grpcurl -plaintext -d '{
+  "name":"postgres-data",
+  "driver":"local",
+  "labels":{
+    "app":"rtainer",
+    "env":"dev"
+  }
+}' localhost:50051 agent.AgentService/CreateVolume
+
+
+##### remove
+> grpcurl -plaintext -d '{ "name":"postgres-data", "force":true }' localhost:50051 agent.AgentService/RemoveVolume
+
+
+#### Docker info
+
+> grpcurl -plaintext -d '{}' localhost:50051 agent.AgentService/DockerInfo
+
 ### API Endpoints
 
 GET /health

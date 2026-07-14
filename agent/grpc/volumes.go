@@ -6,6 +6,7 @@ import (
 	pb "konsin1988/agent/proto"
 )
 
+// -------------------------------------------- LIST VOLUMES
 func (s *Server) ListVolumes(
     ctx context.Context,
     req *pb.ListVolumesRequest,
@@ -29,4 +30,32 @@ func (s *Server) ListVolumes(
     }
 
     return resp, nil
+}
+
+// ------------------------------------------------- CREATE VOLUME
+func (s *Server) CreateVolume(
+    ctx context.Context,
+    req *pb.CreateVolumeRequest,
+) (*pb.VolumeResponse, error) {
+
+    err := s.volumeSvc.CreateVolume(ctx, req)
+    if err != nil {
+        return nil, err
+    }
+
+    return &pb.VolumeResponse{}, nil
+}
+
+
+// ------------------------------------------------- REMOVE VOLUME 
+func (s *Server) RemoveVolume(
+    ctx context.Context,
+    req *pb.RemoveVolumeRequest,
+) (*pb.VolumeResponse, error) {
+    err := s.volumeSvc.RemoveVolume(ctx, req)
+    if err != nil {
+        return nil, err
+    }
+
+    return &pb.VolumeResponse{}, nil
 }
