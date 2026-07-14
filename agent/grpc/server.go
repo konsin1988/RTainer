@@ -13,14 +13,16 @@ type Server struct {
     containerSvc *service.ContainerService
 		imageSvc *service.ImageService
 		networkSvc *service.NetworkService
+		volumeSvc *service.VolumeService
 }
 
 func New(
 	container *service.ContainerService, 
 	image *service.ImageService, 
 	network *service.NetworkService,
+	volume *service.VolumeService,
 ) *Server {
-	return &Server{containerSvc: container, imageSvc: image, networkSvc: network}
+	return &Server{containerSvc: container, imageSvc: image, networkSvc: network, volumeSvc: volume}
 }
 
 func (s *Server) Register(grpcSrv *grpc.Server) {

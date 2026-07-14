@@ -20,6 +20,30 @@ type Network struct {
     Containers []NetContainer
 }
 
+type IPAMConfig struct {
+    Subnet  string
+    Gateway string
+    IPRange string
+}
+
+type NetworkInfo struct {
+    ID         string
+    Name       string
+    Driver     string
+    Scope      string
+
+    Internal   bool
+    Attachable bool
+    Ingress    bool
+
+    IPAM       []IPAMConfig
+
+    Options    map[string]string
+    Labels     map[string]string
+
+    Containers []NetContainer
+}
+
 // ----------------------- LIST NETWORKS -------------------
 func (c *Client) ListNetworks(
     ctx context.Context,
@@ -110,4 +134,51 @@ func (c *Client) RemoveNetwork(
         ctx,
         id,
     )
+}
+
+
+// ------------------------- INSPECT NETWORK -----------------
+func (c *Client) InspectNetwork(
+    ctx context.Context,
+    id string,
+) (NetworkInfo, error) {
+
+    n, err := c.cli.NetworkInspect(
+        ctx,
+        id,
+        network.InspectOptions{},
+    )
+    if err != nil {
+        return NetworkInfo{}, err
+    }
+
+    info := NetworkInfo{
+        ID:         n.ID,
+        Name:       n.Name,
+        Driver:     n.Driver,
+        Scope:      n.Scope,
+        Internal:   n.Internal,
+        Attachable: n.Attachable,
+        Ingress:    n.Ingress,
+        Options:    n.Options,
+        Labels:     n.Labels,
+    }
+
+    for _, cfg := range n.IPAM.Config {
+        info.IPAM = append(info.IPAM, IPAMConfig{
+            Subnet:  cfg.Subnet,
+            Gateway: cfg.Gateway,
+            IPRange: cfg.IPRange,
+        })
+    }
+
+    for id, endpoint := range n.Containers {
+        info.Containers = append(info.Containers, NetContainer{
+            ID:          id,
+            Name:        endpoint.Name,
+            IPv4Address: endpoint.IPv4Address,
+        })
+    }
+
+    return info, nil
 }

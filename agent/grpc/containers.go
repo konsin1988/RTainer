@@ -68,6 +68,25 @@ func (s *Server) StartContainer(
 }
 
 // ------------------------------------
+// RESTART CONTAINER 
+// --------------------------------------
+func (s *Server) RestartContainer(
+    ctx context.Context,
+    req *pb.ContainerRequest,
+) (*pb.ContainerResponse, error) {
+
+    err := s.containerSvc.RestartContainer(
+        ctx,
+        req.Id,
+    )
+    if err != nil {
+        return nil, err
+    }
+
+    return &pb.ContainerResponse{}, nil
+}
+
+// ------------------------------------
 // REMOVE CONTAINER
 // ------------------------------------
 func (s *Server) RemoveContainer(

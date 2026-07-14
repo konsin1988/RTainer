@@ -71,8 +71,12 @@ grpcurl -plaintext localhost:50051 list
 ##### list
 > grpcurl -plaintext -d '{}' localhost:50051 agent.AgentService/ListContainers
 
-##### start / stop
+##### start / stop / restart
+> grpcurl -plaintext -d '{"id":"<container_id>"}' localhost:50051 agent.AgentService/StartContainer
+
 > grpcurl -plaintext -d '{"id":"<container_id>"}' localhost:50051 agent.AgentService/StopContainer
+
+> grpcurl -plaintext -d '{"id":"<container_id>"}' localhost:50051 agent.AgentService/RestartContainer
 
 ##### delete
 > grpcurl -plaintext -d '{"id":"5ad2dd0ea57b152ded0be23a713d2d10a8cdff0953f87110d0a68dc628039d93", "force": "true", "remove_volumes": "false"}' localhost:50051 agent.AgentService/RemoveContainer
@@ -199,6 +203,42 @@ grpcurl -plaintext -d '{ "container_id":"2eeebdcd26c91ac36cde73609b6991538d51172
 ##### remove
 > grpcurl -plaintext -d '{"id":"sha256:a97d82f709e2e0ef35e48a697aec860e12cbf2a0ffbfd95d7701976e81d470ed", "force":true }' localhost:50051 agent.AgentService/RemoveImage
 
+##### inspect 
+> grpcurl -plaintext -d '{ "id":"sha256:a97d82f709e2e0ef35e48a697aec860e12cbf2a0ffbfd95d7701976e81d470ed" }' localhost:50051 agent.AgentService/InspectImage
+
+###### response
+```
+{
+  "id": "sha256:f2c967e41f72b294e2b96f25154dda38dbde3603b3be33888fb437147972f24b",
+  "repoTags": [
+    "ankane/pgvector:latest"
+  ],
+  "repoDigests": [
+    "ankane/pgvector@sha256:956744bd14e9cbdf639c61c2a2a7c7c2c48a9c8cdd42f7de4ac034f4e96b90f8"
+  ],
+  "size": "440359940",
+  "os": "linux",
+  "architecture": "amd64",
+  "env": [
+    "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/15/bin",
+    "GOSU_VERSION=1.16",
+    "LANG=en_US.utf8",
+    "PG_MAJOR=15",
+    "PG_VERSION=15.4-2.pgdg120+1",
+    "PGDATA=/var/lib/postgresql/data"
+  ],
+  "cmd": [
+    "postgres"
+  ],
+  "entrypoint": [
+    "docker-entrypoint.sh"
+  ],
+  "exposedPorts": [
+    "5432/tcp"
+  ]
+}
+```
+
 #### NETWORKS 
 
 ##### list
@@ -252,6 +292,73 @@ grpcurl -plaintext -d '{ "container_id":"2eeebdcd26c91ac36cde73609b6991538d51172
 ##### remove
 > grpcurl -plaintext -d '{ "id":"8e4f5f..." }' localhost:50051 agent.AgentService/RemoveNetwork
 
+##### inspect 
+> grpcurl -plaintext -d '{"id":"d322401759b1a25b698253deba793673c6246b5bb289428951d94f6e16611cd8"}' localhost:50051 agent.AgentService/InspectNetwork
+
+###### response
+```
+{
+  "id": "0ce18fbe71fb694a2e93ce6da300643438d0a56cd16294f4b9cb9e51372affa8",
+  "name": "rt-messenger",
+  "driver": "bridge",
+  "scope": "local",
+  "ipam": [
+    {
+      "subnet": "172.21.0.0/16",
+      "gateway": "172.21.0.1"
+    }
+  ],
+  "containers": [
+    {
+      "id": "0b411ac9426e549d56f636d73a1bfcd3841b6df8065f6cda3706b45beb3fbb09",
+      "name": "keycloak",
+      "ipv4Address": "172.21.0.2/16"
+    }
+  ]
+}
+```
+
+#### Volumes
+
+##### list
+> grpcurl -plaintext -d '{}' localhost:50051 agent.AgentService/ListVolumes
+
+###### response 
+```
+{
+  "volumes": [
+    {
+      "name": "25aeeb6f15ff1ffc45821378191530efe2578174436fc3a8d17c5409f52bd065",
+      "driver": "local",
+      "mountpoint": "/home/konsin1988/docker.d/volumes/25aeeb6f15ff1ffc45821378191530efe2578174436fc3a8d17c5409f52bd065/_data",
+      "labels": {
+        "com.docker.volume.anonymous": ""
+      },
+      "scope": "local"
+    },
+    ...
+  ]
+}
+```
+
+##### create 
+> grpcurl -plaintext -d '{
+  "name":"postgres-data",
+  "driver":"local",
+  "labels":{
+    "app":"rtainer",
+    "env":"dev"
+  }
+}' localhost:50051 agent.AgentService/CreateVolume
+
+
+##### remove
+> grpcurl -plaintext -d '{ "name":"postgres-data", "force":true }' localhost:50051 agent.AgentService/RemoveVolume
+
+
+#### Docker info
+
+> grpcurl -plaintext -d '{}' localhost:50051 agent.AgentService/DockerInfo
 
 ### API Endpoints
 

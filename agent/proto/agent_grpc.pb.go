@@ -21,11 +21,13 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	AgentService_ListImages_FullMethodName       = "/agent.AgentService/ListImages"
 	AgentService_RemoveImage_FullMethodName      = "/agent.AgentService/RemoveImage"
+	AgentService_InspectImage_FullMethodName     = "/agent.AgentService/InspectImage"
 	AgentService_ListContainers_FullMethodName   = "/agent.AgentService/ListContainers"
 	AgentService_StopContainer_FullMethodName    = "/agent.AgentService/StopContainer"
 	AgentService_StartContainer_FullMethodName   = "/agent.AgentService/StartContainer"
 	AgentService_RemoveContainer_FullMethodName  = "/agent.AgentService/RemoveContainer"
 	AgentService_RunContainer_FullMethodName     = "/agent.AgentService/RunContainer"
+	AgentService_RestartContainer_FullMethodName = "/agent.AgentService/RestartContainer"
 	AgentService_ViewLogs_FullMethodName         = "/agent.AgentService/ViewLogs"
 	AgentService_InspectContainer_FullMethodName = "/agent.AgentService/InspectContainer"
 	AgentService_ContainerStats_FullMethodName   = "/agent.AgentService/ContainerStats"
@@ -33,6 +35,11 @@ const (
 	AgentService_ListNetworks_FullMethodName     = "/agent.AgentService/ListNetworks"
 	AgentService_CreateNetwork_FullMethodName    = "/agent.AgentService/CreateNetwork"
 	AgentService_RemoveNetwork_FullMethodName    = "/agent.AgentService/RemoveNetwork"
+	AgentService_InspectNetwork_FullMethodName   = "/agent.AgentService/InspectNetwork"
+	AgentService_ListVolumes_FullMethodName      = "/agent.AgentService/ListVolumes"
+	AgentService_CreateVolume_FullMethodName     = "/agent.AgentService/CreateVolume"
+	AgentService_RemoveVolume_FullMethodName     = "/agent.AgentService/RemoveVolume"
+	AgentService_DockerInfo_FullMethodName       = "/agent.AgentService/DockerInfo"
 )
 
 // AgentServiceClient is the client API for AgentService service.
@@ -42,12 +49,14 @@ type AgentServiceClient interface {
 	// images
 	ListImages(ctx context.Context, in *ListImagesRequest, opts ...grpc.CallOption) (*ListImagesResponse, error)
 	RemoveImage(ctx context.Context, in *RemoveImageRequest, opts ...grpc.CallOption) (*RemoveImageResponse, error)
+	InspectImage(ctx context.Context, in *ImageRequest, opts ...grpc.CallOption) (*InspectImageResponse, error)
 	// containers movements
 	ListContainers(ctx context.Context, in *ListContainersRequest, opts ...grpc.CallOption) (*ListContainersResponse, error)
 	StopContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 	StartContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 	RemoveContainer(ctx context.Context, in *RemoveContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 	RunContainer(ctx context.Context, in *RunContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
+	RestartContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 	// data / other
 	ViewLogs(ctx context.Context, in *ViewLogsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error)
 	InspectContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*InspectContainerResponse, error)
@@ -56,7 +65,14 @@ type AgentServiceClient interface {
 	// network
 	ListNetworks(ctx context.Context, in *ListNetworksRequest, opts ...grpc.CallOption) (*ListNetworksResponse, error)
 	CreateNetwork(ctx context.Context, in *CreateNetworkRequest, opts ...grpc.CallOption) (*CreateNetworkResponse, error)
-	RemoveNetwork(ctx context.Context, in *RemoveNetworkRequest, opts ...grpc.CallOption) (*RemoveNetworkResponse, error)
+	RemoveNetwork(ctx context.Context, in *NetworkRequest, opts ...grpc.CallOption) (*NetworkResponse, error)
+	InspectNetwork(ctx context.Context, in *NetworkRequest, opts ...grpc.CallOption) (*InspectNetworkResponse, error)
+	// volumes
+	ListVolumes(ctx context.Context, in *ListVolumesRequest, opts ...grpc.CallOption) (*ListVolumesResponse, error)
+	CreateVolume(ctx context.Context, in *CreateVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error)
+	RemoveVolume(ctx context.Context, in *RemoveVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error)
+	// docker info
+	DockerInfo(ctx context.Context, in *DockerInfoRequest, opts ...grpc.CallOption) (*DockerInfoResponse, error)
 }
 
 type agentServiceClient struct {
@@ -81,6 +97,16 @@ func (c *agentServiceClient) RemoveImage(ctx context.Context, in *RemoveImageReq
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(RemoveImageResponse)
 	err := c.cc.Invoke(ctx, AgentService_RemoveImage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentServiceClient) InspectImage(ctx context.Context, in *ImageRequest, opts ...grpc.CallOption) (*InspectImageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(InspectImageResponse)
+	err := c.cc.Invoke(ctx, AgentService_InspectImage_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -131,6 +157,16 @@ func (c *agentServiceClient) RunContainer(ctx context.Context, in *RunContainerR
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ContainerResponse)
 	err := c.cc.Invoke(ctx, AgentService_RunContainer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentServiceClient) RestartContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ContainerResponse)
+	err := c.cc.Invoke(ctx, AgentService_RestartContainer_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -224,10 +260,60 @@ func (c *agentServiceClient) CreateNetwork(ctx context.Context, in *CreateNetwor
 	return out, nil
 }
 
-func (c *agentServiceClient) RemoveNetwork(ctx context.Context, in *RemoveNetworkRequest, opts ...grpc.CallOption) (*RemoveNetworkResponse, error) {
+func (c *agentServiceClient) RemoveNetwork(ctx context.Context, in *NetworkRequest, opts ...grpc.CallOption) (*NetworkResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RemoveNetworkResponse)
+	out := new(NetworkResponse)
 	err := c.cc.Invoke(ctx, AgentService_RemoveNetwork_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentServiceClient) InspectNetwork(ctx context.Context, in *NetworkRequest, opts ...grpc.CallOption) (*InspectNetworkResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(InspectNetworkResponse)
+	err := c.cc.Invoke(ctx, AgentService_InspectNetwork_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentServiceClient) ListVolumes(ctx context.Context, in *ListVolumesRequest, opts ...grpc.CallOption) (*ListVolumesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListVolumesResponse)
+	err := c.cc.Invoke(ctx, AgentService_ListVolumes_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentServiceClient) CreateVolume(ctx context.Context, in *CreateVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(VolumeResponse)
+	err := c.cc.Invoke(ctx, AgentService_CreateVolume_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentServiceClient) RemoveVolume(ctx context.Context, in *RemoveVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(VolumeResponse)
+	err := c.cc.Invoke(ctx, AgentService_RemoveVolume_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentServiceClient) DockerInfo(ctx context.Context, in *DockerInfoRequest, opts ...grpc.CallOption) (*DockerInfoResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DockerInfoResponse)
+	err := c.cc.Invoke(ctx, AgentService_DockerInfo_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -241,12 +327,14 @@ type AgentServiceServer interface {
 	// images
 	ListImages(context.Context, *ListImagesRequest) (*ListImagesResponse, error)
 	RemoveImage(context.Context, *RemoveImageRequest) (*RemoveImageResponse, error)
+	InspectImage(context.Context, *ImageRequest) (*InspectImageResponse, error)
 	// containers movements
 	ListContainers(context.Context, *ListContainersRequest) (*ListContainersResponse, error)
 	StopContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
 	StartContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
 	RemoveContainer(context.Context, *RemoveContainerRequest) (*ContainerResponse, error)
 	RunContainer(context.Context, *RunContainerRequest) (*ContainerResponse, error)
+	RestartContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
 	// data / other
 	ViewLogs(*ViewLogsRequest, grpc.ServerStreamingServer[LogMessage]) error
 	InspectContainer(context.Context, *ContainerRequest) (*InspectContainerResponse, error)
@@ -255,7 +343,14 @@ type AgentServiceServer interface {
 	// network
 	ListNetworks(context.Context, *ListNetworksRequest) (*ListNetworksResponse, error)
 	CreateNetwork(context.Context, *CreateNetworkRequest) (*CreateNetworkResponse, error)
-	RemoveNetwork(context.Context, *RemoveNetworkRequest) (*RemoveNetworkResponse, error)
+	RemoveNetwork(context.Context, *NetworkRequest) (*NetworkResponse, error)
+	InspectNetwork(context.Context, *NetworkRequest) (*InspectNetworkResponse, error)
+	// volumes
+	ListVolumes(context.Context, *ListVolumesRequest) (*ListVolumesResponse, error)
+	CreateVolume(context.Context, *CreateVolumeRequest) (*VolumeResponse, error)
+	RemoveVolume(context.Context, *RemoveVolumeRequest) (*VolumeResponse, error)
+	// docker info
+	DockerInfo(context.Context, *DockerInfoRequest) (*DockerInfoResponse, error)
 	mustEmbedUnimplementedAgentServiceServer()
 }
 
@@ -272,6 +367,9 @@ func (UnimplementedAgentServiceServer) ListImages(context.Context, *ListImagesRe
 func (UnimplementedAgentServiceServer) RemoveImage(context.Context, *RemoveImageRequest) (*RemoveImageResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RemoveImage not implemented")
 }
+func (UnimplementedAgentServiceServer) InspectImage(context.Context, *ImageRequest) (*InspectImageResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method InspectImage not implemented")
+}
 func (UnimplementedAgentServiceServer) ListContainers(context.Context, *ListContainersRequest) (*ListContainersResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListContainers not implemented")
 }
@@ -286,6 +384,9 @@ func (UnimplementedAgentServiceServer) RemoveContainer(context.Context, *RemoveC
 }
 func (UnimplementedAgentServiceServer) RunContainer(context.Context, *RunContainerRequest) (*ContainerResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RunContainer not implemented")
+}
+func (UnimplementedAgentServiceServer) RestartContainer(context.Context, *ContainerRequest) (*ContainerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RestartContainer not implemented")
 }
 func (UnimplementedAgentServiceServer) ViewLogs(*ViewLogsRequest, grpc.ServerStreamingServer[LogMessage]) error {
 	return status.Error(codes.Unimplemented, "method ViewLogs not implemented")
@@ -305,8 +406,23 @@ func (UnimplementedAgentServiceServer) ListNetworks(context.Context, *ListNetwor
 func (UnimplementedAgentServiceServer) CreateNetwork(context.Context, *CreateNetworkRequest) (*CreateNetworkResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateNetwork not implemented")
 }
-func (UnimplementedAgentServiceServer) RemoveNetwork(context.Context, *RemoveNetworkRequest) (*RemoveNetworkResponse, error) {
+func (UnimplementedAgentServiceServer) RemoveNetwork(context.Context, *NetworkRequest) (*NetworkResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RemoveNetwork not implemented")
+}
+func (UnimplementedAgentServiceServer) InspectNetwork(context.Context, *NetworkRequest) (*InspectNetworkResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method InspectNetwork not implemented")
+}
+func (UnimplementedAgentServiceServer) ListVolumes(context.Context, *ListVolumesRequest) (*ListVolumesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListVolumes not implemented")
+}
+func (UnimplementedAgentServiceServer) CreateVolume(context.Context, *CreateVolumeRequest) (*VolumeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateVolume not implemented")
+}
+func (UnimplementedAgentServiceServer) RemoveVolume(context.Context, *RemoveVolumeRequest) (*VolumeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RemoveVolume not implemented")
+}
+func (UnimplementedAgentServiceServer) DockerInfo(context.Context, *DockerInfoRequest) (*DockerInfoResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DockerInfo not implemented")
 }
 func (UnimplementedAgentServiceServer) mustEmbedUnimplementedAgentServiceServer() {}
 func (UnimplementedAgentServiceServer) testEmbeddedByValue()                      {}
@@ -361,6 +477,24 @@ func _AgentService_RemoveImage_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AgentServiceServer).RemoveImage(ctx, req.(*RemoveImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentService_InspectImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).InspectImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_InspectImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).InspectImage(ctx, req.(*ImageRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -455,6 +589,24 @@ func _AgentService_RunContainer_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AgentService_RestartContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ContainerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).RestartContainer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_RestartContainer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).RestartContainer(ctx, req.(*ContainerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AgentService_ViewLogs_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(ViewLogsRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -543,7 +695,7 @@ func _AgentService_CreateNetwork_Handler(srv interface{}, ctx context.Context, d
 }
 
 func _AgentService_RemoveNetwork_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RemoveNetworkRequest)
+	in := new(NetworkRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -555,7 +707,97 @@ func _AgentService_RemoveNetwork_Handler(srv interface{}, ctx context.Context, d
 		FullMethod: AgentService_RemoveNetwork_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServiceServer).RemoveNetwork(ctx, req.(*RemoveNetworkRequest))
+		return srv.(AgentServiceServer).RemoveNetwork(ctx, req.(*NetworkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentService_InspectNetwork_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NetworkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).InspectNetwork(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_InspectNetwork_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).InspectNetwork(ctx, req.(*NetworkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentService_ListVolumes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListVolumesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).ListVolumes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_ListVolumes_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).ListVolumes(ctx, req.(*ListVolumesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentService_CreateVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateVolumeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).CreateVolume(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_CreateVolume_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).CreateVolume(ctx, req.(*CreateVolumeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentService_RemoveVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveVolumeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).RemoveVolume(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_RemoveVolume_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).RemoveVolume(ctx, req.(*RemoveVolumeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentService_DockerInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DockerInfoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).DockerInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_DockerInfo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).DockerInfo(ctx, req.(*DockerInfoRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -574,6 +816,10 @@ var AgentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RemoveImage",
 			Handler:    _AgentService_RemoveImage_Handler,
+		},
+		{
+			MethodName: "InspectImage",
+			Handler:    _AgentService_InspectImage_Handler,
 		},
 		{
 			MethodName: "ListContainers",
@@ -596,6 +842,10 @@ var AgentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AgentService_RunContainer_Handler,
 		},
 		{
+			MethodName: "RestartContainer",
+			Handler:    _AgentService_RestartContainer_Handler,
+		},
+		{
 			MethodName: "InspectContainer",
 			Handler:    _AgentService_InspectContainer_Handler,
 		},
@@ -610,6 +860,26 @@ var AgentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RemoveNetwork",
 			Handler:    _AgentService_RemoveNetwork_Handler,
+		},
+		{
+			MethodName: "InspectNetwork",
+			Handler:    _AgentService_InspectNetwork_Handler,
+		},
+		{
+			MethodName: "ListVolumes",
+			Handler:    _AgentService_ListVolumes_Handler,
+		},
+		{
+			MethodName: "CreateVolume",
+			Handler:    _AgentService_CreateVolume_Handler,
+		},
+		{
+			MethodName: "RemoveVolume",
+			Handler:    _AgentService_RemoveVolume_Handler,
+		},
+		{
+			MethodName: "DockerInfo",
+			Handler:    _AgentService_DockerInfo_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

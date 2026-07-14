@@ -78,6 +78,18 @@ func (c *Client) StartContainer(
     )
 }
 
+// ----------------------------- RESTART CONTAINER -----------------
+func (c *Client) RestartContainer(
+    ctx context.Context,
+    id string,
+) error {
+    return c.cli.ContainerRestart(
+        ctx,
+        id,
+        container.StopOptions{},
+    )
+}
+
 // ------------------------------- REMOVE CONTAINER ---------------
 func (c *Client) RemoveContainer(
 	ctx context.Context,

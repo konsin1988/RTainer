@@ -8,6 +8,7 @@ service AgentService {
   // images
   rpc ListImages(ListImagesRequest) returns (ListImagesResponse);
   rpc RemoveImage(RemoveImageRequest) returns (RemoveImageResponse);
+  rpc InspectImage(ImageRequest) returns (InspectImageResponse);
 
   // containers movements 
   rpc ListContainers(ListContainersRequest) returns (ListContainersResponse);
@@ -15,6 +16,7 @@ service AgentService {
   rpc StartContainer(ContainerRequest) returns (ContainerResponse);
   rpc RemoveContainer(RemoveContainerRequest) returns (ContainerResponse);
   rpc RunContainer(RunContainerRequest) returns (ContainerResponse);
+  rpc RestartContainer(ContainerRequest) returns (ContainerResponse);
 
   // data / other 
   rpc ViewLogs(ViewLogsRequest) returns (stream LogMessage);
@@ -25,12 +27,19 @@ service AgentService {
   // network
   rpc ListNetworks(ListNetworksRequest) returns (ListNetworksResponse);
   rpc CreateNetwork(CreateNetworkRequest) returns (CreateNetworkResponse);
-  rpc RemoveNetwork(RemoveNetworkRequest) returns (RemoveNetworkResponse);
+  rpc RemoveNetwork(NetworkRequest) returns (NetworkResponse);
+  rpc InspectNetwork(NetworkRequest) returns (InspectNetworkResponse);
+
+  // volumes
+  rpc ListVolumes(ListVolumesRequest) returns (ListVolumesResponse);
+  rpc CreateVolume(CreateVolumeRequest) returns (VolumeResponse);
+  rpc RemoveVolume(RemoveVolumeRequest) returns (VolumeResponse);
+
+  // docker info
+  rpc DockerInfo(DockerInfoRequest) returns (DockerInfoResponse);
 }
 
-// ----------------------------
-// LIST CONTAINERS 
-// ----------------------------
+// ----------------------------------- LIST CONTAINERS 
 message ListContainersRequest {}
 
 message Container {
@@ -45,9 +54,7 @@ message ListContainersResponse {
 }
 
 
-// ----------------------------
-// LIST IMAGES 
-// ----------------------------
+// ------------------------------------ LIST IMAGES 
 message ListImagesRequest {}
 
 message Image {
@@ -62,9 +69,7 @@ message ListImagesResponse {
 }
 
 
-// -------------------------------
-// REMOVE IMAGE 
-// -------------------------------
+// -------------------------------------- REMOVE IMAGE 
 message RemoveImageRequest {
     string id = 1;
     bool force = 2;
@@ -72,25 +77,45 @@ message RemoveImageRequest {
 message RemoveImageResponse {}
 
 
-// ------------------------------
-// STOP, START EXISTING CONTAINER BY ID
-// -----------------------------
+// --------------------------------------- INSPECT IMAGE
+message ImageRequest {
+  string id = 1;
+}
+
+message InspectImageResponse {
+  string id = 1;
+
+  repeated string repo_tags = 2;
+  repeated string repo_digests = 3;
+
+  int64 size = 4;
+  int64 created = 5;
+
+  string os = 6;
+  string architecture = 7;
+
+  repeated string env = 8;
+  repeated string cmd = 9;
+  repeated string entrypoint = 10;
+
+  map<string, string> labels = 11;
+
+  repeated string exposed_ports = 12;
+}
+
+// ----------------------------------------- STOP, START EXISTING CONTAINER BY ID
 message ContainerRequest { string id = 1; }
 message ContainerResponse {}
 
 
-// -------------------------------
-// REMOVE CONTAINER
-// ------------------------------
+// ----------------------------------------- REMOVE CONTAINER
 message RemoveContainerRequest {
     string id = 1;
     bool force = 2;
     bool remove_volumes = 3;
 }
 
-// --------------------------------
-// RUN CONTAINER
-// ---------------------------------
+// ------------------------------------------ RUN CONTAINER
 message RunContainerRequest {
   string image_id = 1;
 
@@ -104,9 +129,9 @@ message RunContainerRequest {
 }
 
 message PortBinding {
-  string container_port = 1;    // "80/tcp"
+  string container_port = 1;
   string host_ip = 2;
-  string host_port = 3;         // "8080"
+  string host_port = 3;
 }
 
 message VolumeBinding {
@@ -114,14 +139,12 @@ message VolumeBinding {
   string target = 2;
 }
 
-// ------------------------------------
-// VIEW LOGS
-// --------------------------------------
+// -------------------------------------------- VIEW LOGS
 message ViewLogsRequest {
   string container_id = 1;
 
-  bool follow = 2;            // like docker logs -f
-  uint32 tail = 3;            // last N lines (0 = all)
+  bool follow = 2;            
+  uint32 tail = 3;           
   bool timestamps = 4;
 }
 
@@ -136,9 +159,7 @@ message LogMessage {
     LogStream stream = 2;
 }
 
-// --------------------------------------
-// EXECUTE COMMAND
-// --------------------------------------
+// ------------------------------------------- EXECUTE COMMAND
 message ExecuteCommandRequest {
     string id = 1;
     repeated string command = 2;
@@ -146,9 +167,7 @@ message ExecuteCommandRequest {
 }
 
 
-// -------------------------------------
-// INSPECT CONTAINER
-// ------------------------------------
+// ------------------------------------------- INSPECT CONTAINER
 message InspectContainerResponse {
     string id = 1;
     string name = 2;
@@ -168,9 +187,7 @@ message HealthStatus {
     repeated string logs = 3;
 }
 
-// ---------------------------------------
-// CONTAINER STATS
-// ---------------------------------------
+// --------------------------------------------- CONTAINER STATS
 message ContainerStatsResponse {
   double cpu_percent = 1;
 
@@ -186,9 +203,7 @@ message ContainerStatsResponse {
   uint32 pids = 8;
 }
 
-// ---------------------------------------
-// LIST NETWORKS
-// -------------------------------------
+// --------------------------------------------- LIST NETWORKS
 message NetContainer {
   string id = 1;
 	string name = 2;
@@ -212,9 +227,7 @@ message ListNetworksResponse {
 
 
 
-// -----------------------------------
-// CREATE AND REMOVE NETWORK
-// ------------------------------------
+// ------------------------------------------CREATE AND REMOVE NETWORK
 message CreateNetworkRequest {
   string name = 1;
 
@@ -226,9 +239,107 @@ message CreateNetworkResponse {
   string id = 1;
 }
 
-message RemoveNetworkRequest {
+message NetworkRequest {
     string id = 1;
 }
 
-message RemoveNetworkResponse {}
+message NetworkResponse {}
 
+
+// -------------------------------------------- INSPECT NETWORK 
+message IPAMConfig {
+    string subnet = 1;
+    string gateway = 2;
+    string ip_range = 3;
+}
+
+message NetworkContainer {
+    string id = 1;
+    string name = 2;
+    string ipv4_address = 3;
+}
+
+message InspectNetworkResponse {
+    string id = 1;
+    string name = 2;
+
+    string driver = 3;
+    string scope = 4;
+
+    bool internal = 5;
+    bool attachable = 6;
+    bool ingress = 7;
+
+    repeated IPAMConfig ipam = 8;
+
+    map<string, string> options = 9;
+    map<string, string> labels = 10;
+
+    repeated NetworkContainer containers = 11;
+}
+
+// --------------------------------------
+// VOLUMES 
+// ----------------------------------------------- LIST VOLUMES
+message ListVolumesRequest {}
+
+message Volume {
+    string name = 1;
+    string driver = 2;
+    string mountpoint = 3;
+
+    map<string, string> labels = 4;
+
+    string scope = 5;
+}
+
+message ListVolumesResponse {
+    repeated Volume volumes = 1;
+}
+
+// -------------------------------------- ---------CREATE VOLUME 
+message CreateVolumeRequest {
+    string name = 1;
+    string driver = 2;
+
+    map<string, string> labels = 3;
+    map<string, string> options = 4;
+}
+
+message VolumeResponse {}
+
+// ----------------------------------------------- REMOVE VOLUME
+message RemoveVolumeRequest {
+    string name = 1;
+    bool force = 2;
+}
+
+// ------------------------------------------------ DOCKER INFO
+message DockerInfoRequest {}
+
+message DockerInfoResponse {
+    string server_version = 1;
+    string api_version = 2;
+
+    string operating_system = 3;
+    string architecture = 4;
+    string kernel_version = 5;
+
+    int32 containers = 6;
+    int32 containers_running = 7;
+    int32 containers_paused = 8;
+    int32 containers_stopped = 9;
+
+    int32 images = 10;
+    int32 volumes = 11;
+
+    string driver = 12;
+
+    int64 mem_total = 13;
+    int32 ncpu = 14;
+
+    string docker_root_dir = 15;
+
+    string name = 16;
+    string id = 17;
+}

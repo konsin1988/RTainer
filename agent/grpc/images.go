@@ -53,3 +53,35 @@ func (s *Server) RemoveImage(
 
     return &pb.RemoveImageResponse{}, nil
 }
+
+// ------------------------------------------------------
+// INSPECT IMAGE 
+// ------------------------------------------------------
+func (s *Server) InspectImage(
+    ctx context.Context,
+    req *pb.ImageRequest,
+) (*pb.InspectImageResponse, error) {
+
+    img, err := s.imageSvc.InspectImage(
+        ctx,
+        req.Id,
+    )
+    if err != nil {
+        return nil, err
+    }
+
+    return &pb.InspectImageResponse {
+        Id:            img.ID,
+        RepoTags:      img.RepoTags,
+        RepoDigests:   img.RepoDigests,
+        Size:          img.Size,
+        Created:       img.Created,
+        Os:            img.OS,
+        Architecture:  img.Architecture,
+        Env:           img.Env,
+        Cmd:           img.Cmd,
+        Entrypoint:    img.Entrypoint,
+        Labels:        img.Labels,
+        ExposedPorts:  img.ExposedPorts,
+    }, nil
+}

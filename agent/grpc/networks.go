@@ -79,8 +79,8 @@ func (s *Server) CreateNetwork(
 // ------------------ REMOVE NETWORK -----------------------
 func (s *Server) RemoveNetwork(
     ctx context.Context,
-    req *pb.RemoveNetworkRequest,
-) (*pb.RemoveNetworkResponse, error) {
+    req *pb.NetworkRequest,
+) (*pb.NetworkResponse, error) {
 
 
     err := s.networkSvc.RemoveNetwork(
@@ -93,5 +93,48 @@ func (s *Server) RemoveNetwork(
     }
 
 
-    return &pb.RemoveNetworkResponse{}, nil
+    return &pb.NetworkResponse{}, nil
+}
+
+
+// ------------------ INSPECT NETWORK ----------------------
+func (s *Server) InspectNetwork(
+    ctx context.Context,
+    req *pb.NetworkRequest,
+) (*pb.InspectNetworkResponse, error) {
+
+    n, err := s.networkSvc.InspectNetwork(ctx, req.Id)
+    if err != nil {
+        return nil, err
+    }
+
+    resp := &pb.InspectNetworkResponse {
+        Id:         n.ID,
+        Name:       n.Name,
+        Driver:     n.Driver,
+        Scope:      n.Scope,
+        Internal:   n.Internal,
+        Attachable: n.Attachable,
+        Ingress:    n.Ingress,
+        Options:    n.Options,
+        Labels:     n.Labels,
+    }
+
+    for _, cfg := range n.IPAM {
+        resp.Ipam = append(resp.Ipam, &pb.IPAMConfig{
+            Subnet:  cfg.Subnet,
+            Gateway: cfg.Gateway,
+            IpRange: cfg.IPRange,
+        })
+    }
+
+    for _, c := range n.Containers {
+        resp.Containers = append(resp.Containers, &pb.NetworkContainer{
+            Id:          c.ID,
+            Name:        c.Name,
+            Ipv4Address: c.IPv4Address,
+        })
+    }
+
+    return resp, nil
 }

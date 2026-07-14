@@ -64,6 +64,14 @@ func (s *ContainerService) StartContainer(
     return s.docker.StartContainer(ctx, id)
 }
 
+// ------------------------ RESTART CONTAINER ---------------
+func (s *ContainerService) RestartContainer(
+    ctx context.Context,
+    id string,
+) error {
+    return s.docker.RestartContainer(ctx, id)
+}
+
 // --------------------- REMOVE CONTAINER --------------------
 func (s *ContainerService) RemoveContainer(
 		ctx context.Context,
@@ -139,4 +147,12 @@ func (s *ContainerService) ExecuteCommand(
             Tty:         req.Tty,
         },
     )
+}
+
+
+// ------------------------------------------- DOCKER INFO
+func (s *ContainerService) DockerInfo(
+    ctx context.Context,
+) (docker.DockerInfo, error) {
+    return s.docker.DockerInfo(ctx)
 }
