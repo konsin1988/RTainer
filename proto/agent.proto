@@ -9,6 +9,7 @@ service AgentService {
   rpc ListImages(ListImagesRequest) returns (ListImagesResponse);
   rpc RemoveImage(RemoveImageRequest) returns (RemoveImageResponse);
   rpc InspectImage(ImageRequest) returns (InspectImageResponse);
+  rpc PullImage(PullImageRequest) returns (stream PullImageMessage);
 
   // containers movements 
   rpc ListContainers(ListContainersRequest) returns (ListContainersResponse);
@@ -37,6 +38,9 @@ service AgentService {
 
   // docker info
   rpc DockerInfo(DockerInfoRequest) returns (DockerInfoResponse);
+
+  // events
+  rpc Events(EventsRequest) returns (stream EventMessage);
 }
 
 // ----------------------------------- LIST CONTAINERS 
@@ -102,6 +106,22 @@ message InspectImageResponse {
 
   repeated string exposed_ports = 12;
 }
+
+// --------------------------------------------PULL IMAGE
+message PullImageRequest {
+    string reference = 1; // e.g. "nginx:latest"
+}
+
+message PullImageMessage {
+    string status = 1;
+    string id = 2;
+
+    int64 current = 3;
+    int64 total = 4;
+
+    string error = 5;
+}
+
 
 // ----------------------------------------- STOP, START EXISTING CONTAINER BY ID
 message ContainerRequest { string id = 1; }
@@ -342,4 +362,21 @@ message DockerInfoResponse {
 
     string name = 16;
     string id = 17;
+}
+
+// ----------------------------------------------- EVENTS
+message EventsRequest {
+    repeated string types = 1;      // container, image, network, volume...
+    repeated string actions = 2;    // create, start, stop...
+}
+
+message EventMessage {
+    int64 time = 1;
+
+    string type = 2;
+    string action = 3;
+
+    string id = 4;
+
+    map<string, string> attributes = 5;
 }

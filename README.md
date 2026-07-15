@@ -239,6 +239,23 @@ grpcurl -plaintext -d '{ "container_id":"2eeebdcd26c91ac36cde73609b6991538d51172
 }
 ```
 
+
+##### pull image
+grpcurl -plaintext -d '{ "reference":"nginx:latest" }' localhost:50051 agent.AgentService/PullImage
+
+###### response
+```
+{
+  "status": "Pulling from library/nginx",
+  "id": "latest"
+}
+{
+  "status": "Pulling fs layer",
+  "id": "062e450697fa"
+}
+...
+```
+
 #### NETWORKS 
 
 ##### list
@@ -359,6 +376,29 @@ grpcurl -plaintext -d '{ "container_id":"2eeebdcd26c91ac36cde73609b6991538d51172
 #### Docker info
 
 > grpcurl -plaintext -d '{}' localhost:50051 agent.AgentService/DockerInfo
+
+
+#### Events
+> grpcurl -plaintext -d '{}' localhost:50051 agent.AgentService/Events
+
+> grpcurl -plaintext -d '{ "types":["container"] }' localhost:50051 agent.AgentService/Events
+
+> grpcurl -plaintext -d '{ "types":["container"], "actions":["start","stop"] }' localhost:50051 agent.AgentService/Events
+
+###### response:
+```
+{
+  "time": "1784117226",
+  "type": "container",
+  "action": "start",
+  "id": "ed0b399946b89cfdecbf20e5d4f1b7d590e69a4647bd98016bb6a8b96936fbb6",
+  "attributes": {
+    "image": "sha256:a97d82f709e2e0ef35e48a697aec860e12cbf2a0ffbfd95d7701976e81d470ed",
+    "maintainer": "NGINX Docker Maintainers \u003cdocker-maint@nginx.com\u003e",
+    "name": "my-test-nginx"
+  }
+}
+```
 
 ### API Endpoints
 

@@ -2,8 +2,11 @@ package docker
 
 import (
     "context"
+		"encoding/json"
+		"io"
 
 		"github.com/docker/docker/api/types/image"
+		"github.com/docker/docker/pkg/jsonmessage"
 )
 
 type Image struct {
@@ -33,8 +36,22 @@ type ImageInfo struct {
     ExposedPorts  []string
 }
 
-// ------------------------ LIST IMAGE ----------------------------
-func (c *Client) ListImages(ctx context.Context) ([]Image, error) {
+type PullImageRequest struct {
+    Reference string
+}
+
+type PullProgress struct {
+    Status  string
+    ID      string
+    Current int64
+    Total   int64
+    Error   string
+}
+
+// ---------------------------------------------------- LIST IMAGE 
+func (c *Client) ListImages(
+	ctx context.Context,
+) ([]Image, error) {
     imgs, err := c.cli.ImageList(ctx, image.ListOptions{})
     if err != nil {
         return nil, err
@@ -55,7 +72,7 @@ func (c *Client) ListImages(ctx context.Context) ([]Image, error) {
 }
 
 
-// --------------------------- REMOVE IMAGE ------------------------------
+// ------------------------------------------------- REMOVE IMAGE 
 func (c *Client) RemoveImage(
     ctx context.Context,
     id string,
@@ -74,7 +91,7 @@ func (c *Client) RemoveImage(
 }
 
 
-// ----------------------------- INSPECT IMAGE -----------------------------
+// ------------------------------------------------- INSPECT IMAGE 
 func (c *Client) InspectImage(
     ctx context.Context,
     id string,
@@ -109,4 +126,55 @@ func (c *Client) InspectImage(
     }
 
     return info, nil
+}
+
+
+// ----------------------------------------------------PULL IMAGE
+func (c *Client) PullImage(
+    ctx context.Context,
+    req PullImageRequest,
+    onProgress func(PullProgress) error,
+) error {
+
+    reader, err := c.cli.ImagePull(
+        ctx,
+        req.Reference,
+        image.PullOptions{},
+    )
+    if err != nil {
+        return err
+    }
+    defer reader.Close()
+
+    decoder := json.NewDecoder(reader)
+
+    for {
+        var msg jsonmessage.JSONMessage
+
+        if err := decoder.Decode(&msg); err != nil {
+            if err == io.EOF {
+                return nil
+            }
+
+            return err
+        }
+
+        progress := PullProgress{
+            Status: msg.Status,
+            ID:     msg.ID,
+        }
+
+				if err := msg.Error; err != nil {
+				    progress.Error = err.Message
+				}
+
+        if msg.Progress != nil {
+            progress.Current = msg.Progress.Current
+            progress.Total = msg.Progress.Total
+        }
+
+        if err := onProgress(progress); err != nil {
+            return err
+        }
+    }
 }

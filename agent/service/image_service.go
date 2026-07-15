@@ -22,8 +22,10 @@ type Image struct {
     Created   int64
 }
 
-// ----------------------------- LIST IMAGES -------------------------------
-func (s *ImageService) ListImages(ctx context.Context) ([]Image, error) {
+// -------------------------------------------- LIST IMAGES 
+func (s *ImageService) ListImages(
+	ctx context.Context,
+) ([]Image, error) {
     images, err := s.docker.ListImages(ctx)
     if err != nil {
         return nil, err
@@ -39,7 +41,7 @@ func (s *ImageService) ListImages(ctx context.Context) ([]Image, error) {
 }
 
 
-// -------------------------------- REMOVE IMAGE ----------------------------
+// --------------------------------------------- REMOVE IMAGE 
 func (s *ImageService) RemoveImage(
     ctx context.Context,
     req *proto.RemoveImageRequest,
@@ -52,11 +54,28 @@ func (s *ImageService) RemoveImage(
     )
 }
 
-// ---------------------- INSPECT IMAGE ---------------------------
+// --------------------------------------------- INSPECT IMAGE 
 func (s *ImageService) InspectImage(
     ctx context.Context,
     id string,
 ) (docker.ImageInfo, error) {
 
     return s.docker.InspectImage(ctx, id)
+}
+
+
+// ---------------------------------------------- PULL IMAGE
+func (s *ImageService) PullImage(
+    ctx context.Context,
+    req *proto.PullImageRequest,
+    onProgress func(docker.PullProgress) error,
+) error {
+
+    return s.docker.PullImage(
+        ctx,
+        docker.PullImageRequest{
+            Reference: req.Reference,
+        },
+        onProgress,
+    )
 }
