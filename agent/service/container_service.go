@@ -23,7 +23,10 @@ type Container struct {
     Status string
 }
 
-func (s *ContainerService) ListContainers(ctx context.Context) ([]Container, error) {
+// -------------------------------------------------- LIST CONTAINERS
+func (s *ContainerService) ListContainers(
+	ctx context.Context,
+) ([]Container, error) {
     ctrs, err := s.docker.ListContainers(ctx)
     if err != nil {
         return nil, err
@@ -45,7 +48,7 @@ func (s *ContainerService) ListContainers(ctx context.Context) ([]Container, err
 }
 
 
-// ---------------------------	STOP CONTAINER -----------------
+// -------------------------------------------- STOP CONTAINER 
 func (s *ContainerService) StopContainer(
     ctx context.Context,
     id string,
@@ -55,7 +58,7 @@ func (s *ContainerService) StopContainer(
 }
 
 
-// -------------------------------START CONTAINER ----------------
+// ------------------------------------------- START CONTAINER 
 func (s *ContainerService) StartContainer(
     ctx context.Context,
     id string,
@@ -64,7 +67,7 @@ func (s *ContainerService) StartContainer(
     return s.docker.StartContainer(ctx, id)
 }
 
-// ------------------------ RESTART CONTAINER ---------------
+// -------------------------------------------- RESTART CONTAINER 
 func (s *ContainerService) RestartContainer(
     ctx context.Context,
     id string,
@@ -72,7 +75,7 @@ func (s *ContainerService) RestartContainer(
     return s.docker.RestartContainer(ctx, id)
 }
 
-// --------------------- REMOVE CONTAINER --------------------
+// -------------------------------------------- REMOVE CONTAINER 
 func (s *ContainerService) RemoveContainer(
 		ctx context.Context,
 		id string,
@@ -83,7 +86,7 @@ func (s *ContainerService) RemoveContainer(
 }
 
 
-// ---------------------- RUN CONTAINER ------------------------
+// ------------------------------------------ RUN CONTAINER 
 func (s *ContainerService) RunContainer(
     ctx context.Context,
     req *proto.RunContainerRequest,
@@ -91,7 +94,7 @@ func (s *ContainerService) RunContainer(
     return s.docker.RunContainer(ctx, req)
 }
 
-// ------------------------	VIEW LOGS --------------------------
+// ------------------------------------------	VIEW LOGS 
 func (s *ContainerService) ViewLogs(
 	ctx context.Context,
 	req *proto.ViewLogsRequest,
@@ -108,7 +111,7 @@ func (s *ContainerService) ViewLogs(
     )
 }
 
-// ------------------------ INSPECT CONTAINER ---------------------
+// ------------------------------------------ INSPECT CONTAINER 
 func (s *ContainerService) InspectContainer(
     ctx context.Context,
     req *proto.ContainerRequest,
@@ -120,7 +123,7 @@ func (s *ContainerService) InspectContainer(
     )
 }
 
-// ------------------------ CONTAINER STATS ----------------------
+// ----------------------------------------- CONTAINER STATS 
 func (s *ContainerService) ContainerStats(
     ctx context.Context,
     req *proto.ContainerRequest,
@@ -133,7 +136,7 @@ func (s *ContainerService) ContainerStats(
 }
 
 
-// ----------------- EXECUTE COMMAND -------------------------
+// ---------------------------------------- EXECUTE COMMAND 
 func (s *ContainerService) ExecuteCommand(
     ctx context.Context,
     req *proto.ExecuteCommandRequest,
@@ -155,4 +158,19 @@ func (s *ContainerService) DockerInfo(
     ctx context.Context,
 ) (docker.DockerInfo, error) {
     return s.docker.DockerInfo(ctx)
+}
+
+// ------------------------------------------------ EVENTS
+func (s *ContainerService) Events(
+    ctx context.Context,
+    req *proto.EventsRequest,
+) (<-chan docker.Event, <-chan error) {
+
+    return s.docker.Events(
+        ctx,
+        docker.EventsRequest{
+            Types: req.Types,
+            Actions: req.Actions,
+        },
+    )
 }

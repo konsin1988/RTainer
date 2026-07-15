@@ -22,6 +22,7 @@ const (
 	AgentService_ListImages_FullMethodName       = "/agent.AgentService/ListImages"
 	AgentService_RemoveImage_FullMethodName      = "/agent.AgentService/RemoveImage"
 	AgentService_InspectImage_FullMethodName     = "/agent.AgentService/InspectImage"
+	AgentService_PullImage_FullMethodName        = "/agent.AgentService/PullImage"
 	AgentService_ListContainers_FullMethodName   = "/agent.AgentService/ListContainers"
 	AgentService_StopContainer_FullMethodName    = "/agent.AgentService/StopContainer"
 	AgentService_StartContainer_FullMethodName   = "/agent.AgentService/StartContainer"
@@ -40,6 +41,7 @@ const (
 	AgentService_CreateVolume_FullMethodName     = "/agent.AgentService/CreateVolume"
 	AgentService_RemoveVolume_FullMethodName     = "/agent.AgentService/RemoveVolume"
 	AgentService_DockerInfo_FullMethodName       = "/agent.AgentService/DockerInfo"
+	AgentService_Events_FullMethodName           = "/agent.AgentService/Events"
 )
 
 // AgentServiceClient is the client API for AgentService service.
@@ -50,6 +52,7 @@ type AgentServiceClient interface {
 	ListImages(ctx context.Context, in *ListImagesRequest, opts ...grpc.CallOption) (*ListImagesResponse, error)
 	RemoveImage(ctx context.Context, in *RemoveImageRequest, opts ...grpc.CallOption) (*RemoveImageResponse, error)
 	InspectImage(ctx context.Context, in *ImageRequest, opts ...grpc.CallOption) (*InspectImageResponse, error)
+	PullImage(ctx context.Context, in *PullImageRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[PullImageMessage], error)
 	// containers movements
 	ListContainers(ctx context.Context, in *ListContainersRequest, opts ...grpc.CallOption) (*ListContainersResponse, error)
 	StopContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
@@ -73,6 +76,8 @@ type AgentServiceClient interface {
 	RemoveVolume(ctx context.Context, in *RemoveVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error)
 	// docker info
 	DockerInfo(ctx context.Context, in *DockerInfoRequest, opts ...grpc.CallOption) (*DockerInfoResponse, error)
+	// events
+	Events(ctx context.Context, in *EventsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[EventMessage], error)
 }
 
 type agentServiceClient struct {
@@ -112,6 +117,25 @@ func (c *agentServiceClient) InspectImage(ctx context.Context, in *ImageRequest,
 	}
 	return out, nil
 }
+
+func (c *agentServiceClient) PullImage(ctx context.Context, in *PullImageRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[PullImageMessage], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &AgentService_ServiceDesc.Streams[0], AgentService_PullImage_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[PullImageRequest, PullImageMessage]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type AgentService_PullImageClient = grpc.ServerStreamingClient[PullImageMessage]
 
 func (c *agentServiceClient) ListContainers(ctx context.Context, in *ListContainersRequest, opts ...grpc.CallOption) (*ListContainersResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
@@ -175,7 +199,7 @@ func (c *agentServiceClient) RestartContainer(ctx context.Context, in *Container
 
 func (c *agentServiceClient) ViewLogs(ctx context.Context, in *ViewLogsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &AgentService_ServiceDesc.Streams[0], AgentService_ViewLogs_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &AgentService_ServiceDesc.Streams[1], AgentService_ViewLogs_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -204,7 +228,7 @@ func (c *agentServiceClient) InspectContainer(ctx context.Context, in *Container
 
 func (c *agentServiceClient) ContainerStats(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ContainerStatsResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &AgentService_ServiceDesc.Streams[1], AgentService_ContainerStats_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &AgentService_ServiceDesc.Streams[2], AgentService_ContainerStats_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -223,7 +247,7 @@ type AgentService_ContainerStatsClient = grpc.ServerStreamingClient[ContainerSta
 
 func (c *agentServiceClient) ExecuteCommand(ctx context.Context, in *ExecuteCommandRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &AgentService_ServiceDesc.Streams[2], AgentService_ExecuteCommand_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &AgentService_ServiceDesc.Streams[3], AgentService_ExecuteCommand_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -320,6 +344,25 @@ func (c *agentServiceClient) DockerInfo(ctx context.Context, in *DockerInfoReque
 	return out, nil
 }
 
+func (c *agentServiceClient) Events(ctx context.Context, in *EventsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[EventMessage], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &AgentService_ServiceDesc.Streams[4], AgentService_Events_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[EventsRequest, EventMessage]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type AgentService_EventsClient = grpc.ServerStreamingClient[EventMessage]
+
 // AgentServiceServer is the server API for AgentService service.
 // All implementations must embed UnimplementedAgentServiceServer
 // for forward compatibility.
@@ -328,6 +371,7 @@ type AgentServiceServer interface {
 	ListImages(context.Context, *ListImagesRequest) (*ListImagesResponse, error)
 	RemoveImage(context.Context, *RemoveImageRequest) (*RemoveImageResponse, error)
 	InspectImage(context.Context, *ImageRequest) (*InspectImageResponse, error)
+	PullImage(*PullImageRequest, grpc.ServerStreamingServer[PullImageMessage]) error
 	// containers movements
 	ListContainers(context.Context, *ListContainersRequest) (*ListContainersResponse, error)
 	StopContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
@@ -351,6 +395,8 @@ type AgentServiceServer interface {
 	RemoveVolume(context.Context, *RemoveVolumeRequest) (*VolumeResponse, error)
 	// docker info
 	DockerInfo(context.Context, *DockerInfoRequest) (*DockerInfoResponse, error)
+	// events
+	Events(*EventsRequest, grpc.ServerStreamingServer[EventMessage]) error
 	mustEmbedUnimplementedAgentServiceServer()
 }
 
@@ -369,6 +415,9 @@ func (UnimplementedAgentServiceServer) RemoveImage(context.Context, *RemoveImage
 }
 func (UnimplementedAgentServiceServer) InspectImage(context.Context, *ImageRequest) (*InspectImageResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method InspectImage not implemented")
+}
+func (UnimplementedAgentServiceServer) PullImage(*PullImageRequest, grpc.ServerStreamingServer[PullImageMessage]) error {
+	return status.Error(codes.Unimplemented, "method PullImage not implemented")
 }
 func (UnimplementedAgentServiceServer) ListContainers(context.Context, *ListContainersRequest) (*ListContainersResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListContainers not implemented")
@@ -423,6 +472,9 @@ func (UnimplementedAgentServiceServer) RemoveVolume(context.Context, *RemoveVolu
 }
 func (UnimplementedAgentServiceServer) DockerInfo(context.Context, *DockerInfoRequest) (*DockerInfoResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DockerInfo not implemented")
+}
+func (UnimplementedAgentServiceServer) Events(*EventsRequest, grpc.ServerStreamingServer[EventMessage]) error {
+	return status.Error(codes.Unimplemented, "method Events not implemented")
 }
 func (UnimplementedAgentServiceServer) mustEmbedUnimplementedAgentServiceServer() {}
 func (UnimplementedAgentServiceServer) testEmbeddedByValue()                      {}
@@ -498,6 +550,17 @@ func _AgentService_InspectImage_Handler(srv interface{}, ctx context.Context, de
 	}
 	return interceptor(ctx, in, info, handler)
 }
+
+func _AgentService_PullImage_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(PullImageRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(AgentServiceServer).PullImage(m, &grpc.GenericServerStream[PullImageRequest, PullImageMessage]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type AgentService_PullImageServer = grpc.ServerStreamingServer[PullImageMessage]
 
 func _AgentService_ListContainers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListContainersRequest)
@@ -802,6 +865,17 @@ func _AgentService_DockerInfo_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AgentService_Events_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(EventsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(AgentServiceServer).Events(m, &grpc.GenericServerStream[EventsRequest, EventMessage]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type AgentService_EventsServer = grpc.ServerStreamingServer[EventMessage]
+
 // AgentService_ServiceDesc is the grpc.ServiceDesc for AgentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -884,6 +958,11 @@ var AgentService_ServiceDesc = grpc.ServiceDesc{
 	},
 	Streams: []grpc.StreamDesc{
 		{
+			StreamName:    "PullImage",
+			Handler:       _AgentService_PullImage_Handler,
+			ServerStreams: true,
+		},
+		{
 			StreamName:    "ViewLogs",
 			Handler:       _AgentService_ViewLogs_Handler,
 			ServerStreams: true,
@@ -896,6 +975,11 @@ var AgentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "ExecuteCommand",
 			Handler:       _AgentService_ExecuteCommand_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "Events",
+			Handler:       _AgentService_Events_Handler,
 			ServerStreams: true,
 		},
 	},

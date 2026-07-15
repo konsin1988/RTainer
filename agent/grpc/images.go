@@ -4,6 +4,7 @@ import (
     "context"
 		"strings"
 
+		"konsin1988/agent/docker"
     pb "konsin1988/agent/proto"
 )
 
@@ -84,4 +85,27 @@ func (s *Server) InspectImage(
         Labels:        img.Labels,
         ExposedPorts:  img.ExposedPorts,
     }, nil
+}
+
+
+// --------------------------------------------- PULL IMAGE
+func (s *Server) PullImage(
+    req *pb.PullImageRequest,
+    stream pb.AgentService_PullImageServer,
+) error {
+
+    return s.imageSvc.PullImage(
+        stream.Context(),
+        req,
+        func(p docker.PullProgress) error {
+
+            return stream.Send(&pb.PullImageMessage{
+                Status:  p.Status,
+                Id:      p.ID,
+                Current: p.Current,
+                Total:   p.Total,
+                Error:   p.Error,
+            })
+        },
+    )
 }
