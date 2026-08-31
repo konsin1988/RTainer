@@ -10,6 +10,10 @@ import (
 
 type Server struct {
     pb.UnimplementedAgentServiceServer
+    pb.UnimplementedContainerServiceServer
+    pb.UnimplementedImageServiceServer
+    pb.UnimplementedNetworkServiceServer
+    pb.UnimplementedVolumeServiceServer
     containerSvc *service.ContainerService
 		imageSvc *service.ImageService
 		networkSvc *service.NetworkService
@@ -27,6 +31,11 @@ func New(
 
 func (s *Server) Register(grpcSrv *grpc.Server) {
     pb.RegisterAgentServiceServer(grpcSrv, s)
+    pb.RegisterContainerServiceServer(grpcSrv, s)
+    pb.RegisterImageServiceServer(grpcSrv, s)
+    pb.RegisterNetworkServiceServer(grpcSrv, s)
+    pb.RegisterVolumeServiceServer(grpcSrv, s)
+
 }
 
 
