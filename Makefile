@@ -23,5 +23,7 @@ down:
 
 
 re:
+	-docker compose -f docker-compose.agent.yml down;
 	-docker image rm konsin1988/$(PROJECT_NAME)-agent:$(PROJECT_VERSION);
 	docker compose -f docker-compose.agent.yml build;
+	docker compose -f docker-compose.agent.yml up -d;

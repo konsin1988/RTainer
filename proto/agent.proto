@@ -4,37 +4,85 @@ package agent;
 
 option go_package = "/agent/proto";
 
-service AgentService {
-  // images
+service ImageService{
   rpc ListImages(ListImagesRequest) returns (ListImagesResponse);
-  rpc RemoveImage(RemoveImageRequest) returns (RemoveImageResponse);
   rpc InspectImage(ImageRequest) returns (InspectImageResponse);
   rpc PullImage(PullImageRequest) returns (stream PullImageMessage);
+  //rpc Push(...)
+  //rpc Build(...)
+  //rpc Tag(...)
+  rpc RemoveImage(RemoveImageRequest) returns (RemoveImageResponse);
+  //rpc Prune(...)
+}
 
-  // containers movements 
+service ContainerService{
   rpc ListContainers(ListContainersRequest) returns (ListContainersResponse);
-  rpc StopContainer(ContainerRequest) returns (ContainerResponse);
-  rpc StartContainer(ContainerRequest) returns (ContainerResponse);
-  rpc RemoveContainer(RemoveContainerRequest) returns (ContainerResponse);
-  rpc RunContainer(RunContainerRequest) returns (ContainerResponse);
-  rpc RestartContainer(ContainerRequest) returns (ContainerResponse);
-
-  // data / other 
-  rpc ViewLogs(ViewLogsRequest) returns (stream LogMessage);
   rpc InspectContainer(ContainerRequest) returns (InspectContainerResponse);
-  rpc ContainerStats(ContainerRequest) returns (stream ContainerStatsResponse);
-  rpc ExecuteCommand(ExecuteCommandRequest) returns (stream LogMessage);
+  rpc CreateContainer(RunContainerRequest) returns (ContainerResponse);
+  rpc StartContainer(ContainerRequest) returns (ContainerResponse);
+  rpc StopContainer(ContainerRequest) returns (ContainerResponse);
+  rpc RestartContainer(ContainerRequest) returns (ContainerResponse);
+  //rpc Kill(...)
+  //rpc Pause(...)
+  //rpc Unpause(...)
+  rpc RemoveContainer(RemoveContainerRequest) returns (ContainerResponse);
+  //rpc Update(...)
+  //rpc Rename(...)
+  rpc ExecContainer(ExecuteCommandRequest) returns (stream LogMessage);
+  rpc LogsContainer(ViewLogsRequest) returns (stream LogMessage);
+  rpc StatsContainer(ContainerRequest) returns (stream ContainerStatsResponse);
+  //rpc Attach(...)
+}
 
-  // network
+service NetworkService {
   rpc ListNetworks(ListNetworksRequest) returns (ListNetworksResponse);
+  rpc InspectNetwork(NetworkRequest) returns (InspectNetworkResponse);
   rpc CreateNetwork(CreateNetworkRequest) returns (CreateNetworkResponse);
   rpc RemoveNetwork(NetworkRequest) returns (NetworkResponse);
-  rpc InspectNetwork(NetworkRequest) returns (InspectNetworkResponse);
+  //rpc Connect(...)
+  //rpc Disconnect(...)
+  //rpc Prune(...)
+}
 
-  // volumes
+service VolumeService {
   rpc ListVolumes(ListVolumesRequest) returns (ListVolumesResponse);
+  //rpc Inspect(...)
   rpc CreateVolume(CreateVolumeRequest) returns (VolumeResponse);
   rpc RemoveVolume(RemoveVolumeRequest) returns (VolumeResponse);
+  //rpc Prune(...)
+}
+
+//service StackService {
+//  rpc List(...)
+//  rpc Get(...)
+//  rpc Deploy(...)
+//  rpc Update(...)
+//  rpc Stop(...)
+//  rpc Start(...)
+//  rpc Remove(...)
+//}
+//
+//service RegistryService {
+//  rpc List(...)
+//  rpc Create(...)
+//  rpc Update(...)
+//  rpc Remove(...)
+//  rpc Test(...)
+//}
+//
+//service SystemService {
+//  rpc Info(...)
+//  rpc Version(...)
+//  rpc DiskUsage(...)
+//  rpc Prune(...)
+//}
+//
+//service EventService {
+//  rpc Events(...)
+//}
+
+service AgentService {
+
 
   // docker info
   rpc DockerInfo(DockerInfoRequest) returns (DockerInfoResponse);
@@ -42,21 +90,6 @@ service AgentService {
   // events
   rpc Events(EventsRequest) returns (stream EventMessage);
 }
-
-// ----------------------------------- LIST CONTAINERS 
-message ListContainersRequest {}
-
-message Container {
-  string id = 1;
-  string name = 2;
-  string image = 3;
-  string status = 4;
-}
-
-message ListContainersResponse {
-  repeated Container containers = 1;
-}
-
 
 // ------------------------------------ LIST IMAGES 
 message ListImagesRequest {}
@@ -121,7 +154,19 @@ message PullImageMessage {
 
     string error = 5;
 }
+// ----------------------------------- LIST CONTAINERS 
+message ListContainersRequest {}
 
+message Container {
+  string id = 1;
+  string name = 2;
+  string image = 3;
+  string status = 4;
+}
+
+message ListContainersResponse {
+  repeated Container containers = 1;
+}
 
 // ----------------------------------------- STOP, START EXISTING CONTAINER BY ID
 message ContainerRequest { string id = 1; }

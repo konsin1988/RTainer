@@ -91,7 +91,7 @@ func (s *Server) InspectImage(
 // --------------------------------------------- PULL IMAGE
 func (s *Server) PullImage(
     req *pb.PullImageRequest,
-    stream pb.AgentService_PullImageServer,
+    stream pb.ImageService_PullImageServer,
 ) error {
 
     return s.imageSvc.PullImage(

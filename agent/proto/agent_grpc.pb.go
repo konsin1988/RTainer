@@ -19,108 +19,56 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AgentService_ListImages_FullMethodName       = "/agent.AgentService/ListImages"
-	AgentService_RemoveImage_FullMethodName      = "/agent.AgentService/RemoveImage"
-	AgentService_InspectImage_FullMethodName     = "/agent.AgentService/InspectImage"
-	AgentService_PullImage_FullMethodName        = "/agent.AgentService/PullImage"
-	AgentService_ListContainers_FullMethodName   = "/agent.AgentService/ListContainers"
-	AgentService_StopContainer_FullMethodName    = "/agent.AgentService/StopContainer"
-	AgentService_StartContainer_FullMethodName   = "/agent.AgentService/StartContainer"
-	AgentService_RemoveContainer_FullMethodName  = "/agent.AgentService/RemoveContainer"
-	AgentService_RunContainer_FullMethodName     = "/agent.AgentService/RunContainer"
-	AgentService_RestartContainer_FullMethodName = "/agent.AgentService/RestartContainer"
-	AgentService_ViewLogs_FullMethodName         = "/agent.AgentService/ViewLogs"
-	AgentService_InspectContainer_FullMethodName = "/agent.AgentService/InspectContainer"
-	AgentService_ContainerStats_FullMethodName   = "/agent.AgentService/ContainerStats"
-	AgentService_ExecuteCommand_FullMethodName   = "/agent.AgentService/ExecuteCommand"
-	AgentService_ListNetworks_FullMethodName     = "/agent.AgentService/ListNetworks"
-	AgentService_CreateNetwork_FullMethodName    = "/agent.AgentService/CreateNetwork"
-	AgentService_RemoveNetwork_FullMethodName    = "/agent.AgentService/RemoveNetwork"
-	AgentService_InspectNetwork_FullMethodName   = "/agent.AgentService/InspectNetwork"
-	AgentService_ListVolumes_FullMethodName      = "/agent.AgentService/ListVolumes"
-	AgentService_CreateVolume_FullMethodName     = "/agent.AgentService/CreateVolume"
-	AgentService_RemoveVolume_FullMethodName     = "/agent.AgentService/RemoveVolume"
-	AgentService_DockerInfo_FullMethodName       = "/agent.AgentService/DockerInfo"
-	AgentService_Events_FullMethodName           = "/agent.AgentService/Events"
+	ImageService_ListImages_FullMethodName   = "/agent.ImageService/ListImages"
+	ImageService_InspectImage_FullMethodName = "/agent.ImageService/InspectImage"
+	ImageService_PullImage_FullMethodName    = "/agent.ImageService/PullImage"
+	ImageService_RemoveImage_FullMethodName  = "/agent.ImageService/RemoveImage"
 )
 
-// AgentServiceClient is the client API for AgentService service.
+// ImageServiceClient is the client API for ImageService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type AgentServiceClient interface {
-	// images
+type ImageServiceClient interface {
 	ListImages(ctx context.Context, in *ListImagesRequest, opts ...grpc.CallOption) (*ListImagesResponse, error)
-	RemoveImage(ctx context.Context, in *RemoveImageRequest, opts ...grpc.CallOption) (*RemoveImageResponse, error)
 	InspectImage(ctx context.Context, in *ImageRequest, opts ...grpc.CallOption) (*InspectImageResponse, error)
 	PullImage(ctx context.Context, in *PullImageRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[PullImageMessage], error)
-	// containers movements
-	ListContainers(ctx context.Context, in *ListContainersRequest, opts ...grpc.CallOption) (*ListContainersResponse, error)
-	StopContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
-	StartContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
-	RemoveContainer(ctx context.Context, in *RemoveContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
-	RunContainer(ctx context.Context, in *RunContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
-	RestartContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
-	// data / other
-	ViewLogs(ctx context.Context, in *ViewLogsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error)
-	InspectContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*InspectContainerResponse, error)
-	ContainerStats(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ContainerStatsResponse], error)
-	ExecuteCommand(ctx context.Context, in *ExecuteCommandRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error)
-	// network
-	ListNetworks(ctx context.Context, in *ListNetworksRequest, opts ...grpc.CallOption) (*ListNetworksResponse, error)
-	CreateNetwork(ctx context.Context, in *CreateNetworkRequest, opts ...grpc.CallOption) (*CreateNetworkResponse, error)
-	RemoveNetwork(ctx context.Context, in *NetworkRequest, opts ...grpc.CallOption) (*NetworkResponse, error)
-	InspectNetwork(ctx context.Context, in *NetworkRequest, opts ...grpc.CallOption) (*InspectNetworkResponse, error)
-	// volumes
-	ListVolumes(ctx context.Context, in *ListVolumesRequest, opts ...grpc.CallOption) (*ListVolumesResponse, error)
-	CreateVolume(ctx context.Context, in *CreateVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error)
-	RemoveVolume(ctx context.Context, in *RemoveVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error)
-	// docker info
-	DockerInfo(ctx context.Context, in *DockerInfoRequest, opts ...grpc.CallOption) (*DockerInfoResponse, error)
-	// events
-	Events(ctx context.Context, in *EventsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[EventMessage], error)
+	// rpc Push(...)
+	// rpc Build(...)
+	// rpc Tag(...)
+	RemoveImage(ctx context.Context, in *RemoveImageRequest, opts ...grpc.CallOption) (*RemoveImageResponse, error)
 }
 
-type agentServiceClient struct {
+type imageServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewAgentServiceClient(cc grpc.ClientConnInterface) AgentServiceClient {
-	return &agentServiceClient{cc}
+func NewImageServiceClient(cc grpc.ClientConnInterface) ImageServiceClient {
+	return &imageServiceClient{cc}
 }
 
-func (c *agentServiceClient) ListImages(ctx context.Context, in *ListImagesRequest, opts ...grpc.CallOption) (*ListImagesResponse, error) {
+func (c *imageServiceClient) ListImages(ctx context.Context, in *ListImagesRequest, opts ...grpc.CallOption) (*ListImagesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListImagesResponse)
-	err := c.cc.Invoke(ctx, AgentService_ListImages_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, ImageService_ListImages_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *agentServiceClient) RemoveImage(ctx context.Context, in *RemoveImageRequest, opts ...grpc.CallOption) (*RemoveImageResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RemoveImageResponse)
-	err := c.cc.Invoke(ctx, AgentService_RemoveImage_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *agentServiceClient) InspectImage(ctx context.Context, in *ImageRequest, opts ...grpc.CallOption) (*InspectImageResponse, error) {
+func (c *imageServiceClient) InspectImage(ctx context.Context, in *ImageRequest, opts ...grpc.CallOption) (*InspectImageResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(InspectImageResponse)
-	err := c.cc.Invoke(ctx, AgentService_InspectImage_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, ImageService_InspectImage_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *agentServiceClient) PullImage(ctx context.Context, in *PullImageRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[PullImageMessage], error) {
+func (c *imageServiceClient) PullImage(ctx context.Context, in *PullImageRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[PullImageMessage], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &AgentService_ServiceDesc.Streams[0], AgentService_PullImage_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ImageService_ServiceDesc.Streams[0], ImageService_PullImage_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -135,119 +83,282 @@ func (c *agentServiceClient) PullImage(ctx context.Context, in *PullImageRequest
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type AgentService_PullImageClient = grpc.ServerStreamingClient[PullImageMessage]
+type ImageService_PullImageClient = grpc.ServerStreamingClient[PullImageMessage]
 
-func (c *agentServiceClient) ListContainers(ctx context.Context, in *ListContainersRequest, opts ...grpc.CallOption) (*ListContainersResponse, error) {
+func (c *imageServiceClient) RemoveImage(ctx context.Context, in *RemoveImageRequest, opts ...grpc.CallOption) (*RemoveImageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RemoveImageResponse)
+	err := c.cc.Invoke(ctx, ImageService_RemoveImage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ImageServiceServer is the server API for ImageService service.
+// All implementations must embed UnimplementedImageServiceServer
+// for forward compatibility.
+type ImageServiceServer interface {
+	ListImages(context.Context, *ListImagesRequest) (*ListImagesResponse, error)
+	InspectImage(context.Context, *ImageRequest) (*InspectImageResponse, error)
+	PullImage(*PullImageRequest, grpc.ServerStreamingServer[PullImageMessage]) error
+	// rpc Push(...)
+	// rpc Build(...)
+	// rpc Tag(...)
+	RemoveImage(context.Context, *RemoveImageRequest) (*RemoveImageResponse, error)
+	mustEmbedUnimplementedImageServiceServer()
+}
+
+// UnimplementedImageServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedImageServiceServer struct{}
+
+func (UnimplementedImageServiceServer) ListImages(context.Context, *ListImagesRequest) (*ListImagesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListImages not implemented")
+}
+func (UnimplementedImageServiceServer) InspectImage(context.Context, *ImageRequest) (*InspectImageResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method InspectImage not implemented")
+}
+func (UnimplementedImageServiceServer) PullImage(*PullImageRequest, grpc.ServerStreamingServer[PullImageMessage]) error {
+	return status.Error(codes.Unimplemented, "method PullImage not implemented")
+}
+func (UnimplementedImageServiceServer) RemoveImage(context.Context, *RemoveImageRequest) (*RemoveImageResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RemoveImage not implemented")
+}
+func (UnimplementedImageServiceServer) mustEmbedUnimplementedImageServiceServer() {}
+func (UnimplementedImageServiceServer) testEmbeddedByValue()                      {}
+
+// UnsafeImageServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ImageServiceServer will
+// result in compilation errors.
+type UnsafeImageServiceServer interface {
+	mustEmbedUnimplementedImageServiceServer()
+}
+
+func RegisterImageServiceServer(s grpc.ServiceRegistrar, srv ImageServiceServer) {
+	// If the following call panics, it indicates UnimplementedImageServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&ImageService_ServiceDesc, srv)
+}
+
+func _ImageService_ListImages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListImagesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ImageServiceServer).ListImages(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ImageService_ListImages_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ImageServiceServer).ListImages(ctx, req.(*ListImagesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ImageService_InspectImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ImageServiceServer).InspectImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ImageService_InspectImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ImageServiceServer).InspectImage(ctx, req.(*ImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ImageService_PullImage_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(PullImageRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ImageServiceServer).PullImage(m, &grpc.GenericServerStream[PullImageRequest, PullImageMessage]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ImageService_PullImageServer = grpc.ServerStreamingServer[PullImageMessage]
+
+func _ImageService_RemoveImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ImageServiceServer).RemoveImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ImageService_RemoveImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ImageServiceServer).RemoveImage(ctx, req.(*RemoveImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// ImageService_ServiceDesc is the grpc.ServiceDesc for ImageService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var ImageService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "agent.ImageService",
+	HandlerType: (*ImageServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ListImages",
+			Handler:    _ImageService_ListImages_Handler,
+		},
+		{
+			MethodName: "InspectImage",
+			Handler:    _ImageService_InspectImage_Handler,
+		},
+		{
+			MethodName: "RemoveImage",
+			Handler:    _ImageService_RemoveImage_Handler,
+		},
+	},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "PullImage",
+			Handler:       _ImageService_PullImage_Handler,
+			ServerStreams: true,
+		},
+	},
+	Metadata: "proto/agent.proto",
+}
+
+const (
+	ContainerService_ListContainers_FullMethodName   = "/agent.ContainerService/ListContainers"
+	ContainerService_InspectContainer_FullMethodName = "/agent.ContainerService/InspectContainer"
+	ContainerService_CreateContainer_FullMethodName  = "/agent.ContainerService/CreateContainer"
+	ContainerService_StartContainer_FullMethodName   = "/agent.ContainerService/StartContainer"
+	ContainerService_StopContainer_FullMethodName    = "/agent.ContainerService/StopContainer"
+	ContainerService_RestartContainer_FullMethodName = "/agent.ContainerService/RestartContainer"
+	ContainerService_RemoveContainer_FullMethodName  = "/agent.ContainerService/RemoveContainer"
+	ContainerService_ExecContainer_FullMethodName    = "/agent.ContainerService/ExecContainer"
+	ContainerService_LogsContainer_FullMethodName    = "/agent.ContainerService/LogsContainer"
+	ContainerService_StatsContainer_FullMethodName   = "/agent.ContainerService/StatsContainer"
+)
+
+// ContainerServiceClient is the client API for ContainerService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type ContainerServiceClient interface {
+	ListContainers(ctx context.Context, in *ListContainersRequest, opts ...grpc.CallOption) (*ListContainersResponse, error)
+	InspectContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*InspectContainerResponse, error)
+	CreateContainer(ctx context.Context, in *RunContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
+	StartContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
+	StopContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
+	RestartContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
+	// rpc Kill(...)
+	// rpc Pause(...)
+	// rpc Unpause(...)
+	RemoveContainer(ctx context.Context, in *RemoveContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
+	// rpc Update(...)
+	// rpc Rename(...)
+	ExecContainer(ctx context.Context, in *ExecuteCommandRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error)
+	LogsContainer(ctx context.Context, in *ViewLogsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error)
+	StatsContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ContainerStatsResponse], error)
+}
+
+type containerServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewContainerServiceClient(cc grpc.ClientConnInterface) ContainerServiceClient {
+	return &containerServiceClient{cc}
+}
+
+func (c *containerServiceClient) ListContainers(ctx context.Context, in *ListContainersRequest, opts ...grpc.CallOption) (*ListContainersResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListContainersResponse)
-	err := c.cc.Invoke(ctx, AgentService_ListContainers_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, ContainerService_ListContainers_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *agentServiceClient) StopContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ContainerResponse)
-	err := c.cc.Invoke(ctx, AgentService_StopContainer_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *agentServiceClient) StartContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ContainerResponse)
-	err := c.cc.Invoke(ctx, AgentService_StartContainer_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *agentServiceClient) RemoveContainer(ctx context.Context, in *RemoveContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ContainerResponse)
-	err := c.cc.Invoke(ctx, AgentService_RemoveContainer_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *agentServiceClient) RunContainer(ctx context.Context, in *RunContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ContainerResponse)
-	err := c.cc.Invoke(ctx, AgentService_RunContainer_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *agentServiceClient) RestartContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ContainerResponse)
-	err := c.cc.Invoke(ctx, AgentService_RestartContainer_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *agentServiceClient) ViewLogs(ctx context.Context, in *ViewLogsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &AgentService_ServiceDesc.Streams[1], AgentService_ViewLogs_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[ViewLogsRequest, LogMessage]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type AgentService_ViewLogsClient = grpc.ServerStreamingClient[LogMessage]
-
-func (c *agentServiceClient) InspectContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*InspectContainerResponse, error) {
+func (c *containerServiceClient) InspectContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*InspectContainerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(InspectContainerResponse)
-	err := c.cc.Invoke(ctx, AgentService_InspectContainer_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, ContainerService_InspectContainer_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *agentServiceClient) ContainerStats(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ContainerStatsResponse], error) {
+func (c *containerServiceClient) CreateContainer(ctx context.Context, in *RunContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &AgentService_ServiceDesc.Streams[2], AgentService_ContainerStats_FullMethodName, cOpts...)
+	out := new(ContainerResponse)
+	err := c.cc.Invoke(ctx, ContainerService_CreateContainer_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &grpc.GenericClientStream[ContainerRequest, ContainerStatsResponse]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
+	return out, nil
 }
 
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type AgentService_ContainerStatsClient = grpc.ServerStreamingClient[ContainerStatsResponse]
-
-func (c *agentServiceClient) ExecuteCommand(ctx context.Context, in *ExecuteCommandRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error) {
+func (c *containerServiceClient) StartContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &AgentService_ServiceDesc.Streams[3], AgentService_ExecuteCommand_FullMethodName, cOpts...)
+	out := new(ContainerResponse)
+	err := c.cc.Invoke(ctx, ContainerService_StartContainer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *containerServiceClient) StopContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ContainerResponse)
+	err := c.cc.Invoke(ctx, ContainerService_StopContainer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *containerServiceClient) RestartContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ContainerResponse)
+	err := c.cc.Invoke(ctx, ContainerService_RestartContainer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *containerServiceClient) RemoveContainer(ctx context.Context, in *RemoveContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ContainerResponse)
+	err := c.cc.Invoke(ctx, ContainerService_RemoveContainer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *containerServiceClient) ExecContainer(ctx context.Context, in *ExecuteCommandRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &ContainerService_ServiceDesc.Streams[0], ContainerService_ExecContainer_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -262,76 +373,758 @@ func (c *agentServiceClient) ExecuteCommand(ctx context.Context, in *ExecuteComm
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type AgentService_ExecuteCommandClient = grpc.ServerStreamingClient[LogMessage]
+type ContainerService_ExecContainerClient = grpc.ServerStreamingClient[LogMessage]
 
-func (c *agentServiceClient) ListNetworks(ctx context.Context, in *ListNetworksRequest, opts ...grpc.CallOption) (*ListNetworksResponse, error) {
+func (c *containerServiceClient) LogsContainer(ctx context.Context, in *ViewLogsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &ContainerService_ServiceDesc.Streams[1], ContainerService_LogsContainer_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[ViewLogsRequest, LogMessage]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ContainerService_LogsContainerClient = grpc.ServerStreamingClient[LogMessage]
+
+func (c *containerServiceClient) StatsContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ContainerStatsResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &ContainerService_ServiceDesc.Streams[2], ContainerService_StatsContainer_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[ContainerRequest, ContainerStatsResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ContainerService_StatsContainerClient = grpc.ServerStreamingClient[ContainerStatsResponse]
+
+// ContainerServiceServer is the server API for ContainerService service.
+// All implementations must embed UnimplementedContainerServiceServer
+// for forward compatibility.
+type ContainerServiceServer interface {
+	ListContainers(context.Context, *ListContainersRequest) (*ListContainersResponse, error)
+	InspectContainer(context.Context, *ContainerRequest) (*InspectContainerResponse, error)
+	CreateContainer(context.Context, *RunContainerRequest) (*ContainerResponse, error)
+	StartContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
+	StopContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
+	RestartContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
+	// rpc Kill(...)
+	// rpc Pause(...)
+	// rpc Unpause(...)
+	RemoveContainer(context.Context, *RemoveContainerRequest) (*ContainerResponse, error)
+	// rpc Update(...)
+	// rpc Rename(...)
+	ExecContainer(*ExecuteCommandRequest, grpc.ServerStreamingServer[LogMessage]) error
+	LogsContainer(*ViewLogsRequest, grpc.ServerStreamingServer[LogMessage]) error
+	StatsContainer(*ContainerRequest, grpc.ServerStreamingServer[ContainerStatsResponse]) error
+	mustEmbedUnimplementedContainerServiceServer()
+}
+
+// UnimplementedContainerServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedContainerServiceServer struct{}
+
+func (UnimplementedContainerServiceServer) ListContainers(context.Context, *ListContainersRequest) (*ListContainersResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListContainers not implemented")
+}
+func (UnimplementedContainerServiceServer) InspectContainer(context.Context, *ContainerRequest) (*InspectContainerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method InspectContainer not implemented")
+}
+func (UnimplementedContainerServiceServer) CreateContainer(context.Context, *RunContainerRequest) (*ContainerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateContainer not implemented")
+}
+func (UnimplementedContainerServiceServer) StartContainer(context.Context, *ContainerRequest) (*ContainerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method StartContainer not implemented")
+}
+func (UnimplementedContainerServiceServer) StopContainer(context.Context, *ContainerRequest) (*ContainerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method StopContainer not implemented")
+}
+func (UnimplementedContainerServiceServer) RestartContainer(context.Context, *ContainerRequest) (*ContainerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RestartContainer not implemented")
+}
+func (UnimplementedContainerServiceServer) RemoveContainer(context.Context, *RemoveContainerRequest) (*ContainerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RemoveContainer not implemented")
+}
+func (UnimplementedContainerServiceServer) ExecContainer(*ExecuteCommandRequest, grpc.ServerStreamingServer[LogMessage]) error {
+	return status.Error(codes.Unimplemented, "method ExecContainer not implemented")
+}
+func (UnimplementedContainerServiceServer) LogsContainer(*ViewLogsRequest, grpc.ServerStreamingServer[LogMessage]) error {
+	return status.Error(codes.Unimplemented, "method LogsContainer not implemented")
+}
+func (UnimplementedContainerServiceServer) StatsContainer(*ContainerRequest, grpc.ServerStreamingServer[ContainerStatsResponse]) error {
+	return status.Error(codes.Unimplemented, "method StatsContainer not implemented")
+}
+func (UnimplementedContainerServiceServer) mustEmbedUnimplementedContainerServiceServer() {}
+func (UnimplementedContainerServiceServer) testEmbeddedByValue()                          {}
+
+// UnsafeContainerServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ContainerServiceServer will
+// result in compilation errors.
+type UnsafeContainerServiceServer interface {
+	mustEmbedUnimplementedContainerServiceServer()
+}
+
+func RegisterContainerServiceServer(s grpc.ServiceRegistrar, srv ContainerServiceServer) {
+	// If the following call panics, it indicates UnimplementedContainerServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&ContainerService_ServiceDesc, srv)
+}
+
+func _ContainerService_ListContainers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListContainersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContainerServiceServer).ListContainers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContainerService_ListContainers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContainerServiceServer).ListContainers(ctx, req.(*ListContainersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContainerService_InspectContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ContainerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContainerServiceServer).InspectContainer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContainerService_InspectContainer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContainerServiceServer).InspectContainer(ctx, req.(*ContainerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContainerService_CreateContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RunContainerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContainerServiceServer).CreateContainer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContainerService_CreateContainer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContainerServiceServer).CreateContainer(ctx, req.(*RunContainerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContainerService_StartContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ContainerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContainerServiceServer).StartContainer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContainerService_StartContainer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContainerServiceServer).StartContainer(ctx, req.(*ContainerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContainerService_StopContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ContainerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContainerServiceServer).StopContainer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContainerService_StopContainer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContainerServiceServer).StopContainer(ctx, req.(*ContainerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContainerService_RestartContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ContainerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContainerServiceServer).RestartContainer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContainerService_RestartContainer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContainerServiceServer).RestartContainer(ctx, req.(*ContainerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContainerService_RemoveContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveContainerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContainerServiceServer).RemoveContainer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContainerService_RemoveContainer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContainerServiceServer).RemoveContainer(ctx, req.(*RemoveContainerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContainerService_ExecContainer_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ExecuteCommandRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ContainerServiceServer).ExecContainer(m, &grpc.GenericServerStream[ExecuteCommandRequest, LogMessage]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ContainerService_ExecContainerServer = grpc.ServerStreamingServer[LogMessage]
+
+func _ContainerService_LogsContainer_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ViewLogsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ContainerServiceServer).LogsContainer(m, &grpc.GenericServerStream[ViewLogsRequest, LogMessage]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ContainerService_LogsContainerServer = grpc.ServerStreamingServer[LogMessage]
+
+func _ContainerService_StatsContainer_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ContainerRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ContainerServiceServer).StatsContainer(m, &grpc.GenericServerStream[ContainerRequest, ContainerStatsResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ContainerService_StatsContainerServer = grpc.ServerStreamingServer[ContainerStatsResponse]
+
+// ContainerService_ServiceDesc is the grpc.ServiceDesc for ContainerService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var ContainerService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "agent.ContainerService",
+	HandlerType: (*ContainerServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ListContainers",
+			Handler:    _ContainerService_ListContainers_Handler,
+		},
+		{
+			MethodName: "InspectContainer",
+			Handler:    _ContainerService_InspectContainer_Handler,
+		},
+		{
+			MethodName: "CreateContainer",
+			Handler:    _ContainerService_CreateContainer_Handler,
+		},
+		{
+			MethodName: "StartContainer",
+			Handler:    _ContainerService_StartContainer_Handler,
+		},
+		{
+			MethodName: "StopContainer",
+			Handler:    _ContainerService_StopContainer_Handler,
+		},
+		{
+			MethodName: "RestartContainer",
+			Handler:    _ContainerService_RestartContainer_Handler,
+		},
+		{
+			MethodName: "RemoveContainer",
+			Handler:    _ContainerService_RemoveContainer_Handler,
+		},
+	},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "ExecContainer",
+			Handler:       _ContainerService_ExecContainer_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "LogsContainer",
+			Handler:       _ContainerService_LogsContainer_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "StatsContainer",
+			Handler:       _ContainerService_StatsContainer_Handler,
+			ServerStreams: true,
+		},
+	},
+	Metadata: "proto/agent.proto",
+}
+
+const (
+	NetworkService_ListNetworks_FullMethodName   = "/agent.NetworkService/ListNetworks"
+	NetworkService_InspectNetwork_FullMethodName = "/agent.NetworkService/InspectNetwork"
+	NetworkService_CreateNetwork_FullMethodName  = "/agent.NetworkService/CreateNetwork"
+	NetworkService_RemoveNetwork_FullMethodName  = "/agent.NetworkService/RemoveNetwork"
+)
+
+// NetworkServiceClient is the client API for NetworkService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type NetworkServiceClient interface {
+	ListNetworks(ctx context.Context, in *ListNetworksRequest, opts ...grpc.CallOption) (*ListNetworksResponse, error)
+	InspectNetwork(ctx context.Context, in *NetworkRequest, opts ...grpc.CallOption) (*InspectNetworkResponse, error)
+	CreateNetwork(ctx context.Context, in *CreateNetworkRequest, opts ...grpc.CallOption) (*CreateNetworkResponse, error)
+	RemoveNetwork(ctx context.Context, in *NetworkRequest, opts ...grpc.CallOption) (*NetworkResponse, error)
+}
+
+type networkServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewNetworkServiceClient(cc grpc.ClientConnInterface) NetworkServiceClient {
+	return &networkServiceClient{cc}
+}
+
+func (c *networkServiceClient) ListNetworks(ctx context.Context, in *ListNetworksRequest, opts ...grpc.CallOption) (*ListNetworksResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListNetworksResponse)
-	err := c.cc.Invoke(ctx, AgentService_ListNetworks_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, NetworkService_ListNetworks_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *agentServiceClient) CreateNetwork(ctx context.Context, in *CreateNetworkRequest, opts ...grpc.CallOption) (*CreateNetworkResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateNetworkResponse)
-	err := c.cc.Invoke(ctx, AgentService_CreateNetwork_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *agentServiceClient) RemoveNetwork(ctx context.Context, in *NetworkRequest, opts ...grpc.CallOption) (*NetworkResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(NetworkResponse)
-	err := c.cc.Invoke(ctx, AgentService_RemoveNetwork_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *agentServiceClient) InspectNetwork(ctx context.Context, in *NetworkRequest, opts ...grpc.CallOption) (*InspectNetworkResponse, error) {
+func (c *networkServiceClient) InspectNetwork(ctx context.Context, in *NetworkRequest, opts ...grpc.CallOption) (*InspectNetworkResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(InspectNetworkResponse)
-	err := c.cc.Invoke(ctx, AgentService_InspectNetwork_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, NetworkService_InspectNetwork_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *agentServiceClient) ListVolumes(ctx context.Context, in *ListVolumesRequest, opts ...grpc.CallOption) (*ListVolumesResponse, error) {
+func (c *networkServiceClient) CreateNetwork(ctx context.Context, in *CreateNetworkRequest, opts ...grpc.CallOption) (*CreateNetworkResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateNetworkResponse)
+	err := c.cc.Invoke(ctx, NetworkService_CreateNetwork_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *networkServiceClient) RemoveNetwork(ctx context.Context, in *NetworkRequest, opts ...grpc.CallOption) (*NetworkResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(NetworkResponse)
+	err := c.cc.Invoke(ctx, NetworkService_RemoveNetwork_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// NetworkServiceServer is the server API for NetworkService service.
+// All implementations must embed UnimplementedNetworkServiceServer
+// for forward compatibility.
+type NetworkServiceServer interface {
+	ListNetworks(context.Context, *ListNetworksRequest) (*ListNetworksResponse, error)
+	InspectNetwork(context.Context, *NetworkRequest) (*InspectNetworkResponse, error)
+	CreateNetwork(context.Context, *CreateNetworkRequest) (*CreateNetworkResponse, error)
+	RemoveNetwork(context.Context, *NetworkRequest) (*NetworkResponse, error)
+	mustEmbedUnimplementedNetworkServiceServer()
+}
+
+// UnimplementedNetworkServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedNetworkServiceServer struct{}
+
+func (UnimplementedNetworkServiceServer) ListNetworks(context.Context, *ListNetworksRequest) (*ListNetworksResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListNetworks not implemented")
+}
+func (UnimplementedNetworkServiceServer) InspectNetwork(context.Context, *NetworkRequest) (*InspectNetworkResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method InspectNetwork not implemented")
+}
+func (UnimplementedNetworkServiceServer) CreateNetwork(context.Context, *CreateNetworkRequest) (*CreateNetworkResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateNetwork not implemented")
+}
+func (UnimplementedNetworkServiceServer) RemoveNetwork(context.Context, *NetworkRequest) (*NetworkResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RemoveNetwork not implemented")
+}
+func (UnimplementedNetworkServiceServer) mustEmbedUnimplementedNetworkServiceServer() {}
+func (UnimplementedNetworkServiceServer) testEmbeddedByValue()                        {}
+
+// UnsafeNetworkServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to NetworkServiceServer will
+// result in compilation errors.
+type UnsafeNetworkServiceServer interface {
+	mustEmbedUnimplementedNetworkServiceServer()
+}
+
+func RegisterNetworkServiceServer(s grpc.ServiceRegistrar, srv NetworkServiceServer) {
+	// If the following call panics, it indicates UnimplementedNetworkServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&NetworkService_ServiceDesc, srv)
+}
+
+func _NetworkService_ListNetworks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListNetworksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NetworkServiceServer).ListNetworks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NetworkService_ListNetworks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NetworkServiceServer).ListNetworks(ctx, req.(*ListNetworksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NetworkService_InspectNetwork_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NetworkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NetworkServiceServer).InspectNetwork(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NetworkService_InspectNetwork_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NetworkServiceServer).InspectNetwork(ctx, req.(*NetworkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NetworkService_CreateNetwork_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateNetworkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NetworkServiceServer).CreateNetwork(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NetworkService_CreateNetwork_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NetworkServiceServer).CreateNetwork(ctx, req.(*CreateNetworkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NetworkService_RemoveNetwork_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NetworkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NetworkServiceServer).RemoveNetwork(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NetworkService_RemoveNetwork_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NetworkServiceServer).RemoveNetwork(ctx, req.(*NetworkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// NetworkService_ServiceDesc is the grpc.ServiceDesc for NetworkService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var NetworkService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "agent.NetworkService",
+	HandlerType: (*NetworkServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ListNetworks",
+			Handler:    _NetworkService_ListNetworks_Handler,
+		},
+		{
+			MethodName: "InspectNetwork",
+			Handler:    _NetworkService_InspectNetwork_Handler,
+		},
+		{
+			MethodName: "CreateNetwork",
+			Handler:    _NetworkService_CreateNetwork_Handler,
+		},
+		{
+			MethodName: "RemoveNetwork",
+			Handler:    _NetworkService_RemoveNetwork_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "proto/agent.proto",
+}
+
+const (
+	VolumeService_ListVolumes_FullMethodName  = "/agent.VolumeService/ListVolumes"
+	VolumeService_CreateVolume_FullMethodName = "/agent.VolumeService/CreateVolume"
+	VolumeService_RemoveVolume_FullMethodName = "/agent.VolumeService/RemoveVolume"
+)
+
+// VolumeServiceClient is the client API for VolumeService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type VolumeServiceClient interface {
+	ListVolumes(ctx context.Context, in *ListVolumesRequest, opts ...grpc.CallOption) (*ListVolumesResponse, error)
+	// rpc Inspect(...)
+	CreateVolume(ctx context.Context, in *CreateVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error)
+	RemoveVolume(ctx context.Context, in *RemoveVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error)
+}
+
+type volumeServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewVolumeServiceClient(cc grpc.ClientConnInterface) VolumeServiceClient {
+	return &volumeServiceClient{cc}
+}
+
+func (c *volumeServiceClient) ListVolumes(ctx context.Context, in *ListVolumesRequest, opts ...grpc.CallOption) (*ListVolumesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListVolumesResponse)
-	err := c.cc.Invoke(ctx, AgentService_ListVolumes_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, VolumeService_ListVolumes_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *agentServiceClient) CreateVolume(ctx context.Context, in *CreateVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error) {
+func (c *volumeServiceClient) CreateVolume(ctx context.Context, in *CreateVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(VolumeResponse)
-	err := c.cc.Invoke(ctx, AgentService_CreateVolume_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, VolumeService_CreateVolume_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *agentServiceClient) RemoveVolume(ctx context.Context, in *RemoveVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error) {
+func (c *volumeServiceClient) RemoveVolume(ctx context.Context, in *RemoveVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(VolumeResponse)
-	err := c.cc.Invoke(ctx, AgentService_RemoveVolume_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, VolumeService_RemoveVolume_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
+}
+
+// VolumeServiceServer is the server API for VolumeService service.
+// All implementations must embed UnimplementedVolumeServiceServer
+// for forward compatibility.
+type VolumeServiceServer interface {
+	ListVolumes(context.Context, *ListVolumesRequest) (*ListVolumesResponse, error)
+	// rpc Inspect(...)
+	CreateVolume(context.Context, *CreateVolumeRequest) (*VolumeResponse, error)
+	RemoveVolume(context.Context, *RemoveVolumeRequest) (*VolumeResponse, error)
+	mustEmbedUnimplementedVolumeServiceServer()
+}
+
+// UnimplementedVolumeServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedVolumeServiceServer struct{}
+
+func (UnimplementedVolumeServiceServer) ListVolumes(context.Context, *ListVolumesRequest) (*ListVolumesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListVolumes not implemented")
+}
+func (UnimplementedVolumeServiceServer) CreateVolume(context.Context, *CreateVolumeRequest) (*VolumeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateVolume not implemented")
+}
+func (UnimplementedVolumeServiceServer) RemoveVolume(context.Context, *RemoveVolumeRequest) (*VolumeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RemoveVolume not implemented")
+}
+func (UnimplementedVolumeServiceServer) mustEmbedUnimplementedVolumeServiceServer() {}
+func (UnimplementedVolumeServiceServer) testEmbeddedByValue()                       {}
+
+// UnsafeVolumeServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to VolumeServiceServer will
+// result in compilation errors.
+type UnsafeVolumeServiceServer interface {
+	mustEmbedUnimplementedVolumeServiceServer()
+}
+
+func RegisterVolumeServiceServer(s grpc.ServiceRegistrar, srv VolumeServiceServer) {
+	// If the following call panics, it indicates UnimplementedVolumeServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&VolumeService_ServiceDesc, srv)
+}
+
+func _VolumeService_ListVolumes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListVolumesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VolumeServiceServer).ListVolumes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VolumeService_ListVolumes_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VolumeServiceServer).ListVolumes(ctx, req.(*ListVolumesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VolumeService_CreateVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateVolumeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VolumeServiceServer).CreateVolume(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VolumeService_CreateVolume_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VolumeServiceServer).CreateVolume(ctx, req.(*CreateVolumeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VolumeService_RemoveVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveVolumeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VolumeServiceServer).RemoveVolume(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VolumeService_RemoveVolume_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VolumeServiceServer).RemoveVolume(ctx, req.(*RemoveVolumeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// VolumeService_ServiceDesc is the grpc.ServiceDesc for VolumeService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var VolumeService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "agent.VolumeService",
+	HandlerType: (*VolumeServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ListVolumes",
+			Handler:    _VolumeService_ListVolumes_Handler,
+		},
+		{
+			MethodName: "CreateVolume",
+			Handler:    _VolumeService_CreateVolume_Handler,
+		},
+		{
+			MethodName: "RemoveVolume",
+			Handler:    _VolumeService_RemoveVolume_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "proto/agent.proto",
+}
+
+const (
+	AgentService_DockerInfo_FullMethodName = "/agent.AgentService/DockerInfo"
+	AgentService_Events_FullMethodName     = "/agent.AgentService/Events"
+)
+
+// AgentServiceClient is the client API for AgentService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type AgentServiceClient interface {
+	// docker info
+	DockerInfo(ctx context.Context, in *DockerInfoRequest, opts ...grpc.CallOption) (*DockerInfoResponse, error)
+	// events
+	Events(ctx context.Context, in *EventsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[EventMessage], error)
+}
+
+type agentServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewAgentServiceClient(cc grpc.ClientConnInterface) AgentServiceClient {
+	return &agentServiceClient{cc}
 }
 
 func (c *agentServiceClient) DockerInfo(ctx context.Context, in *DockerInfoRequest, opts ...grpc.CallOption) (*DockerInfoResponse, error) {
@@ -346,7 +1139,7 @@ func (c *agentServiceClient) DockerInfo(ctx context.Context, in *DockerInfoReque
 
 func (c *agentServiceClient) Events(ctx context.Context, in *EventsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[EventMessage], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &AgentService_ServiceDesc.Streams[4], AgentService_Events_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &AgentService_ServiceDesc.Streams[0], AgentService_Events_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -367,32 +1160,6 @@ type AgentService_EventsClient = grpc.ServerStreamingClient[EventMessage]
 // All implementations must embed UnimplementedAgentServiceServer
 // for forward compatibility.
 type AgentServiceServer interface {
-	// images
-	ListImages(context.Context, *ListImagesRequest) (*ListImagesResponse, error)
-	RemoveImage(context.Context, *RemoveImageRequest) (*RemoveImageResponse, error)
-	InspectImage(context.Context, *ImageRequest) (*InspectImageResponse, error)
-	PullImage(*PullImageRequest, grpc.ServerStreamingServer[PullImageMessage]) error
-	// containers movements
-	ListContainers(context.Context, *ListContainersRequest) (*ListContainersResponse, error)
-	StopContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
-	StartContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
-	RemoveContainer(context.Context, *RemoveContainerRequest) (*ContainerResponse, error)
-	RunContainer(context.Context, *RunContainerRequest) (*ContainerResponse, error)
-	RestartContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
-	// data / other
-	ViewLogs(*ViewLogsRequest, grpc.ServerStreamingServer[LogMessage]) error
-	InspectContainer(context.Context, *ContainerRequest) (*InspectContainerResponse, error)
-	ContainerStats(*ContainerRequest, grpc.ServerStreamingServer[ContainerStatsResponse]) error
-	ExecuteCommand(*ExecuteCommandRequest, grpc.ServerStreamingServer[LogMessage]) error
-	// network
-	ListNetworks(context.Context, *ListNetworksRequest) (*ListNetworksResponse, error)
-	CreateNetwork(context.Context, *CreateNetworkRequest) (*CreateNetworkResponse, error)
-	RemoveNetwork(context.Context, *NetworkRequest) (*NetworkResponse, error)
-	InspectNetwork(context.Context, *NetworkRequest) (*InspectNetworkResponse, error)
-	// volumes
-	ListVolumes(context.Context, *ListVolumesRequest) (*ListVolumesResponse, error)
-	CreateVolume(context.Context, *CreateVolumeRequest) (*VolumeResponse, error)
-	RemoveVolume(context.Context, *RemoveVolumeRequest) (*VolumeResponse, error)
 	// docker info
 	DockerInfo(context.Context, *DockerInfoRequest) (*DockerInfoResponse, error)
 	// events
@@ -407,69 +1174,6 @@ type AgentServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAgentServiceServer struct{}
 
-func (UnimplementedAgentServiceServer) ListImages(context.Context, *ListImagesRequest) (*ListImagesResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method ListImages not implemented")
-}
-func (UnimplementedAgentServiceServer) RemoveImage(context.Context, *RemoveImageRequest) (*RemoveImageResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method RemoveImage not implemented")
-}
-func (UnimplementedAgentServiceServer) InspectImage(context.Context, *ImageRequest) (*InspectImageResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method InspectImage not implemented")
-}
-func (UnimplementedAgentServiceServer) PullImage(*PullImageRequest, grpc.ServerStreamingServer[PullImageMessage]) error {
-	return status.Error(codes.Unimplemented, "method PullImage not implemented")
-}
-func (UnimplementedAgentServiceServer) ListContainers(context.Context, *ListContainersRequest) (*ListContainersResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method ListContainers not implemented")
-}
-func (UnimplementedAgentServiceServer) StopContainer(context.Context, *ContainerRequest) (*ContainerResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method StopContainer not implemented")
-}
-func (UnimplementedAgentServiceServer) StartContainer(context.Context, *ContainerRequest) (*ContainerResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method StartContainer not implemented")
-}
-func (UnimplementedAgentServiceServer) RemoveContainer(context.Context, *RemoveContainerRequest) (*ContainerResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method RemoveContainer not implemented")
-}
-func (UnimplementedAgentServiceServer) RunContainer(context.Context, *RunContainerRequest) (*ContainerResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method RunContainer not implemented")
-}
-func (UnimplementedAgentServiceServer) RestartContainer(context.Context, *ContainerRequest) (*ContainerResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method RestartContainer not implemented")
-}
-func (UnimplementedAgentServiceServer) ViewLogs(*ViewLogsRequest, grpc.ServerStreamingServer[LogMessage]) error {
-	return status.Error(codes.Unimplemented, "method ViewLogs not implemented")
-}
-func (UnimplementedAgentServiceServer) InspectContainer(context.Context, *ContainerRequest) (*InspectContainerResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method InspectContainer not implemented")
-}
-func (UnimplementedAgentServiceServer) ContainerStats(*ContainerRequest, grpc.ServerStreamingServer[ContainerStatsResponse]) error {
-	return status.Error(codes.Unimplemented, "method ContainerStats not implemented")
-}
-func (UnimplementedAgentServiceServer) ExecuteCommand(*ExecuteCommandRequest, grpc.ServerStreamingServer[LogMessage]) error {
-	return status.Error(codes.Unimplemented, "method ExecuteCommand not implemented")
-}
-func (UnimplementedAgentServiceServer) ListNetworks(context.Context, *ListNetworksRequest) (*ListNetworksResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method ListNetworks not implemented")
-}
-func (UnimplementedAgentServiceServer) CreateNetwork(context.Context, *CreateNetworkRequest) (*CreateNetworkResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CreateNetwork not implemented")
-}
-func (UnimplementedAgentServiceServer) RemoveNetwork(context.Context, *NetworkRequest) (*NetworkResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method RemoveNetwork not implemented")
-}
-func (UnimplementedAgentServiceServer) InspectNetwork(context.Context, *NetworkRequest) (*InspectNetworkResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method InspectNetwork not implemented")
-}
-func (UnimplementedAgentServiceServer) ListVolumes(context.Context, *ListVolumesRequest) (*ListVolumesResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method ListVolumes not implemented")
-}
-func (UnimplementedAgentServiceServer) CreateVolume(context.Context, *CreateVolumeRequest) (*VolumeResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CreateVolume not implemented")
-}
-func (UnimplementedAgentServiceServer) RemoveVolume(context.Context, *RemoveVolumeRequest) (*VolumeResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method RemoveVolume not implemented")
-}
 func (UnimplementedAgentServiceServer) DockerInfo(context.Context, *DockerInfoRequest) (*DockerInfoResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DockerInfo not implemented")
 }
@@ -495,356 +1199,6 @@ func RegisterAgentServiceServer(s grpc.ServiceRegistrar, srv AgentServiceServer)
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&AgentService_ServiceDesc, srv)
-}
-
-func _AgentService_ListImages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListImagesRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServiceServer).ListImages(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AgentService_ListImages_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServiceServer).ListImages(ctx, req.(*ListImagesRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AgentService_RemoveImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RemoveImageRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServiceServer).RemoveImage(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AgentService_RemoveImage_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServiceServer).RemoveImage(ctx, req.(*RemoveImageRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AgentService_InspectImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ImageRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServiceServer).InspectImage(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AgentService_InspectImage_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServiceServer).InspectImage(ctx, req.(*ImageRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AgentService_PullImage_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(PullImageRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(AgentServiceServer).PullImage(m, &grpc.GenericServerStream[PullImageRequest, PullImageMessage]{ServerStream: stream})
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type AgentService_PullImageServer = grpc.ServerStreamingServer[PullImageMessage]
-
-func _AgentService_ListContainers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListContainersRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServiceServer).ListContainers(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AgentService_ListContainers_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServiceServer).ListContainers(ctx, req.(*ListContainersRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AgentService_StopContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ContainerRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServiceServer).StopContainer(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AgentService_StopContainer_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServiceServer).StopContainer(ctx, req.(*ContainerRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AgentService_StartContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ContainerRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServiceServer).StartContainer(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AgentService_StartContainer_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServiceServer).StartContainer(ctx, req.(*ContainerRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AgentService_RemoveContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RemoveContainerRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServiceServer).RemoveContainer(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AgentService_RemoveContainer_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServiceServer).RemoveContainer(ctx, req.(*RemoveContainerRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AgentService_RunContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RunContainerRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServiceServer).RunContainer(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AgentService_RunContainer_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServiceServer).RunContainer(ctx, req.(*RunContainerRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AgentService_RestartContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ContainerRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServiceServer).RestartContainer(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AgentService_RestartContainer_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServiceServer).RestartContainer(ctx, req.(*ContainerRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AgentService_ViewLogs_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(ViewLogsRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(AgentServiceServer).ViewLogs(m, &grpc.GenericServerStream[ViewLogsRequest, LogMessage]{ServerStream: stream})
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type AgentService_ViewLogsServer = grpc.ServerStreamingServer[LogMessage]
-
-func _AgentService_InspectContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ContainerRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServiceServer).InspectContainer(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AgentService_InspectContainer_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServiceServer).InspectContainer(ctx, req.(*ContainerRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AgentService_ContainerStats_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(ContainerRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(AgentServiceServer).ContainerStats(m, &grpc.GenericServerStream[ContainerRequest, ContainerStatsResponse]{ServerStream: stream})
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type AgentService_ContainerStatsServer = grpc.ServerStreamingServer[ContainerStatsResponse]
-
-func _AgentService_ExecuteCommand_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(ExecuteCommandRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(AgentServiceServer).ExecuteCommand(m, &grpc.GenericServerStream[ExecuteCommandRequest, LogMessage]{ServerStream: stream})
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type AgentService_ExecuteCommandServer = grpc.ServerStreamingServer[LogMessage]
-
-func _AgentService_ListNetworks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListNetworksRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServiceServer).ListNetworks(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AgentService_ListNetworks_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServiceServer).ListNetworks(ctx, req.(*ListNetworksRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AgentService_CreateNetwork_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateNetworkRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServiceServer).CreateNetwork(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AgentService_CreateNetwork_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServiceServer).CreateNetwork(ctx, req.(*CreateNetworkRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AgentService_RemoveNetwork_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NetworkRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServiceServer).RemoveNetwork(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AgentService_RemoveNetwork_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServiceServer).RemoveNetwork(ctx, req.(*NetworkRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AgentService_InspectNetwork_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NetworkRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServiceServer).InspectNetwork(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AgentService_InspectNetwork_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServiceServer).InspectNetwork(ctx, req.(*NetworkRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AgentService_ListVolumes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListVolumesRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServiceServer).ListVolumes(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AgentService_ListVolumes_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServiceServer).ListVolumes(ctx, req.(*ListVolumesRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AgentService_CreateVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateVolumeRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServiceServer).CreateVolume(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AgentService_CreateVolume_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServiceServer).CreateVolume(ctx, req.(*CreateVolumeRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AgentService_RemoveVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RemoveVolumeRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentServiceServer).RemoveVolume(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AgentService_RemoveVolume_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServiceServer).RemoveVolume(ctx, req.(*RemoveVolumeRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _AgentService_DockerInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -884,99 +1238,11 @@ var AgentService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AgentServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "ListImages",
-			Handler:    _AgentService_ListImages_Handler,
-		},
-		{
-			MethodName: "RemoveImage",
-			Handler:    _AgentService_RemoveImage_Handler,
-		},
-		{
-			MethodName: "InspectImage",
-			Handler:    _AgentService_InspectImage_Handler,
-		},
-		{
-			MethodName: "ListContainers",
-			Handler:    _AgentService_ListContainers_Handler,
-		},
-		{
-			MethodName: "StopContainer",
-			Handler:    _AgentService_StopContainer_Handler,
-		},
-		{
-			MethodName: "StartContainer",
-			Handler:    _AgentService_StartContainer_Handler,
-		},
-		{
-			MethodName: "RemoveContainer",
-			Handler:    _AgentService_RemoveContainer_Handler,
-		},
-		{
-			MethodName: "RunContainer",
-			Handler:    _AgentService_RunContainer_Handler,
-		},
-		{
-			MethodName: "RestartContainer",
-			Handler:    _AgentService_RestartContainer_Handler,
-		},
-		{
-			MethodName: "InspectContainer",
-			Handler:    _AgentService_InspectContainer_Handler,
-		},
-		{
-			MethodName: "ListNetworks",
-			Handler:    _AgentService_ListNetworks_Handler,
-		},
-		{
-			MethodName: "CreateNetwork",
-			Handler:    _AgentService_CreateNetwork_Handler,
-		},
-		{
-			MethodName: "RemoveNetwork",
-			Handler:    _AgentService_RemoveNetwork_Handler,
-		},
-		{
-			MethodName: "InspectNetwork",
-			Handler:    _AgentService_InspectNetwork_Handler,
-		},
-		{
-			MethodName: "ListVolumes",
-			Handler:    _AgentService_ListVolumes_Handler,
-		},
-		{
-			MethodName: "CreateVolume",
-			Handler:    _AgentService_CreateVolume_Handler,
-		},
-		{
-			MethodName: "RemoveVolume",
-			Handler:    _AgentService_RemoveVolume_Handler,
-		},
-		{
 			MethodName: "DockerInfo",
 			Handler:    _AgentService_DockerInfo_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
-		{
-			StreamName:    "PullImage",
-			Handler:       _AgentService_PullImage_Handler,
-			ServerStreams: true,
-		},
-		{
-			StreamName:    "ViewLogs",
-			Handler:       _AgentService_ViewLogs_Handler,
-			ServerStreams: true,
-		},
-		{
-			StreamName:    "ContainerStats",
-			Handler:       _AgentService_ContainerStats_Handler,
-			ServerStreams: true,
-		},
-		{
-			StreamName:    "ExecuteCommand",
-			Handler:       _AgentService_ExecuteCommand_Handler,
-			ServerStreams: true,
-		},
 		{
 			StreamName:    "Events",
 			Handler:       _AgentService_Events_Handler,
