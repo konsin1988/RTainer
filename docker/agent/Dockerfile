@@ -10,7 +10,7 @@ RUN go mod download
 COPY ./agent .
 
 RUN go build -o /usr/local/bin/agent .
-RUN go install github.com/grpc-ecosystem/grpc-health-probe@latest
+RUN go install github.com/grpc-ecosystem/grpc-health-probe@v0.4.56
 
 FROM alpine:3.20
 

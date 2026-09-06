@@ -32,9 +32,9 @@ type ImageServiceClient interface {
 	ListImages(ctx context.Context, in *ListImagesRequest, opts ...grpc.CallOption) (*ListImagesResponse, error)
 	InspectImage(ctx context.Context, in *ImageRequest, opts ...grpc.CallOption) (*InspectImageResponse, error)
 	PullImage(ctx context.Context, in *PullImageRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[PullImageMessage], error)
-	// rpc Push(...)
-	// rpc Build(...)
-	// rpc Tag(...)
+	// rpc PushImage(...)
+	// rpc BuildImage(...)
+	// rpc TagImage(...)
 	RemoveImage(ctx context.Context, in *RemoveImageRequest, opts ...grpc.CallOption) (*RemoveImageResponse, error)
 }
 
@@ -102,9 +102,9 @@ type ImageServiceServer interface {
 	ListImages(context.Context, *ListImagesRequest) (*ListImagesResponse, error)
 	InspectImage(context.Context, *ImageRequest) (*InspectImageResponse, error)
 	PullImage(*PullImageRequest, grpc.ServerStreamingServer[PullImageMessage]) error
-	// rpc Push(...)
-	// rpc Build(...)
-	// rpc Tag(...)
+	// rpc PushImage(...)
+	// rpc BuildImage(...)
+	// rpc TagImage(...)
 	RemoveImage(context.Context, *RemoveImageRequest) (*RemoveImageResponse, error)
 	mustEmbedUnimplementedImageServiceServer()
 }
@@ -267,12 +267,12 @@ type ContainerServiceClient interface {
 	StartContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 	StopContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 	RestartContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
-	// rpc Kill(...)
-	// rpc Pause(...)
-	// rpc Unpause(...)
+	// rpc KillContainer(...)
+	// rpc PauseContainer(...)
+	// rpc UnpauseContainer(...)
 	RemoveContainer(ctx context.Context, in *RemoveContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
-	// rpc Update(...)
-	// rpc Rename(...)
+	// rpc UpdateContainer(...)
+	// rpc RenameContainer(...)
 	ExecContainer(ctx context.Context, in *ExecuteCommandRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error)
 	LogsContainer(ctx context.Context, in *ViewLogsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error)
 	StatsContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ContainerStatsResponse], error)
@@ -423,12 +423,12 @@ type ContainerServiceServer interface {
 	StartContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
 	StopContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
 	RestartContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
-	// rpc Kill(...)
-	// rpc Pause(...)
-	// rpc Unpause(...)
+	// rpc KillContainer(...)
+	// rpc PauseContainer(...)
+	// rpc UnpauseContainer(...)
 	RemoveContainer(context.Context, *RemoveContainerRequest) (*ContainerResponse, error)
-	// rpc Update(...)
-	// rpc Rename(...)
+	// rpc UpdateContainer(...)
+	// rpc RenameContainer(...)
 	ExecContainer(*ExecuteCommandRequest, grpc.ServerStreamingServer[LogMessage]) error
 	LogsContainer(*ViewLogsRequest, grpc.ServerStreamingServer[LogMessage]) error
 	StatsContainer(*ContainerRequest, grpc.ServerStreamingServer[ContainerStatsResponse]) error
@@ -709,10 +709,12 @@ var ContainerService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	NetworkService_ListNetworks_FullMethodName   = "/agent.NetworkService/ListNetworks"
-	NetworkService_InspectNetwork_FullMethodName = "/agent.NetworkService/InspectNetwork"
-	NetworkService_CreateNetwork_FullMethodName  = "/agent.NetworkService/CreateNetwork"
-	NetworkService_RemoveNetwork_FullMethodName  = "/agent.NetworkService/RemoveNetwork"
+	NetworkService_ListNetworks_FullMethodName      = "/agent.NetworkService/ListNetworks"
+	NetworkService_InspectNetwork_FullMethodName    = "/agent.NetworkService/InspectNetwork"
+	NetworkService_CreateNetwork_FullMethodName     = "/agent.NetworkService/CreateNetwork"
+	NetworkService_RemoveNetwork_FullMethodName     = "/agent.NetworkService/RemoveNetwork"
+	NetworkService_ConnectNetwork_FullMethodName    = "/agent.NetworkService/ConnectNetwork"
+	NetworkService_DisconnectNetwork_FullMethodName = "/agent.NetworkService/DisconnectNetwork"
 )
 
 // NetworkServiceClient is the client API for NetworkService service.
@@ -720,9 +722,11 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NetworkServiceClient interface {
 	ListNetworks(ctx context.Context, in *ListNetworksRequest, opts ...grpc.CallOption) (*ListNetworksResponse, error)
-	InspectNetwork(ctx context.Context, in *NetworkRequest, opts ...grpc.CallOption) (*InspectNetworkResponse, error)
+	InspectNetwork(ctx context.Context, in *NetworkRequest, opts ...grpc.CallOption) (*NetworkResponse, error)
 	CreateNetwork(ctx context.Context, in *CreateNetworkRequest, opts ...grpc.CallOption) (*CreateNetworkResponse, error)
 	RemoveNetwork(ctx context.Context, in *NetworkRequest, opts ...grpc.CallOption) (*NetworkResponse, error)
+	ConnectNetwork(ctx context.Context, in *ConnectNetworkRequest, opts ...grpc.CallOption) (*NetworkResponse, error)
+	DisconnectNetwork(ctx context.Context, in *DisconnectNetworkRequest, opts ...grpc.CallOption) (*NetworkResponse, error)
 }
 
 type networkServiceClient struct {
@@ -743,9 +747,9 @@ func (c *networkServiceClient) ListNetworks(ctx context.Context, in *ListNetwork
 	return out, nil
 }
 
-func (c *networkServiceClient) InspectNetwork(ctx context.Context, in *NetworkRequest, opts ...grpc.CallOption) (*InspectNetworkResponse, error) {
+func (c *networkServiceClient) InspectNetwork(ctx context.Context, in *NetworkRequest, opts ...grpc.CallOption) (*NetworkResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(InspectNetworkResponse)
+	out := new(NetworkResponse)
 	err := c.cc.Invoke(ctx, NetworkService_InspectNetwork_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -773,14 +777,36 @@ func (c *networkServiceClient) RemoveNetwork(ctx context.Context, in *NetworkReq
 	return out, nil
 }
 
+func (c *networkServiceClient) ConnectNetwork(ctx context.Context, in *ConnectNetworkRequest, opts ...grpc.CallOption) (*NetworkResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(NetworkResponse)
+	err := c.cc.Invoke(ctx, NetworkService_ConnectNetwork_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *networkServiceClient) DisconnectNetwork(ctx context.Context, in *DisconnectNetworkRequest, opts ...grpc.CallOption) (*NetworkResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(NetworkResponse)
+	err := c.cc.Invoke(ctx, NetworkService_DisconnectNetwork_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NetworkServiceServer is the server API for NetworkService service.
 // All implementations must embed UnimplementedNetworkServiceServer
 // for forward compatibility.
 type NetworkServiceServer interface {
 	ListNetworks(context.Context, *ListNetworksRequest) (*ListNetworksResponse, error)
-	InspectNetwork(context.Context, *NetworkRequest) (*InspectNetworkResponse, error)
+	InspectNetwork(context.Context, *NetworkRequest) (*NetworkResponse, error)
 	CreateNetwork(context.Context, *CreateNetworkRequest) (*CreateNetworkResponse, error)
 	RemoveNetwork(context.Context, *NetworkRequest) (*NetworkResponse, error)
+	ConnectNetwork(context.Context, *ConnectNetworkRequest) (*NetworkResponse, error)
+	DisconnectNetwork(context.Context, *DisconnectNetworkRequest) (*NetworkResponse, error)
 	mustEmbedUnimplementedNetworkServiceServer()
 }
 
@@ -794,7 +820,7 @@ type UnimplementedNetworkServiceServer struct{}
 func (UnimplementedNetworkServiceServer) ListNetworks(context.Context, *ListNetworksRequest) (*ListNetworksResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListNetworks not implemented")
 }
-func (UnimplementedNetworkServiceServer) InspectNetwork(context.Context, *NetworkRequest) (*InspectNetworkResponse, error) {
+func (UnimplementedNetworkServiceServer) InspectNetwork(context.Context, *NetworkRequest) (*NetworkResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method InspectNetwork not implemented")
 }
 func (UnimplementedNetworkServiceServer) CreateNetwork(context.Context, *CreateNetworkRequest) (*CreateNetworkResponse, error) {
@@ -802,6 +828,12 @@ func (UnimplementedNetworkServiceServer) CreateNetwork(context.Context, *CreateN
 }
 func (UnimplementedNetworkServiceServer) RemoveNetwork(context.Context, *NetworkRequest) (*NetworkResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RemoveNetwork not implemented")
+}
+func (UnimplementedNetworkServiceServer) ConnectNetwork(context.Context, *ConnectNetworkRequest) (*NetworkResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ConnectNetwork not implemented")
+}
+func (UnimplementedNetworkServiceServer) DisconnectNetwork(context.Context, *DisconnectNetworkRequest) (*NetworkResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DisconnectNetwork not implemented")
 }
 func (UnimplementedNetworkServiceServer) mustEmbedUnimplementedNetworkServiceServer() {}
 func (UnimplementedNetworkServiceServer) testEmbeddedByValue()                        {}
@@ -896,6 +928,42 @@ func _NetworkService_RemoveNetwork_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NetworkService_ConnectNetwork_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConnectNetworkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NetworkServiceServer).ConnectNetwork(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NetworkService_ConnectNetwork_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NetworkServiceServer).ConnectNetwork(ctx, req.(*ConnectNetworkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NetworkService_DisconnectNetwork_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DisconnectNetworkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NetworkServiceServer).DisconnectNetwork(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NetworkService_DisconnectNetwork_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NetworkServiceServer).DisconnectNetwork(ctx, req.(*DisconnectNetworkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NetworkService_ServiceDesc is the grpc.ServiceDesc for NetworkService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -919,6 +987,14 @@ var NetworkService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "RemoveNetwork",
 			Handler:    _NetworkService_RemoveNetwork_Handler,
 		},
+		{
+			MethodName: "ConnectNetwork",
+			Handler:    _NetworkService_ConnectNetwork_Handler,
+		},
+		{
+			MethodName: "DisconnectNetwork",
+			Handler:    _NetworkService_DisconnectNetwork_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "proto/agent.proto",
@@ -935,7 +1011,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type VolumeServiceClient interface {
 	ListVolumes(ctx context.Context, in *ListVolumesRequest, opts ...grpc.CallOption) (*ListVolumesResponse, error)
-	// rpc Inspect(...)
+	// rpc InspectVolume(...)
 	CreateVolume(ctx context.Context, in *CreateVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error)
 	RemoveVolume(ctx context.Context, in *RemoveVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error)
 }
@@ -983,7 +1059,7 @@ func (c *volumeServiceClient) RemoveVolume(ctx context.Context, in *RemoveVolume
 // for forward compatibility.
 type VolumeServiceServer interface {
 	ListVolumes(context.Context, *ListVolumesRequest) (*ListVolumesResponse, error)
-	// rpc Inspect(...)
+	// rpc InspectVolume(...)
 	CreateVolume(context.Context, *CreateVolumeRequest) (*VolumeResponse, error)
 	RemoveVolume(context.Context, *RemoveVolumeRequest) (*VolumeResponse, error)
 	mustEmbedUnimplementedVolumeServiceServer()

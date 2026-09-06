@@ -44,7 +44,7 @@ type NetworkInfo struct {
     Containers []NetContainer
 }
 
-// ----------------------- LIST NETWORKS -------------------
+// ------------------------------------------------- LIST NETWORKS 
 func (c *Client) ListNetworks(
     ctx context.Context,
 ) ([]Network, error) {
@@ -93,13 +93,11 @@ func (c *Client) ListNetworks(
 
         result = append(result, item)
     }
-
-
     return result, nil
 }
 
 
-// -------------------- CREATE NETWORK --------------------
+// ------------------------------------------------------ CREATE NETWORK 
 func (c *Client) CreateNetwork(
     ctx context.Context,
     name string,
@@ -125,7 +123,7 @@ func (c *Client) CreateNetwork(
     return resp.ID, nil
 }
 
-// --------------------- REMOVE NETWORK --------------------
+// ------------------------------------------------------ REMOVE NETWORK 
 func (c *Client) RemoveNetwork(
     ctx context.Context,
     id string,
@@ -137,7 +135,7 @@ func (c *Client) RemoveNetwork(
 }
 
 
-// ------------------------- INSPECT NETWORK -----------------
+// ------------------------------------------------------ INSPECT NETWORK 
 func (c *Client) InspectNetwork(
     ctx context.Context,
     id string,
@@ -181,4 +179,34 @@ func (c *Client) InspectNetwork(
     }
 
     return info, nil
+}
+
+// ------------------------------------------------------ CONNECT NETWORK 
+func (c *Client) ConnectNetwork(
+    ctx context.Context,
+    networkID string,
+		containerID string,
+		endpoint *network.EndpointSettings,
+) error {
+		return c.cli.NetworkConnect(
+        ctx,
+        networkID,
+        containerID,
+        endpoint,
+    )
+}
+
+// ------------------------------------------------------ DISCONNECT NETWORK 
+func (c *Client) DisconnectNetwork(
+    ctx context.Context,
+    networkID string,
+		containerID string,
+		forse bool,
+) error {
+		return c.cli.NetworkDisconnect(
+        ctx,
+        networkID,
+        containerID,
+				forse,
+    )
 }
