@@ -8,11 +8,11 @@ service ImageService{
   rpc ListImages(ListImagesRequest) returns (ListImagesResponse);
   rpc InspectImage(ImageRequest) returns (InspectImageResponse);
   rpc PullImage(PullImageRequest) returns (stream PullImageMessage);
-  //rpc Push(...)
-  //rpc Build(...)
-  //rpc Tag(...)
+  //rpc PushImage(...)
+  //rpc BuildImage(...)
+  //rpc TagImage(...)
   rpc RemoveImage(RemoveImageRequest) returns (RemoveImageResponse);
-  //rpc Prune(...)
+  //rpc PruneImage(...)
 }
 
 service ContainerService{
@@ -22,34 +22,34 @@ service ContainerService{
   rpc StartContainer(ContainerRequest) returns (ContainerResponse);
   rpc StopContainer(ContainerRequest) returns (ContainerResponse);
   rpc RestartContainer(ContainerRequest) returns (ContainerResponse);
-  //rpc Kill(...)
-  //rpc Pause(...)
-  //rpc Unpause(...)
+  //rpc KillContainer(...)
+  //rpc PauseContainer(...)
+  //rpc UnpauseContainer(...)
   rpc RemoveContainer(RemoveContainerRequest) returns (ContainerResponse);
-  //rpc Update(...)
-  //rpc Rename(...)
+  //rpc UpdateContainer(...)
+  //rpc RenameContainer(...)
   rpc ExecContainer(ExecuteCommandRequest) returns (stream LogMessage);
   rpc LogsContainer(ViewLogsRequest) returns (stream LogMessage);
   rpc StatsContainer(ContainerRequest) returns (stream ContainerStatsResponse);
-  //rpc Attach(...)
+  //rpc AttachContainer(...)
 }
 
 service NetworkService {
   rpc ListNetworks(ListNetworksRequest) returns (ListNetworksResponse);
-  rpc InspectNetwork(NetworkRequest) returns (InspectNetworkResponse);
+  rpc InspectNetwork(NetworkRequest) returns (NetworkResponse);
   rpc CreateNetwork(CreateNetworkRequest) returns (CreateNetworkResponse);
   rpc RemoveNetwork(NetworkRequest) returns (NetworkResponse);
-  //rpc Connect(...)
-  //rpc Disconnect(...)
-  //rpc Prune(...)
+  rpc ConnectNetwork(ConnectNetworkRequest) returns (NetworkResponse);
+  rpc DisconnectNetwork(DisconnectNetworkRequest) returns (NetworkResponse);
+  //rpc PruneNetwork(...)
 }
 
 service VolumeService {
   rpc ListVolumes(ListVolumesRequest) returns (ListVolumesResponse);
-  //rpc Inspect(...)
+  //rpc InspectVolume(...)
   rpc CreateVolume(CreateVolumeRequest) returns (VolumeResponse);
   rpc RemoveVolume(RemoveVolumeRequest) returns (VolumeResponse);
-  //rpc Prune(...)
+  //rpc PruneVolume(...)
 }
 
 //service StackService {
@@ -275,7 +275,7 @@ message NetContainer {
   string ipv4_address = 3; 
 }
 
-message Network {
+message NetworkListItem {
   string id = 1;
   string name = 2;
   string driver = 3;
@@ -284,13 +284,30 @@ message Network {
   repeated NetContainer containers = 5;
 }
 
-message ListNetworksRequest {}
+message NetworkInfo {
+  string id = 1;
+  string name = 2;
+  string driver = 3;
+  string scope = 4;
 
-message ListNetworksResponse {
-  repeated Network networks = 1;
+  bool internal = 5;
+  bool attachable = 6;
+  bool ingress = 7;
+
+  repeated IPAMConfig ipam = 8;
+
+  map<string, string> options = 9;
+  map<string, string> labels = 10;
+
+  repeated NetContainer containers = 11;
 }
 
 
+message ListNetworksRequest {}
+
+message ListNetworksResponse {
+  repeated NetworkListItem networks = 1;
+}
 
 // ------------------------------------------CREATE AND REMOVE NETWORK
 message CreateNetworkRequest {
@@ -308,39 +325,37 @@ message NetworkRequest {
     string id = 1;
 }
 
-message NetworkResponse {}
+message NetworkResponse {
+    NetworkInfo network = 1;
+}
 
-
-// -------------------------------------------- INSPECT NETWORK 
 message IPAMConfig {
     string subnet = 1;
     string gateway = 2;
     string ip_range = 3;
 }
 
-message NetworkContainer {
-    string id = 1;
-    string name = 2;
-    string ipv4_address = 3;
+// ----------------------------------------------------- CONNECT/DISCONNECT NETWORK
+message ConnectNetworkRequest {
+    string network_id = 1;
+    string container_id = 2;
+
+    EndpointSettings endpoint = 3;
 }
 
-message InspectNetworkResponse {
-    string id = 1;
-    string name = 2;
+message EndpointSettings {
+    string ipv4_address = 1;
+    string ipv6_address = 2;
+    string mac_address = 3;
 
-    string driver = 3;
-    string scope = 4;
+    repeated string aliases = 4;
+}
 
-    bool internal = 5;
-    bool attachable = 6;
-    bool ingress = 7;
-
-    repeated IPAMConfig ipam = 8;
-
-    map<string, string> options = 9;
-    map<string, string> labels = 10;
-
-    repeated NetworkContainer containers = 11;
+message DisconnectNetworkRequest {
+    string network_id = 1;
+    string container_id = 2;
+    
+    bool forse = 3;
 }
 
 // --------------------------------------

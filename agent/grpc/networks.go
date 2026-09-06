@@ -4,9 +4,12 @@ import (
     "context"
 
     pb "konsin1988/agent/proto"
+
+		"google.golang.org/grpc/codes"
+    "google.golang.org/grpc/status"
 )
 
-// ------------------------- LIST NETWORKS -----------------
+// -------------------------------------------------- LIST NETWORKS 
 func (s *Server) ListNetworks(
     ctx context.Context,
     req *pb.ListNetworksRequest,
@@ -25,7 +28,7 @@ func (s *Server) ListNetworks(
 
     for _, n := range networks {
 
-        item := &pb.Network{
+        item := &pb.NetworkListItem{
             Id:     n.ID,
             Name:   n.Name,
             Driver: n.Driver,
@@ -53,49 +56,20 @@ func (s *Server) ListNetworks(
     return resp, nil
 }
 
-// ------------------ INSPECT NETWORK ----------------------
+// ------------------------------------------------------- INSPECT NETWORK 
 func (s *Server) InspectNetwork(
     ctx context.Context,
     req *pb.NetworkRequest,
-) (*pb.InspectNetworkResponse, error) {
+) (*pb.NetworkResponse, error) {
 
-    n, err := s.networkSvc.InspectNetwork(ctx, req.Id)
+    resp, err := s.networkSvc.InspectNetwork(ctx, req.Id)
     if err != nil {
         return nil, err
     }
-
-    resp := &pb.InspectNetworkResponse {
-        Id:         n.ID,
-        Name:       n.Name,
-        Driver:     n.Driver,
-        Scope:      n.Scope,
-        Internal:   n.Internal,
-        Attachable: n.Attachable,
-        Ingress:    n.Ingress,
-        Options:    n.Options,
-        Labels:     n.Labels,
-    }
-
-    for _, cfg := range n.IPAM {
-        resp.Ipam = append(resp.Ipam, &pb.IPAMConfig{
-            Subnet:  cfg.Subnet,
-            Gateway: cfg.Gateway,
-            IpRange: cfg.IPRange,
-        })
-    }
-
-    for _, c := range n.Containers {
-        resp.Containers = append(resp.Containers, &pb.NetworkContainer{
-            Id:          c.ID,
-            Name:        c.Name,
-            Ipv4Address: c.IPv4Address,
-        })
-    }
-
-    return resp, nil
+		return &pb.NetworkResponse{Network: resp}, nil
 }
 
-// -------------------- CREATE NETWORK ------------------
+// ------------------------------------------------------- CREATE NETWORK
 func (s *Server) CreateNetwork(
     ctx context.Context,
     req *pb.CreateNetworkRequest,
@@ -117,24 +91,109 @@ func (s *Server) CreateNetwork(
     }, nil
 }
 
-// ------------------ REMOVE NETWORK -----------------------
+// -------------------------------------------------------- REMOVE NETWORK
 func (s *Server) RemoveNetwork(
     ctx context.Context,
     req *pb.NetworkRequest,
 ) (*pb.NetworkResponse, error) {
 
+		if req.GetId() == "" {
+        return nil, status.Error(
+            codes.InvalidArgument,
+            "id is required",
+        )
+    }
+    resp, err := s.networkSvc.InspectNetwork(ctx, req.Id)
+    if err != nil {
+        return nil, err
+    }
 
-    err := s.networkSvc.RemoveNetwork(
+    err = s.networkSvc.RemoveNetwork(
         ctx,
-        req,
+        req.Id,
+    )
+    if err != nil {
+        return nil, err
+    }
+
+		return &pb.NetworkResponse{Network: resp}, nil
+}
+
+
+// ------------------------------------------------------ CONNECT NETWORK
+func (s *Server) ConnectNetwork(
+    ctx context.Context,
+    req *pb.ConnectNetworkRequest,
+) (*pb.NetworkResponse, error) {
+
+		if req.GetNetworkId() == "" {
+        return nil, status.Error(
+            codes.InvalidArgument,
+            "network_id is required",
+        )
+    }
+
+    if req.GetContainerId() == "" {
+        return nil, status.Error(
+            codes.InvalidArgument,
+            "container_id is required",
+        )
+    }
+		
+    resp, err := s.networkSvc.InspectNetwork(ctx, req.NetworkId)
+    if err != nil {
+        return nil, err
+    }
+
+    err = s.networkSvc.ConnectNetwork(
+        ctx,
+        req.NetworkId,
+				req.ContainerId,
+				req.Endpoint,
     )
 
     if err != nil {
         return nil, err
     }
 
-
-    return &pb.NetworkResponse{}, nil
+		return &pb.NetworkResponse{Network: resp}, nil
 }
 
+// ------------------------------------------------------ DISCONNECT NETWORK
+func (s *Server) DisconnectNetwork(
+    ctx context.Context,
+    req *pb.DisconnectNetworkRequest,
+) (*pb.NetworkResponse, error) {
 
+		if req.GetNetworkId() == "" {
+        return nil, status.Error(
+            codes.InvalidArgument,
+            "network_id is required",
+        )
+    }
+    if req.GetContainerId() == "" {
+        return nil, status.Error(
+            codes.InvalidArgument,
+            "container_id is required",
+        )
+    }
+		
+
+		err := s.networkSvc.DisconnectNetwork(
+        ctx,
+        req.NetworkId,
+				req.ContainerId,
+				req.Forse,
+    )
+
+    if err != nil {
+        return nil, err
+    }
+
+    resp, err := s.networkSvc.InspectNetwork(ctx, req.NetworkId)
+    if err != nil {
+        return nil, err
+    }
+
+		return &pb.NetworkResponse{Network: resp}, nil
+}
