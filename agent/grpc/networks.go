@@ -62,6 +62,13 @@ func (s *Server) InspectNetwork(
     req *pb.NetworkRequest,
 ) (*pb.NetworkResponse, error) {
 
+		if req.GetId() == "" {
+        return nil, status.Error(
+            codes.InvalidArgument,
+            "id is required",
+        )
+    }
+
     resp, err := s.networkSvc.InspectNetwork(ctx, req.Id)
     if err != nil {
         return nil, err
