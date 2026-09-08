@@ -18,6 +18,7 @@ type Container struct {
     Status string
 }
 
+// ---------------------------------------------------- LIST CONTAINER 
 func (c *Client) ListContainers(
     ctx context.Context,
 ) ([]Container, error) {
@@ -52,6 +53,7 @@ func (c *Client) ListContainers(
 	return containers, nil
 }
 
+// ---------------------------------------------------- STOP CONTAINER 
 func (c *Client) StopContainer(
     ctx context.Context,
     id string,
@@ -66,7 +68,7 @@ func (c *Client) StopContainer(
     )
 }
 
-// -----------------------------------START CONTAINER ----------------
+// ---------------------------------------------------- START CONTAINER 
 func (c *Client) StartContainer(
     ctx context.Context,
     id string,
@@ -78,7 +80,29 @@ func (c *Client) StartContainer(
     )
 }
 
-// ----------------------------- RESTART CONTAINER -----------------
+// ------------------------------------------------------ PAUSE CONTAINER 
+func (c *Client) PauseContainer(
+    ctx context.Context,
+    id string,
+) error {
+    return c.cli.ContainerPause(
+        ctx,
+        id,
+    )
+}
+
+// ------------------------------------------------------ UNPAUSE CONTAINER 
+func (c *Client) UnpauseContainer(
+    ctx context.Context,
+    id string,
+) error {
+    return c.cli.ContainerUnpause(
+        ctx,
+        id,
+    )
+}
+
+// ----------------------------------------------------- RESTART CONTAINER 
 func (c *Client) RestartContainer(
     ctx context.Context,
     id string,
@@ -90,7 +114,7 @@ func (c *Client) RestartContainer(
     )
 }
 
-// ------------------------------- REMOVE CONTAINER ---------------
+// ----------------------------------------------------- REMOVE CONTAINER 
 func (c *Client) RemoveContainer(
 	ctx context.Context,
 	id string,
@@ -108,8 +132,34 @@ func (c *Client) RemoveContainer(
 	)
 }
 
+// ----------------------------------------------------- KILL CONTAINER 
+func (c *Client) KillContainer(
+	ctx context.Context,
+	id string,
+	signal string,
+) error {
 
-// -------------------------------- RUN CONTAINER ---------------------
+	return c.cli.ContainerKill(
+		ctx,
+		id,
+		signal,
+	)
+}
+
+// ------------------------------------------------------ UPDATE CONTAINER 
+func (c *Client) UpdateContainer(
+    ctx context.Context,
+		containerID string,
+    update container.UpdateConfig,
+) error {
+		_, err := c.cli.ContainerUpdate(ctx, containerID, update)
+		if err != nil {
+			return err
+		}
+		return nil
+}
+
+// ------------------------------------------------------ RUN CONTAINER 
 func (c *Client) RunContainer(
     ctx context.Context,
     req *proto.RunContainerRequest,

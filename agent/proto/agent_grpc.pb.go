@@ -251,7 +251,11 @@ const (
 	ContainerService_StartContainer_FullMethodName   = "/agent.ContainerService/StartContainer"
 	ContainerService_StopContainer_FullMethodName    = "/agent.ContainerService/StopContainer"
 	ContainerService_RestartContainer_FullMethodName = "/agent.ContainerService/RestartContainer"
+	ContainerService_KillContainer_FullMethodName    = "/agent.ContainerService/KillContainer"
+	ContainerService_PauseContainer_FullMethodName   = "/agent.ContainerService/PauseContainer"
+	ContainerService_UnpauseContainer_FullMethodName = "/agent.ContainerService/UnpauseContainer"
 	ContainerService_RemoveContainer_FullMethodName  = "/agent.ContainerService/RemoveContainer"
+	ContainerService_UpdateContainer_FullMethodName  = "/agent.ContainerService/UpdateContainer"
 	ContainerService_ExecContainer_FullMethodName    = "/agent.ContainerService/ExecContainer"
 	ContainerService_LogsContainer_FullMethodName    = "/agent.ContainerService/LogsContainer"
 	ContainerService_StatsContainer_FullMethodName   = "/agent.ContainerService/StatsContainer"
@@ -262,16 +266,16 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ContainerServiceClient interface {
 	ListContainers(ctx context.Context, in *ListContainersRequest, opts ...grpc.CallOption) (*ListContainersResponse, error)
-	InspectContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*InspectContainerResponse, error)
+	InspectContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 	CreateContainer(ctx context.Context, in *RunContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 	StartContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 	StopContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 	RestartContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
-	// rpc KillContainer(...)
-	// rpc PauseContainer(...)
-	// rpc UnpauseContainer(...)
+	KillContainer(ctx context.Context, in *KillContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
+	PauseContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
+	UnpauseContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 	RemoveContainer(ctx context.Context, in *RemoveContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
-	// rpc UpdateContainer(...)
+	UpdateContainer(ctx context.Context, in *UpdateContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 	// rpc RenameContainer(...)
 	ExecContainer(ctx context.Context, in *ExecuteCommandRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error)
 	LogsContainer(ctx context.Context, in *ViewLogsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error)
@@ -296,9 +300,9 @@ func (c *containerServiceClient) ListContainers(ctx context.Context, in *ListCon
 	return out, nil
 }
 
-func (c *containerServiceClient) InspectContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*InspectContainerResponse, error) {
+func (c *containerServiceClient) InspectContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(InspectContainerResponse)
+	out := new(ContainerResponse)
 	err := c.cc.Invoke(ctx, ContainerService_InspectContainer_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -346,10 +350,50 @@ func (c *containerServiceClient) RestartContainer(ctx context.Context, in *Conta
 	return out, nil
 }
 
+func (c *containerServiceClient) KillContainer(ctx context.Context, in *KillContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ContainerResponse)
+	err := c.cc.Invoke(ctx, ContainerService_KillContainer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *containerServiceClient) PauseContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ContainerResponse)
+	err := c.cc.Invoke(ctx, ContainerService_PauseContainer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *containerServiceClient) UnpauseContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ContainerResponse)
+	err := c.cc.Invoke(ctx, ContainerService_UnpauseContainer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *containerServiceClient) RemoveContainer(ctx context.Context, in *RemoveContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ContainerResponse)
 	err := c.cc.Invoke(ctx, ContainerService_RemoveContainer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *containerServiceClient) UpdateContainer(ctx context.Context, in *UpdateContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ContainerResponse)
+	err := c.cc.Invoke(ctx, ContainerService_UpdateContainer_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -418,16 +462,16 @@ type ContainerService_StatsContainerClient = grpc.ServerStreamingClient[Containe
 // for forward compatibility.
 type ContainerServiceServer interface {
 	ListContainers(context.Context, *ListContainersRequest) (*ListContainersResponse, error)
-	InspectContainer(context.Context, *ContainerRequest) (*InspectContainerResponse, error)
+	InspectContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
 	CreateContainer(context.Context, *RunContainerRequest) (*ContainerResponse, error)
 	StartContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
 	StopContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
 	RestartContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
-	// rpc KillContainer(...)
-	// rpc PauseContainer(...)
-	// rpc UnpauseContainer(...)
+	KillContainer(context.Context, *KillContainerRequest) (*ContainerResponse, error)
+	PauseContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
+	UnpauseContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
 	RemoveContainer(context.Context, *RemoveContainerRequest) (*ContainerResponse, error)
-	// rpc UpdateContainer(...)
+	UpdateContainer(context.Context, *UpdateContainerRequest) (*ContainerResponse, error)
 	// rpc RenameContainer(...)
 	ExecContainer(*ExecuteCommandRequest, grpc.ServerStreamingServer[LogMessage]) error
 	LogsContainer(*ViewLogsRequest, grpc.ServerStreamingServer[LogMessage]) error
@@ -445,7 +489,7 @@ type UnimplementedContainerServiceServer struct{}
 func (UnimplementedContainerServiceServer) ListContainers(context.Context, *ListContainersRequest) (*ListContainersResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListContainers not implemented")
 }
-func (UnimplementedContainerServiceServer) InspectContainer(context.Context, *ContainerRequest) (*InspectContainerResponse, error) {
+func (UnimplementedContainerServiceServer) InspectContainer(context.Context, *ContainerRequest) (*ContainerResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method InspectContainer not implemented")
 }
 func (UnimplementedContainerServiceServer) CreateContainer(context.Context, *RunContainerRequest) (*ContainerResponse, error) {
@@ -460,8 +504,20 @@ func (UnimplementedContainerServiceServer) StopContainer(context.Context, *Conta
 func (UnimplementedContainerServiceServer) RestartContainer(context.Context, *ContainerRequest) (*ContainerResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RestartContainer not implemented")
 }
+func (UnimplementedContainerServiceServer) KillContainer(context.Context, *KillContainerRequest) (*ContainerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method KillContainer not implemented")
+}
+func (UnimplementedContainerServiceServer) PauseContainer(context.Context, *ContainerRequest) (*ContainerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method PauseContainer not implemented")
+}
+func (UnimplementedContainerServiceServer) UnpauseContainer(context.Context, *ContainerRequest) (*ContainerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UnpauseContainer not implemented")
+}
 func (UnimplementedContainerServiceServer) RemoveContainer(context.Context, *RemoveContainerRequest) (*ContainerResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RemoveContainer not implemented")
+}
+func (UnimplementedContainerServiceServer) UpdateContainer(context.Context, *UpdateContainerRequest) (*ContainerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateContainer not implemented")
 }
 func (UnimplementedContainerServiceServer) ExecContainer(*ExecuteCommandRequest, grpc.ServerStreamingServer[LogMessage]) error {
 	return status.Error(codes.Unimplemented, "method ExecContainer not implemented")
@@ -601,6 +657,60 @@ func _ContainerService_RestartContainer_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContainerService_KillContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(KillContainerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContainerServiceServer).KillContainer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContainerService_KillContainer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContainerServiceServer).KillContainer(ctx, req.(*KillContainerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContainerService_PauseContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ContainerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContainerServiceServer).PauseContainer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContainerService_PauseContainer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContainerServiceServer).PauseContainer(ctx, req.(*ContainerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContainerService_UnpauseContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ContainerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContainerServiceServer).UnpauseContainer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContainerService_UnpauseContainer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContainerServiceServer).UnpauseContainer(ctx, req.(*ContainerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ContainerService_RemoveContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RemoveContainerRequest)
 	if err := dec(in); err != nil {
@@ -615,6 +725,24 @@ func _ContainerService_RemoveContainer_Handler(srv interface{}, ctx context.Cont
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContainerServiceServer).RemoveContainer(ctx, req.(*RemoveContainerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContainerService_UpdateContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateContainerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContainerServiceServer).UpdateContainer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContainerService_UpdateContainer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContainerServiceServer).UpdateContainer(ctx, req.(*UpdateContainerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -684,8 +812,24 @@ var ContainerService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ContainerService_RestartContainer_Handler,
 		},
 		{
+			MethodName: "KillContainer",
+			Handler:    _ContainerService_KillContainer_Handler,
+		},
+		{
+			MethodName: "PauseContainer",
+			Handler:    _ContainerService_PauseContainer_Handler,
+		},
+		{
+			MethodName: "UnpauseContainer",
+			Handler:    _ContainerService_UnpauseContainer_Handler,
+		},
+		{
 			MethodName: "RemoveContainer",
 			Handler:    _ContainerService_RemoveContainer_Handler,
+		},
+		{
+			MethodName: "UpdateContainer",
+			Handler:    _ContainerService_UpdateContainer_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

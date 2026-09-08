@@ -17,16 +17,16 @@ service ImageService{
 
 service ContainerService{
   rpc ListContainers(ListContainersRequest) returns (ListContainersResponse);
-  rpc InspectContainer(ContainerRequest) returns (InspectContainerResponse);
+  rpc InspectContainer(ContainerRequest) returns (ContainerResponse);
   rpc CreateContainer(RunContainerRequest) returns (ContainerResponse);
   rpc StartContainer(ContainerRequest) returns (ContainerResponse);
   rpc StopContainer(ContainerRequest) returns (ContainerResponse);
   rpc RestartContainer(ContainerRequest) returns (ContainerResponse);
-  //rpc KillContainer(...)
-  //rpc PauseContainer(...)
-  //rpc UnpauseContainer(...)
+  rpc KillContainer(KillContainerRequest) returns (ContainerResponse);
+  rpc PauseContainer(ContainerRequest) returns (ContainerResponse);
+  rpc UnpauseContainer(ContainerRequest) returns (ContainerResponse);
   rpc RemoveContainer(RemoveContainerRequest) returns (ContainerResponse);
-  //rpc UpdateContainer(...)
+  rpc UpdateContainer(UpdateContainerRequest) returns (ContainerResponse);
   //rpc RenameContainer(...)
   rpc ExecContainer(ExecuteCommandRequest) returns (stream LogMessage);
   rpc LogsContainer(ViewLogsRequest) returns (stream LogMessage);
@@ -154,7 +154,8 @@ message PullImageMessage {
 
     string error = 5;
 }
-// ----------------------------------- LIST CONTAINERS 
+
+// ------------------------------------------------------------------ CONTAINERS 
 message ListContainersRequest {}
 
 message Container {
@@ -164,23 +165,44 @@ message Container {
   string status = 4;
 }
 
+message ContainerInfo {
+    string id = 1;
+    string name = 2;
+    string image = 3;
+    string status = 4;
+
+    repeated PortBinding ports = 5;
+    repeated VolumeBinding mounts = 6;
+    repeated string env = 7;
+
+    HealthStatus health = 8;
+}
+
 message ListContainersResponse {
   repeated Container containers = 1;
 }
 
 // ----------------------------------------- STOP, START EXISTING CONTAINER BY ID
 message ContainerRequest { string id = 1; }
-message ContainerResponse {}
+message ContainerResponse {
+    ContainerInfo container = 1;
+}
+
+message KillContainerRequest {
+    string id = 1;
+
+    // Signal to send, e.g. "SIGKILL", "SIGTERM", "9".
+    // If empty, Docker uses SIGKILL.
+    string signal = 2;
+}
 
 
-// ----------------------------------------- REMOVE CONTAINER
 message RemoveContainerRequest {
     string id = 1;
     bool force = 2;
     bool remove_volumes = 3;
 }
 
-// ------------------------------------------ RUN CONTAINER
 message RunContainerRequest {
   string image_id = 1;
 
@@ -202,6 +224,33 @@ message PortBinding {
 message VolumeBinding {
   string source = 1;
   string target = 2;
+}
+
+message UpdateContainerRequest {
+  string id = 1;
+
+  // Resource limits
+  optional int64 cpu_shares = 2;
+  optional int64 cpu_period = 3;
+  optional int64 cpu_quota = 4;
+  optional int64 memory = 5;
+  optional int64 memory_swap = 6;
+  optional int64 pids_limit = 7;
+
+  // Restart policy
+  optional RestartPolicy restart_policy = 8;
+
+  // Storage
+  optional int64 blkio_weight = 9;
+
+  // Runtime
+  optional int64 cpu_count = 10;
+  optional int64 cpu_percent = 11;
+}
+
+message RestartPolicy {
+  string name = 1;        // no, always, unless-stopped, on-failure
+  int64 maximum_retry_count = 2;
 }
 
 // -------------------------------------------- VIEW LOGS
@@ -231,21 +280,6 @@ message ExecuteCommandRequest {
     bool tty = 3;
 }
 
-
-// ------------------------------------------- INSPECT CONTAINER
-message InspectContainerResponse {
-    string id = 1;
-    string name = 2;
-    string image = 3;
-    string status = 4;
-
-    repeated PortBinding ports = 5;
-    repeated VolumeBinding mounts = 6;
-    repeated string env = 7;
-
-    HealthStatus health = 8;
-}
-
 message HealthStatus {
     string status = 1;
     int32 failing_streak = 2;
@@ -268,7 +302,7 @@ message ContainerStatsResponse {
   uint32 pids = 8;
 }
 
-// --------------------------------------------- LIST NETWORKS
+// --------------------------------------------- NETWORKS
 message NetContainer {
   string id = 1;
 	string name = 2;
@@ -309,7 +343,6 @@ message ListNetworksResponse {
   repeated NetworkListItem networks = 1;
 }
 
-// ------------------------------------------CREATE AND REMOVE NETWORK
 message CreateNetworkRequest {
   string name = 1;
 
@@ -335,7 +368,6 @@ message IPAMConfig {
     string ip_range = 3;
 }
 
-// ----------------------------------------------------- CONNECT/DISCONNECT NETWORK
 message ConnectNetworkRequest {
     string network_id = 1;
     string container_id = 2;

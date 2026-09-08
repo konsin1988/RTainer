@@ -11,14 +11,14 @@ import (
 
 		"github.com/docker/docker/pkg/stdcopy"
 		"github.com/docker/docker/api/types/container"
+		"google.golang.org/grpc/codes"
+    "google.golang.org/grpc/status"
 
     pb "konsin1988/agent/proto"
 )
 
 
-// ---------------------------------------
-// LIST CONTAINERS 
-// --------------------------------------
+// -------------------------------------------------------------------- LIST CONTAINERS 
 func (s *Server) ListContainers(
     ctx context.Context,
     req *pb.ListContainersRequest,
@@ -43,70 +43,28 @@ func (s *Server) ListContainers(
     return resp, nil
 }
 
-// ----------------------------------------
-// INSPECT CONTAINER 
-// ---------------------------------------------
+// --------------------------------------------------------------------- INSPECT CONTAINER 
 func (s *Server) InspectContainer(
     ctx context.Context,
     req *pb.ContainerRequest,
-) (*pb.InspectContainerResponse, error) {
+) (*pb.ContainerResponse, error) {
 
-
-    result, err := s.containerSvc.InspectContainer(
-        ctx,
-        req,
-    )
-
-    if err != nil {
-        return nil, err
-    }
-
-    resp := &pb.InspectContainerResponse{
-        Id:     result.ID,
-        Name:   result.Name,
-        Image:  result.Image,
-        Status: result.Status,
-        Env:    result.Env,
-    }
-
-    for _, p := range result.Ports {
-
-        resp.Ports = append(
-            resp.Ports,
-            &pb.PortBinding{
-                ContainerPort: p.ContainerPort,
-								HostIp: 			 p.HostIP,
-                HostPort:      p.HostPort,
-            },
+		if req.GetId() == "" {
+        return nil, status.Error(
+            codes.InvalidArgument,
+            "id is required",
         )
     }
 
-    for _, v := range result.Mounts {
+		resp, err := s.containerSvc.InspectContainer(ctx, req.Id)
+		if err != nil {
+			return nil, err
+		}
 
-        resp.Mounts = append(
-            resp.Mounts,
-            &pb.VolumeBinding{
-                Source: v.Source,
-                Target: v.Target,
-            },
-        )
-    }
-    if result.Health != nil {
-
-        resp.Health = &pb.HealthStatus{
-            Status:        result.Health.Status,
-            FailingStreak: int32(result.Health.FailingStreak),
-            Logs:          result.Health.Logs,
-        }
-    }
-
-
-    return resp, nil
+		return &pb.ContainerResponse{Container: resp}, nil 
 }
 
-// ------------------------------------
-// CREATE CONTAINER
-// ------------------------------------
+// ----------------------------------------------------------------------- CREATE CONTAINER
 func (s *Server) CreateContainer(
     ctx context.Context,
     req *pb.RunContainerRequest,
@@ -120,47 +78,72 @@ func (s *Server) CreateContainer(
     return &pb.ContainerResponse{}, nil
 }
 
-// ------------------------------------
-// START CONTAINER
-// ------------------------------------
+// ----------------------------------------------------------------------- START CONTAINER
 func (s *Server) StartContainer(
     ctx context.Context,
     req *pb.ContainerRequest,
 ) (*pb.ContainerResponse, error) {
 
-    err := s.containerSvc.StartContainer(ctx, req.Id )
-    if err != nil {
-        return &pb.ContainerResponse{}, err
+		if req.GetId() == "" {
+        return nil, status.Error(
+            codes.InvalidArgument,
+            "id is required",
+        )
     }
 
-    return &pb.ContainerResponse{}, nil
+    err := s.containerSvc.StartContainer(ctx, req.Id )
+    if err != nil {
+        return nil, err
+    }
+
+		resp, err := s.containerSvc.InspectContainer(ctx, req.Id)
+		if err != nil {
+			return nil, err
+		}
+
+		return &pb.ContainerResponse{Container: resp}, nil
 }
 
-// ------------------------------------
-// STOP CONTAINER
-// ------------------------------------
+// ---------------------------------------------------------------------- STOP CONTAINER
 func (s *Server) StopContainer(
     ctx context.Context,
     req *pb.ContainerRequest,
 ) (*pb.ContainerResponse, error) {
+
+		if req.GetId() == "" {
+        return nil, status.Error(
+            codes.InvalidArgument,
+            "id is required",
+        )
+    }
 
     err := s.containerSvc.StopContainer(ctx, req.Id )
     if err != nil {
         return &pb.ContainerResponse{}, err
     }
 
-    return &pb.ContainerResponse{}, nil
+		resp, err := s.containerSvc.InspectContainer(ctx, req.Id)
+		if err != nil {
+			return nil, err
+		}
+
+		return &pb.ContainerResponse{Container: resp}, nil
 }
 
 
 
-// ------------------------------------
-// RESTART CONTAINER 
-// --------------------------------------
+// ---------------------------------------------------------------------- RESTART CONTAINER 
 func (s *Server) RestartContainer(
     ctx context.Context,
     req *pb.ContainerRequest,
 ) (*pb.ContainerResponse, error) {
+
+		if req.GetId() == "" {
+        return nil, status.Error(
+            codes.InvalidArgument,
+            "id is required",
+        )
+    }
 
     err := s.containerSvc.RestartContainer(
         ctx,
@@ -170,29 +153,153 @@ func (s *Server) RestartContainer(
         return nil, err
     }
 
-    return &pb.ContainerResponse{}, nil
+		resp, err := s.containerSvc.InspectContainer(ctx, req.Id)
+		if err != nil {
+			return nil, err
+		}
+
+		return &pb.ContainerResponse{Container: resp}, nil
 }
 
-// ------------------------------------
-// REMOVE CONTAINER
-// ------------------------------------
+// ------------------------------------------------------------------- PAUSE CONTAINER
+func (s *Server) PauseContainer(
+    ctx context.Context,
+    req *pb.ContainerRequest,
+) (*pb.ContainerResponse, error) {
+
+		if req.GetId() == "" {
+        return nil, status.Error(
+            codes.InvalidArgument,
+            "id is required",
+        )
+    }
+
+    err := s.containerSvc.PauseContainer(ctx, req.Id )
+    if err != nil {
+        return &pb.ContainerResponse{}, err
+    }
+
+		resp, err := s.containerSvc.InspectContainer(ctx, req.Id)
+		if err != nil {
+			return nil, err
+		}
+
+		return &pb.ContainerResponse{Container: resp}, nil
+}
+
+
+// -------------------------------------------------------------------- UNPAUSE CONTAINER
+func (s *Server) UnpauseContainer(
+    ctx context.Context,
+    req *pb.ContainerRequest,
+) (*pb.ContainerResponse, error) {
+
+		if req.GetId() == "" {
+        return nil, status.Error(
+            codes.InvalidArgument,
+            "id is required",
+        )
+    }
+
+    err := s.containerSvc.UnpauseContainer(ctx, req.Id )
+    if err != nil {
+        return nil, err
+    }
+
+		resp, err := s.containerSvc.InspectContainer(ctx, req.Id)
+		if err != nil {
+			return nil, err
+		}
+
+		return &pb.ContainerResponse{Container: resp}, nil
+}
+
+// ----------------------------------------------------------------------- REMOVE CONTAINER
 func (s *Server) RemoveContainer(
     ctx context.Context,
     req *pb.RemoveContainerRequest,
 ) (*pb.ContainerResponse, error) {
 
-    err := s.containerSvc.RemoveContainer(ctx, req.Id, req.Force, req.RemoveVolumes)
+		if req.GetId() == "" {
+        return nil, status.Error(
+            codes.InvalidArgument,
+            "id is required",
+        )
+    }
+
+		resp, err := s.containerSvc.InspectContainer(ctx, req.Id)
+		if err != nil {
+			return nil, err
+		}
+
+    err = s.containerSvc.RemoveContainer(ctx, req.Id, req.Force, req.RemoveVolumes)
     if err != nil {
         return &pb.ContainerResponse{}, err
     }
 
-    return &pb.ContainerResponse{}, nil
+		return &pb.ContainerResponse{Container: resp}, nil
 }
 
-// --------------------------------------
-// EXEC 
-// ---------------------------------------
 
+// ----------------------------------------------------------------- KILL CONTAINER
+func (s *Server) KillContainer(
+    ctx context.Context,
+    req *pb.KillContainerRequest,
+) (*pb.ContainerResponse, error) {
+
+		if req.GetId() == "" {
+        return nil, status.Error(
+            codes.InvalidArgument,
+            "container_id is required",
+        )
+    }
+
+    signal := req.GetSignal()
+
+    if signal == "" {
+        signal = "SIGKILL"
+    }
+
+		resp, err := s.containerSvc.InspectContainer(ctx, req.Id)
+		if err != nil {
+			return nil, err
+		}
+
+    err = s.containerSvc.KillContainer(ctx, req.Id, signal)
+    if err != nil {
+        return nil, err
+    }
+
+		return &pb.ContainerResponse{Container: resp}, nil
+}
+
+// ----------------------------------------------------------------- UPDATE CONTAINER
+func (s *Server) UpdateContainer(
+    ctx context.Context,
+    req *pb.UpdateContainerRequest,
+) (*pb.ContainerResponse, error) {
+
+		if req.GetId() == "" {
+        return nil, status.Error(
+            codes.InvalidArgument,
+            "container_id is required",
+        )
+    }
+
+    err := s.containerSvc.UpdateContainer(ctx, req)
+    if err != nil {
+        return nil, err
+    }
+
+		resp, err := s.containerSvc.InspectContainer(ctx, req.Id)
+		if err != nil {
+			return nil, err
+		}
+
+		return &pb.ContainerResponse{Container: resp}, nil
+}
+
+// ------------------------------------------------------------------------- EXEC 
 func (s *Server) ExecContainer (
     req *pb.ExecuteCommandRequest,
     stream pb.ContainerService_ExecContainerServer,
@@ -215,9 +322,7 @@ func (s *Server) ExecContainer (
     )
 }
 
-// --------------------------------------
-// LOGS 
-// ---------------------------------------
+// --------------------------------------------------------------- LOGS CONTAINER 
 func (s *Server) LogsContainer(
     req *pb.ViewLogsRequest,
     stream pb.ContainerService_LogsContainerServer,
@@ -241,12 +346,9 @@ func (s *Server) LogsContainer(
 }
 
 
-// -----------------------------------------------
-// STATS 
-// --------------------------------------------------
+// ----------------------------------------------------------------- STATS CONTAINER
 func (s *Server) StatsContainer(
     req *pb.ContainerRequest,
-    //stream pb.AgentService_ContainerStatsServer,
     stream pb.ContainerService_StatsContainerServer,
 ) error {
 
