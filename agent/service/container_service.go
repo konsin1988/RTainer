@@ -121,6 +121,16 @@ func (s *ContainerService) RunContainer(
     return s.docker.RunContainer(ctx, req)
 }
 
+// ---------------------------------------------------------------- RENAME CONTAINER 
+func (s *ContainerService) RenameContainer(
+    ctx context.Context,
+    id string,
+		name string,
+) error {
+
+    return s.docker.RenameContainer(ctx, id, name)
+}
+
 // ---------------------------------------------------------------------	VIEW LOGS 
 func (s *ContainerService) ViewLogs(
 	ctx context.Context,

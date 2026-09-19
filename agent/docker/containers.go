@@ -229,3 +229,15 @@ func (c *Client) RunContainer(
 }
 
 
+// ------------------------------------------------------ RENAME CONTAINER 
+func (c *Client) RenameContainer(
+    ctx context.Context,
+    id string,
+		name string,
+) error {
+    return c.cli.ContainerRename (
+        ctx,
+        id,
+				name,
+    )
+}
