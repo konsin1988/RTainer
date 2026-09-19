@@ -299,6 +299,39 @@ func (s *Server) UpdateContainer(
 		return &pb.ContainerResponse{Container: resp}, nil
 }
 
+
+// ------------------------------------------------------------------- RENAME CONTAINER
+func (s *Server) RenameContainer(
+    ctx context.Context,
+    req *pb.RenameContainerRequest,
+) (*pb.ContainerResponse, error) {
+
+		if req.GetId() == "" {
+        return nil, status.Error(
+            codes.InvalidArgument,
+            "id is required",
+        )
+    }
+		if req.GetName() == "" {
+        return nil, status.Error(
+            codes.InvalidArgument,
+            "name is required",
+        )
+    }
+
+    err := s.containerSvc.RenameContainer(ctx, req.Id, req.Name)
+    if err != nil {
+        return nil, err
+    }
+
+		resp, err := s.containerSvc.InspectContainer(ctx, req.Id)
+		if err != nil {
+			return nil, err
+		}
+
+		return &pb.ContainerResponse{Container: resp}, nil
+}
+
 // ------------------------------------------------------------------------- EXEC 
 func (s *Server) ExecContainer (
     req *pb.ExecuteCommandRequest,

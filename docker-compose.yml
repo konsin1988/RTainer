@@ -1,10 +1,8 @@
 services:
-  # --------------------------
-  # POSTGRES
-  # ---------------------------
+# ------------------------------------------------------------------------- POSTGRES
   postgres:
     image: postgres:14
-    container_name: postgres
+    container_name: ${PROJECT_NAME}-postgres
     ports:
       - "5432:5432"
     env_file: .env
@@ -16,15 +14,60 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
+    mem_limit: 1G
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10M"
+        max-file: "3" 
     volumes:
       - ./volumes/postgres_data:/var/lib/postgresql/data
     networks:
       - rtainer 
 
+# ----------------------------------------------------------------------------- BACKUP
 
-  # ---------------------------
-  # Dev 
-  # --------------------------
+  backup:
+    image: postgres:15-alpine
+    container_name: ${PROJECT_NAME}-backup
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./volumes/backups:/backups
+    entrypoint: >
+      sh -c "while true; do
+        PGPASSWORD=$$POSTGRES_PASSWORD pg_dump -h postgres -U $$POSTGRES_USER $$POSTGRES_DB |
+        gzip > /backups/backup_$$(date +%Y%m%d_%H%M%S).sql.gz;
+        find /backups -mtime +7 -print;
+        find /backups -mtime +7 -delete;
+        sleep 86400;
+      done"
+    restart: unless-stopped
+    mem_limit: 512M 
+    deploy:
+      resources:
+        limits:
+          memory: 512M 
+        reservations:
+          memory: 128M 
+    logging:
+      driver: json-file
+      options:
+        max-size: "10M"
+        max-file: "3" 
+    networks: 
+      - rtainer 
+
+
+# ---------------------------------------------------------------------------- DEV
   api:
     build:
       context: .
@@ -44,12 +87,22 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    mem_limit: 512M 
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10M"
+        max-file: "3" 
     networks:
       - rtainer 
 
-  # -------------------------
-  # Prod
-  # --------------------------
+# ----------------------------------------------------------------------------- PROD
   api-prod:
     build:
       context: .
@@ -65,6 +118,18 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    mem_limit: 512M 
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10M"
+        max-file: "3" 
     networks:
       - rtainer
 

@@ -27,7 +27,7 @@ service ContainerService{
   rpc UnpauseContainer(ContainerRequest) returns (ContainerResponse);
   rpc RemoveContainer(RemoveContainerRequest) returns (ContainerResponse);
   rpc UpdateContainer(UpdateContainerRequest) returns (ContainerResponse);
-  //rpc RenameContainer(...)
+  rpc RenameContainer(RenameContainerRequest) returns (ContainerResponse);
   rpc ExecContainer(ExecuteCommandRequest) returns (stream LogMessage);
   rpc LogsContainer(ViewLogsRequest) returns (stream LogMessage);
   rpc StatsContainer(ContainerRequest) returns (stream ContainerStatsResponse);
@@ -251,6 +251,11 @@ message UpdateContainerRequest {
 message RestartPolicy {
   string name = 1;        // no, always, unless-stopped, on-failure
   int64 maximum_retry_count = 2;
+}
+
+message RenameContainerRequest{
+  string id = 1;
+  string name = 2;
 }
 
 // -------------------------------------------- VIEW LOGS

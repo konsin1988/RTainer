@@ -256,6 +256,7 @@ const (
 	ContainerService_UnpauseContainer_FullMethodName = "/agent.ContainerService/UnpauseContainer"
 	ContainerService_RemoveContainer_FullMethodName  = "/agent.ContainerService/RemoveContainer"
 	ContainerService_UpdateContainer_FullMethodName  = "/agent.ContainerService/UpdateContainer"
+	ContainerService_RenameContainer_FullMethodName  = "/agent.ContainerService/RenameContainer"
 	ContainerService_ExecContainer_FullMethodName    = "/agent.ContainerService/ExecContainer"
 	ContainerService_LogsContainer_FullMethodName    = "/agent.ContainerService/LogsContainer"
 	ContainerService_StatsContainer_FullMethodName   = "/agent.ContainerService/StatsContainer"
@@ -276,7 +277,7 @@ type ContainerServiceClient interface {
 	UnpauseContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 	RemoveContainer(ctx context.Context, in *RemoveContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 	UpdateContainer(ctx context.Context, in *UpdateContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
-	// rpc RenameContainer(...)
+	RenameContainer(ctx context.Context, in *RenameContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error)
 	ExecContainer(ctx context.Context, in *ExecuteCommandRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error)
 	LogsContainer(ctx context.Context, in *ViewLogsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error)
 	StatsContainer(ctx context.Context, in *ContainerRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ContainerStatsResponse], error)
@@ -400,6 +401,16 @@ func (c *containerServiceClient) UpdateContainer(ctx context.Context, in *Update
 	return out, nil
 }
 
+func (c *containerServiceClient) RenameContainer(ctx context.Context, in *RenameContainerRequest, opts ...grpc.CallOption) (*ContainerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ContainerResponse)
+	err := c.cc.Invoke(ctx, ContainerService_RenameContainer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *containerServiceClient) ExecContainer(ctx context.Context, in *ExecuteCommandRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogMessage], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	stream, err := c.cc.NewStream(ctx, &ContainerService_ServiceDesc.Streams[0], ContainerService_ExecContainer_FullMethodName, cOpts...)
@@ -472,7 +483,7 @@ type ContainerServiceServer interface {
 	UnpauseContainer(context.Context, *ContainerRequest) (*ContainerResponse, error)
 	RemoveContainer(context.Context, *RemoveContainerRequest) (*ContainerResponse, error)
 	UpdateContainer(context.Context, *UpdateContainerRequest) (*ContainerResponse, error)
-	// rpc RenameContainer(...)
+	RenameContainer(context.Context, *RenameContainerRequest) (*ContainerResponse, error)
 	ExecContainer(*ExecuteCommandRequest, grpc.ServerStreamingServer[LogMessage]) error
 	LogsContainer(*ViewLogsRequest, grpc.ServerStreamingServer[LogMessage]) error
 	StatsContainer(*ContainerRequest, grpc.ServerStreamingServer[ContainerStatsResponse]) error
@@ -518,6 +529,9 @@ func (UnimplementedContainerServiceServer) RemoveContainer(context.Context, *Rem
 }
 func (UnimplementedContainerServiceServer) UpdateContainer(context.Context, *UpdateContainerRequest) (*ContainerResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateContainer not implemented")
+}
+func (UnimplementedContainerServiceServer) RenameContainer(context.Context, *RenameContainerRequest) (*ContainerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RenameContainer not implemented")
 }
 func (UnimplementedContainerServiceServer) ExecContainer(*ExecuteCommandRequest, grpc.ServerStreamingServer[LogMessage]) error {
 	return status.Error(codes.Unimplemented, "method ExecContainer not implemented")
@@ -747,6 +761,24 @@ func _ContainerService_UpdateContainer_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContainerService_RenameContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RenameContainerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContainerServiceServer).RenameContainer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContainerService_RenameContainer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContainerServiceServer).RenameContainer(ctx, req.(*RenameContainerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ContainerService_ExecContainer_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(ExecuteCommandRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -830,6 +862,10 @@ var ContainerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateContainer",
 			Handler:    _ContainerService_UpdateContainer_Handler,
+		},
+		{
+			MethodName: "RenameContainer",
+			Handler:    _ContainerService_RenameContainer_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
