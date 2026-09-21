@@ -259,7 +259,7 @@ grpcurl -plaintext -d '{ "reference":"nginx:latest" }' localhost:50051 agent.Age
 #### NETWORKS 
 
 ##### list
-> grpcurl -plaintext -d '{}' localhost:50051 agent.AgentService/ListNetworks
+> grpcurl -plaintext -d '{}' localhost:50051 agent.NetworkService/ListNetworks
 
 ###### response: 
 ```
@@ -334,6 +334,16 @@ grpcurl -plaintext -d '{ "reference":"nginx:latest" }' localhost:50051 agent.Age
   ]
 }
 ```
+
+##### prune
+
+> grpcurl -plaintext -d '{}' localhost:50051 agent.NetworkService/PruneNetwork
+> grpcurl -plaintext -d '{"filters":{}}' localhost:50051 agent.NetworkService/PruneNetwork
+
+> grpcurl -plaintext -d '{ "filters": { "label": "environment=test" } }' localhost:50051 agent.NetworkService/PruneNetwork
+
+> grpcurl -plaintext  -d '{ "filters": { "label": "temporary" } }' localhost:50051 agent.NetworkService/PruneNetwork
+
 
 #### Volumes
 

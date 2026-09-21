@@ -6,7 +6,9 @@ import (
 
     "konsin1988/agent/docker"
     "konsin1988/agent/proto"
+
     "github.com/docker/docker/api/types/network"
+		"github.com/docker/docker/api/types/filters"
 )
 
 
@@ -143,4 +145,34 @@ func (s *NetworkService) DisconnectNetwork(
 ) (error) {
 
     return s.docker.DisconnectNetwork(ctx, network_id, container_id, forse)
+}
+
+// --------------------------------------------------- PRUNE NETWORK
+func (s *NetworkService) PruneNetwork(
+	ctx context.Context,
+	req *proto.NetworkPruneRequest,
+)(*proto.NetworkPruneResponse, error){
+
+		pruneFilters := networkPruneFiltersFromProto(req)
+
+    report, err := s.docker.PruneNetwork(ctx, pruneFilters)
+    if err != nil {
+        return nil, err 
+    }
+
+    return &proto.NetworkPruneResponse{
+        DeletedNetworkIds: report.NetworksDeleted,
+    }, nil
+}
+
+func networkPruneFiltersFromProto(
+    req *proto.NetworkPruneRequest,
+) filters.Args {
+    f := filters.NewArgs()
+
+    for key, value := range req.GetFilters() {
+        f.Add(key, value)
+    }
+
+    return f
 }

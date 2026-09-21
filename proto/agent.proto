@@ -31,7 +31,6 @@ service ContainerService{
   rpc ExecContainer(ExecuteCommandRequest) returns (stream LogMessage);
   rpc LogsContainer(ViewLogsRequest) returns (stream LogMessage);
   rpc StatsContainer(ContainerRequest) returns (stream ContainerStatsResponse);
-  //rpc AttachContainer(...)
 }
 
 service NetworkService {
@@ -41,7 +40,7 @@ service NetworkService {
   rpc RemoveNetwork(NetworkRequest) returns (NetworkResponse);
   rpc ConnectNetwork(ConnectNetworkRequest) returns (NetworkResponse);
   rpc DisconnectNetwork(DisconnectNetworkRequest) returns (NetworkResponse);
-  //rpc PruneNetwork(...)
+  rpc PruneNetwork(NetworkPruneRequest) returns (NetworkPruneResponse);
 }
 
 service VolumeService {
@@ -395,9 +394,15 @@ message DisconnectNetworkRequest {
     bool forse = 3;
 }
 
-// --------------------------------------
-// VOLUMES 
-// ----------------------------------------------- LIST VOLUMES
+message NetworkPruneRequest {
+    map<string, string> filters = 1;
+}
+
+message NetworkPruneResponse {
+    repeated string deleted_network_ids = 1;
+}
+
+// --------------------------------------------------- VOLUMES 
 message ListVolumesRequest {}
 
 message Volume {
