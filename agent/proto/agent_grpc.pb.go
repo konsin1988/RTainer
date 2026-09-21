@@ -895,6 +895,7 @@ const (
 	NetworkService_RemoveNetwork_FullMethodName     = "/agent.NetworkService/RemoveNetwork"
 	NetworkService_ConnectNetwork_FullMethodName    = "/agent.NetworkService/ConnectNetwork"
 	NetworkService_DisconnectNetwork_FullMethodName = "/agent.NetworkService/DisconnectNetwork"
+	NetworkService_PruneNetwork_FullMethodName      = "/agent.NetworkService/PruneNetwork"
 )
 
 // NetworkServiceClient is the client API for NetworkService service.
@@ -907,6 +908,7 @@ type NetworkServiceClient interface {
 	RemoveNetwork(ctx context.Context, in *NetworkRequest, opts ...grpc.CallOption) (*NetworkResponse, error)
 	ConnectNetwork(ctx context.Context, in *ConnectNetworkRequest, opts ...grpc.CallOption) (*NetworkResponse, error)
 	DisconnectNetwork(ctx context.Context, in *DisconnectNetworkRequest, opts ...grpc.CallOption) (*NetworkResponse, error)
+	PruneNetwork(ctx context.Context, in *NetworkPruneRequest, opts ...grpc.CallOption) (*NetworkPruneResponse, error)
 }
 
 type networkServiceClient struct {
@@ -977,6 +979,16 @@ func (c *networkServiceClient) DisconnectNetwork(ctx context.Context, in *Discon
 	return out, nil
 }
 
+func (c *networkServiceClient) PruneNetwork(ctx context.Context, in *NetworkPruneRequest, opts ...grpc.CallOption) (*NetworkPruneResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(NetworkPruneResponse)
+	err := c.cc.Invoke(ctx, NetworkService_PruneNetwork_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NetworkServiceServer is the server API for NetworkService service.
 // All implementations must embed UnimplementedNetworkServiceServer
 // for forward compatibility.
@@ -987,6 +999,7 @@ type NetworkServiceServer interface {
 	RemoveNetwork(context.Context, *NetworkRequest) (*NetworkResponse, error)
 	ConnectNetwork(context.Context, *ConnectNetworkRequest) (*NetworkResponse, error)
 	DisconnectNetwork(context.Context, *DisconnectNetworkRequest) (*NetworkResponse, error)
+	PruneNetwork(context.Context, *NetworkPruneRequest) (*NetworkPruneResponse, error)
 	mustEmbedUnimplementedNetworkServiceServer()
 }
 
@@ -1014,6 +1027,9 @@ func (UnimplementedNetworkServiceServer) ConnectNetwork(context.Context, *Connec
 }
 func (UnimplementedNetworkServiceServer) DisconnectNetwork(context.Context, *DisconnectNetworkRequest) (*NetworkResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DisconnectNetwork not implemented")
+}
+func (UnimplementedNetworkServiceServer) PruneNetwork(context.Context, *NetworkPruneRequest) (*NetworkPruneResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method PruneNetwork not implemented")
 }
 func (UnimplementedNetworkServiceServer) mustEmbedUnimplementedNetworkServiceServer() {}
 func (UnimplementedNetworkServiceServer) testEmbeddedByValue()                        {}
@@ -1144,6 +1160,24 @@ func _NetworkService_DisconnectNetwork_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NetworkService_PruneNetwork_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NetworkPruneRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NetworkServiceServer).PruneNetwork(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NetworkService_PruneNetwork_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NetworkServiceServer).PruneNetwork(ctx, req.(*NetworkPruneRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NetworkService_ServiceDesc is the grpc.ServiceDesc for NetworkService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1174,6 +1208,10 @@ var NetworkService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DisconnectNetwork",
 			Handler:    _NetworkService_DisconnectNetwork_Handler,
+		},
+		{
+			MethodName: "PruneNetwork",
+			Handler:    _NetworkService_PruneNetwork_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

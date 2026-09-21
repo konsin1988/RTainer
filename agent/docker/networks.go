@@ -4,6 +4,7 @@ import (
     "context"
 
     "github.com/docker/docker/api/types/network"
+		"github.com/docker/docker/api/types/filters"
 )
 
 type NetContainer struct {
@@ -209,4 +210,12 @@ func (c *Client) DisconnectNetwork(
         containerID,
 				forse,
     )
+}
+
+// ------------------------------------------------------ PRUNE NETWORK
+func (c *Client) PruneNetwork(
+	ctx context.Context,
+	filters filters.Args,
+) (network.PruneReport, error) {
+	return c.cli.NetworksPrune(ctx, filters)
 }

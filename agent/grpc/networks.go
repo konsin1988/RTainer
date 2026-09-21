@@ -204,3 +204,11 @@ func (s *Server) DisconnectNetwork(
 
 		return &pb.NetworkResponse{Network: resp}, nil
 }
+
+// ----------------------------------------------------------------- PRUNE NETWORK
+func (s *Server) PruneNetwork(
+	ctx context.Context,
+	req *pb.NetworkPruneRequest,
+) (*pb.NetworkPruneResponse, error) {
+	return nil, nil
+}
