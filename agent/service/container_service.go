@@ -3,6 +3,7 @@ package service
 import (
     "context"
 		"io"
+		"strings"
 
 		"github.com/docker/docker/api/types/container"
     "konsin1988/agent/docker"
@@ -27,27 +28,34 @@ type Container struct {
 // -------------------------------------------------- LIST CONTAINERS
 func (s *ContainerService) ListContainers(
 	ctx context.Context,
-) ([]Container, error) {
+) (*proto.ListContainersResponse, error) {
+
     ctrs, err := s.docker.ListContainers(ctx)
     if err != nil {
         return nil, err
     }
 
-    // Example business rule (this is WHY this layer exists)
-    filtered := make([]Container, 0, len(ctrs))
+    resp := &proto.ListContainersResponse{}
 
     for _, c := range ctrs {
-        // example rule: ignore dead containers
-        if c.Status == "Dead" {
-            continue
-        }
-
-        filtered = append(filtered, Container(c))
+        resp.Containers = append(resp.Containers, &proto.Container{
+            Id:     c.ID,
+            Name:   containerName(c), 
+            Image:  c.Image,
+            Status: c.Status,
+        })
     }
 
-    return filtered, nil
+    return resp, nil
 }
 
+func containerName(c container.Summary) string {
+    if len(c.Names) == 0 {
+        return ""
+    }
+
+    return strings.TrimLeft(c.Names[0], "/")
+}
 
 // -------------------------------------------- STOP CONTAINER 
 func (s *ContainerService) StopContainer(

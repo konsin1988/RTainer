@@ -3367,6 +3367,172 @@ func (x *EventMessage) GetAttributes() map[string]string {
 	return nil
 }
 
+// ----------------------------------------------------------------------- STACKS
+// LIST
+type ListStackRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListStackRequest) Reset() {
+	*x = ListStackRequest{}
+	mi := &file_proto_agent_proto_msgTypes[53]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListStackRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListStackRequest) ProtoMessage() {}
+
+func (x *ListStackRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_agent_proto_msgTypes[53]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListStackRequest.ProtoReflect.Descriptor instead.
+func (*ListStackRequest) Descriptor() ([]byte, []int) {
+	return file_proto_agent_proto_rawDescGZIP(), []int{53}
+}
+
+type ListStackResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Stacks        []*Stack               `protobuf:"bytes,1,rep,name=stacks,proto3" json:"stacks,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListStackResponse) Reset() {
+	*x = ListStackResponse{}
+	mi := &file_proto_agent_proto_msgTypes[54]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListStackResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListStackResponse) ProtoMessage() {}
+
+func (x *ListStackResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_agent_proto_msgTypes[54]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListStackResponse.ProtoReflect.Descriptor instead.
+func (*ListStackResponse) Descriptor() ([]byte, []int) {
+	return file_proto_agent_proto_rawDescGZIP(), []int{54}
+}
+
+func (x *ListStackResponse) GetStacks() []*Stack {
+	if x != nil {
+		return x.Stacks
+	}
+	return nil
+}
+
+type Stack struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	Containers    []*Container           `protobuf:"bytes,4,rep,name=containers,proto3" json:"containers,omitempty"`
+	Networks      []*NetworkListItem     `protobuf:"bytes,5,rep,name=networks,proto3" json:"networks,omitempty"`
+	Volumes       []*Volume              `protobuf:"bytes,6,rep,name=volumes,proto3" json:"volumes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Stack) Reset() {
+	*x = Stack{}
+	mi := &file_proto_agent_proto_msgTypes[55]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Stack) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Stack) ProtoMessage() {}
+
+func (x *Stack) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_agent_proto_msgTypes[55]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Stack.ProtoReflect.Descriptor instead.
+func (*Stack) Descriptor() ([]byte, []int) {
+	return file_proto_agent_proto_rawDescGZIP(), []int{55}
+}
+
+func (x *Stack) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Stack) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Stack) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *Stack) GetContainers() []*Container {
+	if x != nil {
+		return x.Containers
+	}
+	return nil
+}
+
+func (x *Stack) GetNetworks() []*NetworkListItem {
+	if x != nil {
+		return x.Networks
+	}
+	return nil
+}
+
+func (x *Stack) GetVolumes() []*Volume {
+	if x != nil {
+		return x.Volumes
+	}
+	return nil
+}
+
 var File_proto_agent_proto protoreflect.FileDescriptor
 
 const file_proto_agent_proto_rawDesc = "" +
@@ -3669,7 +3835,19 @@ const file_proto_agent_proto_rawDesc = "" +
 	"attributes\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01*?\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x12\n" +
+	"\x10ListStackRequest\"9\n" +
+	"\x11ListStackResponse\x12$\n" +
+	"\x06stacks\x18\x01 \x03(\v2\f.agent.StackR\x06stacks\"\xd2\x01\n" +
+	"\x05Stack\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
+	"\x06status\x18\x03 \x01(\tR\x06status\x120\n" +
+	"\n" +
+	"containers\x18\x04 \x03(\v2\x10.agent.ContainerR\n" +
+	"containers\x122\n" +
+	"\bnetworks\x18\x05 \x03(\v2\x16.agent.NetworkListItemR\bnetworks\x12'\n" +
+	"\avolumes\x18\x06 \x03(\v2\r.agent.VolumeR\avolumes*?\n" +
 	"\tLogStream\x12\x1a\n" +
 	"\x16LOG_STREAM_UNSPECIFIED\x10\x00\x12\n" +
 	"\n" +
@@ -3709,7 +3887,10 @@ const file_proto_agent_proto_rawDesc = "" +
 	"\rVolumeService\x12D\n" +
 	"\vListVolumes\x12\x19.agent.ListVolumesRequest\x1a\x1a.agent.ListVolumesResponse\x12A\n" +
 	"\fCreateVolume\x12\x1a.agent.CreateVolumeRequest\x1a\x15.agent.VolumeResponse\x12A\n" +
-	"\fRemoveVolume\x12\x1a.agent.RemoveVolumeRequest\x1a\x15.agent.VolumeResponse2\x88\x01\n" +
+	"\fRemoveVolume\x12\x1a.agent.RemoveVolumeRequest\x1a\x15.agent.VolumeResponse2O\n" +
+	"\fStackService\x12?\n" +
+	"\n" +
+	"ListStacks\x12\x17.agent.ListStackRequest\x1a\x18.agent.ListStackResponse2\x88\x01\n" +
 	"\fAgentService\x12A\n" +
 	"\n" +
 	"DockerInfo\x12\x18.agent.DockerInfoRequest\x1a\x19.agent.DockerInfoResponse\x125\n" +
@@ -3728,7 +3909,7 @@ func file_proto_agent_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 61)
+var file_proto_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 64)
 var file_proto_agent_proto_goTypes = []any{
 	(LogStream)(0),                   // 0: agent.LogStream
 	(*ListImagesRequest)(nil),        // 1: agent.ListImagesRequest
@@ -3784,18 +3965,21 @@ var file_proto_agent_proto_goTypes = []any{
 	(*DockerInfoResponse)(nil),       // 51: agent.DockerInfoResponse
 	(*EventsRequest)(nil),            // 52: agent.EventsRequest
 	(*EventMessage)(nil),             // 53: agent.EventMessage
-	nil,                              // 54: agent.InspectImageResponse.LabelsEntry
-	nil,                              // 55: agent.NetworkInfo.OptionsEntry
-	nil,                              // 56: agent.NetworkInfo.LabelsEntry
-	nil,                              // 57: agent.NetworkPruneRequest.FiltersEntry
-	nil,                              // 58: agent.Volume.LabelsEntry
-	nil,                              // 59: agent.CreateVolumeRequest.LabelsEntry
-	nil,                              // 60: agent.CreateVolumeRequest.OptionsEntry
-	nil,                              // 61: agent.EventMessage.AttributesEntry
+	(*ListStackRequest)(nil),         // 54: agent.ListStackRequest
+	(*ListStackResponse)(nil),        // 55: agent.ListStackResponse
+	(*Stack)(nil),                    // 56: agent.Stack
+	nil,                              // 57: agent.InspectImageResponse.LabelsEntry
+	nil,                              // 58: agent.NetworkInfo.OptionsEntry
+	nil,                              // 59: agent.NetworkInfo.LabelsEntry
+	nil,                              // 60: agent.NetworkPruneRequest.FiltersEntry
+	nil,                              // 61: agent.Volume.LabelsEntry
+	nil,                              // 62: agent.CreateVolumeRequest.LabelsEntry
+	nil,                              // 63: agent.CreateVolumeRequest.OptionsEntry
+	nil,                              // 64: agent.EventMessage.AttributesEntry
 }
 var file_proto_agent_proto_depIdxs = []int32{
 	2,  // 0: agent.ListImagesResponse.images:type_name -> agent.Image
-	54, // 1: agent.InspectImageResponse.labels:type_name -> agent.InspectImageResponse.LabelsEntry
+	57, // 1: agent.InspectImageResponse.labels:type_name -> agent.InspectImageResponse.LabelsEntry
 	19, // 2: agent.ContainerInfo.ports:type_name -> agent.PortBinding
 	20, // 3: agent.ContainerInfo.mounts:type_name -> agent.VolumeBinding
 	27, // 4: agent.ContainerInfo.health:type_name -> agent.HealthStatus
@@ -3807,85 +3991,91 @@ var file_proto_agent_proto_depIdxs = []int32{
 	0,  // 10: agent.LogMessage.stream:type_name -> agent.LogStream
 	29, // 11: agent.NetworkListItem.containers:type_name -> agent.NetContainer
 	38, // 12: agent.NetworkInfo.ipam:type_name -> agent.IPAMConfig
-	55, // 13: agent.NetworkInfo.options:type_name -> agent.NetworkInfo.OptionsEntry
-	56, // 14: agent.NetworkInfo.labels:type_name -> agent.NetworkInfo.LabelsEntry
+	58, // 13: agent.NetworkInfo.options:type_name -> agent.NetworkInfo.OptionsEntry
+	59, // 14: agent.NetworkInfo.labels:type_name -> agent.NetworkInfo.LabelsEntry
 	29, // 15: agent.NetworkInfo.containers:type_name -> agent.NetContainer
 	30, // 16: agent.ListNetworksResponse.networks:type_name -> agent.NetworkListItem
 	31, // 17: agent.NetworkResponse.network:type_name -> agent.NetworkInfo
 	40, // 18: agent.ConnectNetworkRequest.endpoint:type_name -> agent.EndpointSettings
-	57, // 19: agent.NetworkPruneRequest.filters:type_name -> agent.NetworkPruneRequest.FiltersEntry
-	58, // 20: agent.Volume.labels:type_name -> agent.Volume.LabelsEntry
+	60, // 19: agent.NetworkPruneRequest.filters:type_name -> agent.NetworkPruneRequest.FiltersEntry
+	61, // 20: agent.Volume.labels:type_name -> agent.Volume.LabelsEntry
 	45, // 21: agent.ListVolumesResponse.volumes:type_name -> agent.Volume
-	59, // 22: agent.CreateVolumeRequest.labels:type_name -> agent.CreateVolumeRequest.LabelsEntry
-	60, // 23: agent.CreateVolumeRequest.options:type_name -> agent.CreateVolumeRequest.OptionsEntry
-	61, // 24: agent.EventMessage.attributes:type_name -> agent.EventMessage.AttributesEntry
-	1,  // 25: agent.ImageService.ListImages:input_type -> agent.ListImagesRequest
-	6,  // 26: agent.ImageService.InspectImage:input_type -> agent.ImageRequest
-	8,  // 27: agent.ImageService.PullImage:input_type -> agent.PullImageRequest
-	4,  // 28: agent.ImageService.RemoveImage:input_type -> agent.RemoveImageRequest
-	10, // 29: agent.ContainerService.ListContainers:input_type -> agent.ListContainersRequest
-	14, // 30: agent.ContainerService.InspectContainer:input_type -> agent.ContainerRequest
-	18, // 31: agent.ContainerService.CreateContainer:input_type -> agent.RunContainerRequest
-	14, // 32: agent.ContainerService.StartContainer:input_type -> agent.ContainerRequest
-	14, // 33: agent.ContainerService.StopContainer:input_type -> agent.ContainerRequest
-	14, // 34: agent.ContainerService.RestartContainer:input_type -> agent.ContainerRequest
-	16, // 35: agent.ContainerService.KillContainer:input_type -> agent.KillContainerRequest
-	14, // 36: agent.ContainerService.PauseContainer:input_type -> agent.ContainerRequest
-	14, // 37: agent.ContainerService.UnpauseContainer:input_type -> agent.ContainerRequest
-	17, // 38: agent.ContainerService.RemoveContainer:input_type -> agent.RemoveContainerRequest
-	21, // 39: agent.ContainerService.UpdateContainer:input_type -> agent.UpdateContainerRequest
-	23, // 40: agent.ContainerService.RenameContainer:input_type -> agent.RenameContainerRequest
-	26, // 41: agent.ContainerService.ExecContainer:input_type -> agent.ExecuteCommandRequest
-	24, // 42: agent.ContainerService.LogsContainer:input_type -> agent.ViewLogsRequest
-	14, // 43: agent.ContainerService.StatsContainer:input_type -> agent.ContainerRequest
-	32, // 44: agent.NetworkService.ListNetworks:input_type -> agent.ListNetworksRequest
-	36, // 45: agent.NetworkService.InspectNetwork:input_type -> agent.NetworkRequest
-	34, // 46: agent.NetworkService.CreateNetwork:input_type -> agent.CreateNetworkRequest
-	36, // 47: agent.NetworkService.RemoveNetwork:input_type -> agent.NetworkRequest
-	39, // 48: agent.NetworkService.ConnectNetwork:input_type -> agent.ConnectNetworkRequest
-	41, // 49: agent.NetworkService.DisconnectNetwork:input_type -> agent.DisconnectNetworkRequest
-	42, // 50: agent.NetworkService.PruneNetwork:input_type -> agent.NetworkPruneRequest
-	44, // 51: agent.VolumeService.ListVolumes:input_type -> agent.ListVolumesRequest
-	47, // 52: agent.VolumeService.CreateVolume:input_type -> agent.CreateVolumeRequest
-	49, // 53: agent.VolumeService.RemoveVolume:input_type -> agent.RemoveVolumeRequest
-	50, // 54: agent.AgentService.DockerInfo:input_type -> agent.DockerInfoRequest
-	52, // 55: agent.AgentService.Events:input_type -> agent.EventsRequest
-	3,  // 56: agent.ImageService.ListImages:output_type -> agent.ListImagesResponse
-	7,  // 57: agent.ImageService.InspectImage:output_type -> agent.InspectImageResponse
-	9,  // 58: agent.ImageService.PullImage:output_type -> agent.PullImageMessage
-	5,  // 59: agent.ImageService.RemoveImage:output_type -> agent.RemoveImageResponse
-	13, // 60: agent.ContainerService.ListContainers:output_type -> agent.ListContainersResponse
-	15, // 61: agent.ContainerService.InspectContainer:output_type -> agent.ContainerResponse
-	15, // 62: agent.ContainerService.CreateContainer:output_type -> agent.ContainerResponse
-	15, // 63: agent.ContainerService.StartContainer:output_type -> agent.ContainerResponse
-	15, // 64: agent.ContainerService.StopContainer:output_type -> agent.ContainerResponse
-	15, // 65: agent.ContainerService.RestartContainer:output_type -> agent.ContainerResponse
-	15, // 66: agent.ContainerService.KillContainer:output_type -> agent.ContainerResponse
-	15, // 67: agent.ContainerService.PauseContainer:output_type -> agent.ContainerResponse
-	15, // 68: agent.ContainerService.UnpauseContainer:output_type -> agent.ContainerResponse
-	15, // 69: agent.ContainerService.RemoveContainer:output_type -> agent.ContainerResponse
-	15, // 70: agent.ContainerService.UpdateContainer:output_type -> agent.ContainerResponse
-	15, // 71: agent.ContainerService.RenameContainer:output_type -> agent.ContainerResponse
-	25, // 72: agent.ContainerService.ExecContainer:output_type -> agent.LogMessage
-	25, // 73: agent.ContainerService.LogsContainer:output_type -> agent.LogMessage
-	28, // 74: agent.ContainerService.StatsContainer:output_type -> agent.ContainerStatsResponse
-	33, // 75: agent.NetworkService.ListNetworks:output_type -> agent.ListNetworksResponse
-	37, // 76: agent.NetworkService.InspectNetwork:output_type -> agent.NetworkResponse
-	35, // 77: agent.NetworkService.CreateNetwork:output_type -> agent.CreateNetworkResponse
-	37, // 78: agent.NetworkService.RemoveNetwork:output_type -> agent.NetworkResponse
-	37, // 79: agent.NetworkService.ConnectNetwork:output_type -> agent.NetworkResponse
-	37, // 80: agent.NetworkService.DisconnectNetwork:output_type -> agent.NetworkResponse
-	43, // 81: agent.NetworkService.PruneNetwork:output_type -> agent.NetworkPruneResponse
-	46, // 82: agent.VolumeService.ListVolumes:output_type -> agent.ListVolumesResponse
-	48, // 83: agent.VolumeService.CreateVolume:output_type -> agent.VolumeResponse
-	48, // 84: agent.VolumeService.RemoveVolume:output_type -> agent.VolumeResponse
-	51, // 85: agent.AgentService.DockerInfo:output_type -> agent.DockerInfoResponse
-	53, // 86: agent.AgentService.Events:output_type -> agent.EventMessage
-	56, // [56:87] is the sub-list for method output_type
-	25, // [25:56] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	62, // 22: agent.CreateVolumeRequest.labels:type_name -> agent.CreateVolumeRequest.LabelsEntry
+	63, // 23: agent.CreateVolumeRequest.options:type_name -> agent.CreateVolumeRequest.OptionsEntry
+	64, // 24: agent.EventMessage.attributes:type_name -> agent.EventMessage.AttributesEntry
+	56, // 25: agent.ListStackResponse.stacks:type_name -> agent.Stack
+	11, // 26: agent.Stack.containers:type_name -> agent.Container
+	30, // 27: agent.Stack.networks:type_name -> agent.NetworkListItem
+	45, // 28: agent.Stack.volumes:type_name -> agent.Volume
+	1,  // 29: agent.ImageService.ListImages:input_type -> agent.ListImagesRequest
+	6,  // 30: agent.ImageService.InspectImage:input_type -> agent.ImageRequest
+	8,  // 31: agent.ImageService.PullImage:input_type -> agent.PullImageRequest
+	4,  // 32: agent.ImageService.RemoveImage:input_type -> agent.RemoveImageRequest
+	10, // 33: agent.ContainerService.ListContainers:input_type -> agent.ListContainersRequest
+	14, // 34: agent.ContainerService.InspectContainer:input_type -> agent.ContainerRequest
+	18, // 35: agent.ContainerService.CreateContainer:input_type -> agent.RunContainerRequest
+	14, // 36: agent.ContainerService.StartContainer:input_type -> agent.ContainerRequest
+	14, // 37: agent.ContainerService.StopContainer:input_type -> agent.ContainerRequest
+	14, // 38: agent.ContainerService.RestartContainer:input_type -> agent.ContainerRequest
+	16, // 39: agent.ContainerService.KillContainer:input_type -> agent.KillContainerRequest
+	14, // 40: agent.ContainerService.PauseContainer:input_type -> agent.ContainerRequest
+	14, // 41: agent.ContainerService.UnpauseContainer:input_type -> agent.ContainerRequest
+	17, // 42: agent.ContainerService.RemoveContainer:input_type -> agent.RemoveContainerRequest
+	21, // 43: agent.ContainerService.UpdateContainer:input_type -> agent.UpdateContainerRequest
+	23, // 44: agent.ContainerService.RenameContainer:input_type -> agent.RenameContainerRequest
+	26, // 45: agent.ContainerService.ExecContainer:input_type -> agent.ExecuteCommandRequest
+	24, // 46: agent.ContainerService.LogsContainer:input_type -> agent.ViewLogsRequest
+	14, // 47: agent.ContainerService.StatsContainer:input_type -> agent.ContainerRequest
+	32, // 48: agent.NetworkService.ListNetworks:input_type -> agent.ListNetworksRequest
+	36, // 49: agent.NetworkService.InspectNetwork:input_type -> agent.NetworkRequest
+	34, // 50: agent.NetworkService.CreateNetwork:input_type -> agent.CreateNetworkRequest
+	36, // 51: agent.NetworkService.RemoveNetwork:input_type -> agent.NetworkRequest
+	39, // 52: agent.NetworkService.ConnectNetwork:input_type -> agent.ConnectNetworkRequest
+	41, // 53: agent.NetworkService.DisconnectNetwork:input_type -> agent.DisconnectNetworkRequest
+	42, // 54: agent.NetworkService.PruneNetwork:input_type -> agent.NetworkPruneRequest
+	44, // 55: agent.VolumeService.ListVolumes:input_type -> agent.ListVolumesRequest
+	47, // 56: agent.VolumeService.CreateVolume:input_type -> agent.CreateVolumeRequest
+	49, // 57: agent.VolumeService.RemoveVolume:input_type -> agent.RemoveVolumeRequest
+	54, // 58: agent.StackService.ListStacks:input_type -> agent.ListStackRequest
+	50, // 59: agent.AgentService.DockerInfo:input_type -> agent.DockerInfoRequest
+	52, // 60: agent.AgentService.Events:input_type -> agent.EventsRequest
+	3,  // 61: agent.ImageService.ListImages:output_type -> agent.ListImagesResponse
+	7,  // 62: agent.ImageService.InspectImage:output_type -> agent.InspectImageResponse
+	9,  // 63: agent.ImageService.PullImage:output_type -> agent.PullImageMessage
+	5,  // 64: agent.ImageService.RemoveImage:output_type -> agent.RemoveImageResponse
+	13, // 65: agent.ContainerService.ListContainers:output_type -> agent.ListContainersResponse
+	15, // 66: agent.ContainerService.InspectContainer:output_type -> agent.ContainerResponse
+	15, // 67: agent.ContainerService.CreateContainer:output_type -> agent.ContainerResponse
+	15, // 68: agent.ContainerService.StartContainer:output_type -> agent.ContainerResponse
+	15, // 69: agent.ContainerService.StopContainer:output_type -> agent.ContainerResponse
+	15, // 70: agent.ContainerService.RestartContainer:output_type -> agent.ContainerResponse
+	15, // 71: agent.ContainerService.KillContainer:output_type -> agent.ContainerResponse
+	15, // 72: agent.ContainerService.PauseContainer:output_type -> agent.ContainerResponse
+	15, // 73: agent.ContainerService.UnpauseContainer:output_type -> agent.ContainerResponse
+	15, // 74: agent.ContainerService.RemoveContainer:output_type -> agent.ContainerResponse
+	15, // 75: agent.ContainerService.UpdateContainer:output_type -> agent.ContainerResponse
+	15, // 76: agent.ContainerService.RenameContainer:output_type -> agent.ContainerResponse
+	25, // 77: agent.ContainerService.ExecContainer:output_type -> agent.LogMessage
+	25, // 78: agent.ContainerService.LogsContainer:output_type -> agent.LogMessage
+	28, // 79: agent.ContainerService.StatsContainer:output_type -> agent.ContainerStatsResponse
+	33, // 80: agent.NetworkService.ListNetworks:output_type -> agent.ListNetworksResponse
+	37, // 81: agent.NetworkService.InspectNetwork:output_type -> agent.NetworkResponse
+	35, // 82: agent.NetworkService.CreateNetwork:output_type -> agent.CreateNetworkResponse
+	37, // 83: agent.NetworkService.RemoveNetwork:output_type -> agent.NetworkResponse
+	37, // 84: agent.NetworkService.ConnectNetwork:output_type -> agent.NetworkResponse
+	37, // 85: agent.NetworkService.DisconnectNetwork:output_type -> agent.NetworkResponse
+	43, // 86: agent.NetworkService.PruneNetwork:output_type -> agent.NetworkPruneResponse
+	46, // 87: agent.VolumeService.ListVolumes:output_type -> agent.ListVolumesResponse
+	48, // 88: agent.VolumeService.CreateVolume:output_type -> agent.VolumeResponse
+	48, // 89: agent.VolumeService.RemoveVolume:output_type -> agent.VolumeResponse
+	55, // 90: agent.StackService.ListStacks:output_type -> agent.ListStackResponse
+	51, // 91: agent.AgentService.DockerInfo:output_type -> agent.DockerInfoResponse
+	53, // 92: agent.AgentService.Events:output_type -> agent.EventMessage
+	61, // [61:93] is the sub-list for method output_type
+	29, // [29:61] is the sub-list for method input_type
+	29, // [29:29] is the sub-list for extension type_name
+	29, // [29:29] is the sub-list for extension extendee
+	0,  // [0:29] is the sub-list for field type_name
 }
 
 func init() { file_proto_agent_proto_init() }
@@ -3900,9 +4090,9 @@ func file_proto_agent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_agent_proto_rawDesc), len(file_proto_agent_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   61,
+			NumMessages:   64,
 			NumExtensions: 0,
-			NumServices:   5,
+			NumServices:   6,
 		},
 		GoTypes:           file_proto_agent_proto_goTypes,
 		DependencyIndexes: file_proto_agent_proto_depIdxs,
