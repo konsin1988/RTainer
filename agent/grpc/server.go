@@ -14,10 +14,13 @@ type Server struct {
     pb.UnimplementedImageServiceServer
     pb.UnimplementedNetworkServiceServer
     pb.UnimplementedVolumeServiceServer
+		pb.UnimplementedStackServiceServer
+
     containerSvc *service.ContainerService
 		imageSvc *service.ImageService
 		networkSvc *service.NetworkService
 		volumeSvc *service.VolumeService
+		stackSvc *service.StackService
 }
 
 func New(
@@ -25,8 +28,9 @@ func New(
 	image *service.ImageService, 
 	network *service.NetworkService,
 	volume *service.VolumeService,
+	stack *service.StackService,
 ) *Server {
-	return &Server{containerSvc: container, imageSvc: image, networkSvc: network, volumeSvc: volume}
+	return &Server{containerSvc: container, imageSvc: image, networkSvc: network, volumeSvc: volume, stackSvc: stack}
 }
 
 func (s *Server) Register(grpcSrv *grpc.Server) {
@@ -35,6 +39,7 @@ func (s *Server) Register(grpcSrv *grpc.Server) {
     pb.RegisterImageServiceServer(grpcSrv, s)
     pb.RegisterNetworkServiceServer(grpcSrv, s)
     pb.RegisterVolumeServiceServer(grpcSrv, s)
+		pb.RegisterStackServiceServer(grpcSrv, s)
 
 }
 

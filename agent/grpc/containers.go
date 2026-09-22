@@ -24,23 +24,7 @@ func (s *Server) ListContainers(
     req *pb.ListContainersRequest,
 ) (*pb.ListContainersResponse, error) {
 
-    ctrs, err := s.containerSvc.ListContainers(ctx)
-    if err != nil {
-        return nil, err
-    }
-
-    resp := &pb.ListContainersResponse{}
-
-    for _, c := range ctrs {
-        resp.Containers = append(resp.Containers, &pb.Container{
-            Id:     c.ID,
-            Name:   c.Name,
-            Image:  c.Image,
-            Status: c.Status,
-        })
-    }
-
-    return resp, nil
+    return s.containerSvc.ListContainers(ctx)
 }
 
 // --------------------------------------------------------------------- INSPECT CONTAINER 

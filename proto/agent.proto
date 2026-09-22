@@ -51,15 +51,15 @@ service VolumeService {
   //rpc PruneVolume(...)
 }
 
-//service StackService {
-//  rpc List(...)
+service StackService {
+  rpc ListStacks(ListStackRequest) returns (ListStackResponse);
 //  rpc Get(...)
 //  rpc Deploy(...)
 //  rpc Update(...)
 //  rpc Stop(...)
 //  rpc Start(...)
 //  rpc Remove(...)
-//}
+}
 //
 //service RegistryService {
 //  rpc List(...)
@@ -481,4 +481,22 @@ message EventMessage {
     string id = 4;
 
     map<string, string> attributes = 5;
+}
+
+// ----------------------------------------------------------------------- STACKS
+// LIST
+message ListStackRequest {}
+
+message ListStackResponse {
+    repeated Stack stacks = 1;
+}
+
+message Stack {
+    string id = 1;
+    string name = 2;
+    string status = 3;
+
+    repeated Container containers = 4;
+    repeated NetworkListItem networks = 5;
+    repeated Volume volumes = 6;
 }

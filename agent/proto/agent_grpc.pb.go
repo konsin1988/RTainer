@@ -1399,6 +1399,108 @@ var VolumeService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
+	StackService_ListStacks_FullMethodName = "/agent.StackService/ListStacks"
+)
+
+// StackServiceClient is the client API for StackService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type StackServiceClient interface {
+	ListStacks(ctx context.Context, in *ListStackRequest, opts ...grpc.CallOption) (*ListStackResponse, error)
+}
+
+type stackServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewStackServiceClient(cc grpc.ClientConnInterface) StackServiceClient {
+	return &stackServiceClient{cc}
+}
+
+func (c *stackServiceClient) ListStacks(ctx context.Context, in *ListStackRequest, opts ...grpc.CallOption) (*ListStackResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListStackResponse)
+	err := c.cc.Invoke(ctx, StackService_ListStacks_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// StackServiceServer is the server API for StackService service.
+// All implementations must embed UnimplementedStackServiceServer
+// for forward compatibility.
+type StackServiceServer interface {
+	ListStacks(context.Context, *ListStackRequest) (*ListStackResponse, error)
+	mustEmbedUnimplementedStackServiceServer()
+}
+
+// UnimplementedStackServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedStackServiceServer struct{}
+
+func (UnimplementedStackServiceServer) ListStacks(context.Context, *ListStackRequest) (*ListStackResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListStacks not implemented")
+}
+func (UnimplementedStackServiceServer) mustEmbedUnimplementedStackServiceServer() {}
+func (UnimplementedStackServiceServer) testEmbeddedByValue()                      {}
+
+// UnsafeStackServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to StackServiceServer will
+// result in compilation errors.
+type UnsafeStackServiceServer interface {
+	mustEmbedUnimplementedStackServiceServer()
+}
+
+func RegisterStackServiceServer(s grpc.ServiceRegistrar, srv StackServiceServer) {
+	// If the following call panics, it indicates UnimplementedStackServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&StackService_ServiceDesc, srv)
+}
+
+func _StackService_ListStacks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListStackRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StackServiceServer).ListStacks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StackService_ListStacks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StackServiceServer).ListStacks(ctx, req.(*ListStackRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// StackService_ServiceDesc is the grpc.ServiceDesc for StackService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var StackService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "agent.StackService",
+	HandlerType: (*StackServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ListStacks",
+			Handler:    _StackService_ListStacks_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "proto/agent.proto",
+}
+
+const (
 	AgentService_DockerInfo_FullMethodName = "/agent.AgentService/DockerInfo"
 	AgentService_Events_FullMethodName     = "/agent.AgentService/Events"
 )

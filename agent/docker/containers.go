@@ -21,37 +21,81 @@ type Container struct {
 // ---------------------------------------------------- LIST CONTAINER 
 func (c *Client) ListContainers(
     ctx context.Context,
-) ([]Container, error) {
+) ([]container.Summary, error) {
 
-  list, err := c.cli.ContainerList(
+  return c.cli.ContainerList(
       ctx,
       container.ListOptions{
           All: true,
       },
   )
-
-  if err != nil {
-      return nil, err
-  }
-
-	containers := make([]Container, 0, len(list))
-
-	for _, ctr := range list {
-	    name := ""
-	    if len(ctr.Names) > 0 {
-	        name = ctr.Names[0]
-	    }
-	
-	    containers = append(containers, Container{
-	        ID:     ctr.ID,
-	        Name:   name,
-	        Image:  ctr.Image,
-	        Status: ctr.Status,
-	    })
-	}
-	
-	return containers, nil
 }
+
+// ----------------------------- INSPECT CONTAINER ----------------
+func (c *Client) InspectContainer(
+    ctx context.Context,
+    id string,
+) (ContainerInspect, error) {
+
+    result, err := c.cli.ContainerInspect(
+        ctx,
+        id,
+    )
+
+    if err != nil {
+        return ContainerInspect{}, err
+    }
+
+
+    info := ContainerInspect{
+        ID:     result.ID,
+        Name:   result.Name,
+        Image:  result.Config.Image,
+        Status: result.State.Status,
+        Env:    result.Config.Env,
+    }
+
+    // Ports
+    for containerPort, bindings := range result.NetworkSettings.Ports {
+        for _, binding := range bindings {
+            info.Ports = append(info.Ports, PortBinding{
+                ContainerPort: string(containerPort),
+								HostIP: binding.HostIP,
+                HostPort:      binding.HostPort,
+            })
+        }
+    }
+
+    // Mounts
+    for _, mount := range result.Mounts {
+
+        info.Mounts = append(info.Mounts, VolumeBinding{
+            Source: mount.Source,
+            Target: mount.Destination,
+        })
+    }
+
+
+    // Health
+    if result.State.Health != nil {
+
+        health := &HealthStatus{
+            Status:        result.State.Health.Status,
+            FailingStreak: result.State.Health.FailingStreak,
+        }
+
+        for _, log := range result.State.Health.Log {
+            health.Logs = append(
+                health.Logs,
+                log.Output,
+            )
+        }
+
+        info.Health = health
+    }
+    return info, nil
+}
+
 
 // ---------------------------------------------------- STOP CONTAINER 
 func (c *Client) StopContainer(
