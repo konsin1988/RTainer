@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package agent;
 
+import "google/protobuf/struct.proto";
+
 option go_package = "/agent/proto";
 
 service ImageService{
@@ -45,10 +47,10 @@ service NetworkService {
 
 service VolumeService {
   rpc ListVolumes(ListVolumesRequest) returns (ListVolumesResponse);
-  //rpc InspectVolume(...)
+  rpc InspectVolume(InspectVolumeRequest) returns (InspectVolumeResponse);
   rpc CreateVolume(CreateVolumeRequest) returns (VolumeResponse);
   rpc RemoveVolume(RemoveVolumeRequest) returns (VolumeResponse);
-  //rpc PruneVolume(...)
+  rpc PruneVolume(PruneVolumeRequest) returns (PruneVolumeResponse);
 }
 
 service StackService {
@@ -90,7 +92,7 @@ service AgentService {
   rpc Events(EventsRequest) returns (stream EventMessage);
 }
 
-// ------------------------------------ LIST IMAGES 
+// ------------------------------------ IMAGES 
 message ListImagesRequest {}
 
 message Image {
@@ -105,7 +107,6 @@ message ListImagesResponse {
 }
 
 
-// -------------------------------------- REMOVE IMAGE 
 message RemoveImageRequest {
     string id = 1;
     bool force = 2;
@@ -113,7 +114,6 @@ message RemoveImageRequest {
 message RemoveImageResponse {}
 
 
-// --------------------------------------- INSPECT IMAGE
 message ImageRequest {
   string id = 1;
 }
@@ -139,7 +139,6 @@ message InspectImageResponse {
   repeated string exposed_ports = 12;
 }
 
-// --------------------------------------------PULL IMAGE
 message PullImageRequest {
     string reference = 1; // e.g. "nginx:latest"
 }
@@ -419,7 +418,6 @@ message ListVolumesResponse {
     repeated Volume volumes = 1;
 }
 
-// -------------------------------------- ---------CREATE VOLUME 
 message CreateVolumeRequest {
     string name = 1;
     string driver = 2;
@@ -430,10 +428,38 @@ message CreateVolumeRequest {
 
 message VolumeResponse {}
 
-// ----------------------------------------------- REMOVE VOLUME
 message RemoveVolumeRequest {
     string name = 1;
     bool force = 2;
+}
+
+message InspectVolumeRequest{
+    string name = 1;
+}
+
+message InspectVolumeResponse{
+    VolumeInfo volume = 1;
+}
+
+message VolumeInfo{
+    string name = 1;
+    string driver = 2;
+    string mount_point = 3;
+    string created_at = 4;
+    google.protobuf.Struct status = 5;
+    string scope = 6;
+
+    map<string, string> labels = 7;
+    map<string, string> options = 8;
+}
+
+
+message PruneVolumeRequest {
+    map<string, string> filters = 1;
+}
+
+message PruneVolumeResponse {
+    repeated string deleted_volume_ids = 1;
 }
 
 // ------------------------------------------------ DOCKER INFO

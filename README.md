@@ -348,7 +348,7 @@ grpcurl -plaintext -d '{ "reference":"nginx:latest" }' localhost:50051 agent.Age
 #### Volumes
 
 ##### list
-> grpcurl -plaintext -d '{}' localhost:50051 agent.AgentService/ListVolumes
+> grpcurl -plaintext -d '{}' localhost:50051 agent.VolumeService/ListVolumes
 
 ###### response 
 ```
@@ -368,6 +368,9 @@ grpcurl -plaintext -d '{ "reference":"nginx:latest" }' localhost:50051 agent.Age
 }
 ```
 
+##### inspect 
+> grpcurl -plaintext -d '{"name":"messenger_v2_redis_dev_data"}' localhost:50051 agent.VolumeService/InspectVolume
+
 ##### create 
 > grpcurl -plaintext -d '{
   "name":"postgres-data",
@@ -381,6 +384,13 @@ grpcurl -plaintext -d '{ "reference":"nginx:latest" }' localhost:50051 agent.Age
 
 ##### remove
 > grpcurl -plaintext -d '{ "name":"postgres-data", "force":true }' localhost:50051 agent.AgentService/RemoveVolume
+
+##### prune volumes
+> grpcurl -plaintext -d '{"filters": {"all": "true"}}' localhost:50051 agent.VolumeService/PruneVolume
+
+> grpcurl -plaintext -d '{"filters": {"label": "environment=staging"}}' localhost:50051 agent.VolumeService/PruneVolume
+
+> grpcurl -plaintext -d '{"filters": {"label!": "keep=true"}}' localhost:50051 agent.VolumeService/PruneVolume
 
 
 #### Docker info
@@ -409,6 +419,8 @@ grpcurl -plaintext -d '{ "reference":"nginx:latest" }' localhost:50051 agent.Age
   }
 }
 ```
+
+
 
 ### API Endpoints
 

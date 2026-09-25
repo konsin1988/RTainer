@@ -48,53 +48,12 @@ type NetworkInfo struct {
 // ------------------------------------------------- LIST NETWORKS 
 func (c *Client) ListNetworks(
     ctx context.Context,
-) ([]Network, error) {
+) ([]network.Summary, error) {
 
-    networks, err := c.cli.NetworkList(
+    return c.cli.NetworkList(
         ctx,
         network.ListOptions{},
     )
-
-    if err != nil {
-        return nil, err
-    }
-
-
-    result := make([]Network, 0, len(networks))
-
-
-    for _, n := range networks {
-				inspect, err := c.cli.NetworkInspect(
-        		ctx,
-        		n.ID,
-        		network.InspectOptions{},
-    		)
-    		if err != nil {
-    		    return nil, err
-    		}
-
-    		item := Network{
-    		    ID:     inspect.ID,
-    		    Name:   inspect.Name,
-    		    Driver: inspect.Driver,
-    		    Scope:  inspect.Scope,
-    		}
-
-				for id, endpoint := range inspect.Containers {
-				
-				    item.Containers = append(
-				        item.Containers,
-				        NetContainer{
-				            ID:          id,
-				            Name:        endpoint.Name,
-				            IPv4Address: endpoint.IPv4Address,
-				        },
-				    )
-				}
-
-        result = append(result, item)
-    }
-    return result, nil
 }
 
 

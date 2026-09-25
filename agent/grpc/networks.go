@@ -15,45 +15,7 @@ func (s *Server) ListNetworks(
     req *pb.ListNetworksRequest,
 ) (*pb.ListNetworksResponse, error) {
 
-
-    networks, err := s.networkSvc.ListNetworks(ctx)
-
-    if err != nil {
-        return nil, err
-    }
-
-
-    resp := &pb.ListNetworksResponse{}
-
-
-    for _, n := range networks {
-
-        item := &pb.NetworkListItem{
-            Id:     n.ID,
-            Name:   n.Name,
-            Driver: n.Driver,
-            Scope:  n.Scope,
-        }
-
-				for _, c := range n.Containers {
-            item.Containers = append(
-                item.Containers,
-                &pb.NetContainer{
-                    Id:          c.ID,
-                    Name:        c.Name,
-                    Ipv4Address: c.IPv4Address,
-                },
-            )
-        }
-
-        resp.Networks = append(
-            resp.Networks,
-            item,
-        )
-    }
-
-
-    return resp, nil
+    return s.networkSvc.ListNetworks(ctx)
 }
 
 // ------------------------------------------------------- INSPECT NETWORK 
@@ -210,5 +172,6 @@ func (s *Server) PruneNetwork(
 	ctx context.Context,
 	req *pb.NetworkPruneRequest,
 ) (*pb.NetworkPruneResponse, error) {
-	return nil, nil
+
+	return s.networkSvc.PruneNetwork(ctx, req) 
 }

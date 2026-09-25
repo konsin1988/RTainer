@@ -5,6 +5,9 @@ import (
 
 	"konsin1988/agent/docker"
 	"konsin1988/agent/proto"
+
+	"github.com/docker/docker/api/types/filters"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 type VolumeService struct {
@@ -22,6 +25,32 @@ func (s *VolumeService) ListVolumes(
 ) ([]docker.Volume, error) {
 
     return s.docker.ListVolumes(ctx)
+}
+
+// -------------------------------------------- INSPECT VOLUME
+func (s *VolumeService) InspectVolume(
+		ctx context.Context,
+		name string,
+) (*proto.InspectVolumeResponse, error){
+		resp, err := s.docker.InspectVolume(ctx, name)
+		if err != nil{
+			return nil, err
+		}
+
+		statusStruct, err := structpb.NewStruct(resp.Status)
+
+		return &proto.InspectVolumeResponse{
+			Volume: &proto.VolumeInfo{
+				Name:  				resp.Name,   
+				Driver: 			resp.Driver, 
+				MountPoint:		resp.Mountpoint, 
+				CreatedAt: 		resp.CreatedAt, 
+				Status:   		statusStruct, 
+				Scope:   			resp.Scope, 
+				Labels: 			resp.Labels, 
+				Options: 			resp.Options, 
+			},
+		}, nil
 }
 
 // ------------------------------------------- CREATE VOLUME
@@ -52,4 +81,34 @@ func (s *VolumeService) RemoveVolume(
         req.Name,
         req.Force,
     )
+}
+
+// --------------------------------------------------- PRUNE VOLUME 
+func (s *VolumeService) PruneVolume(
+	ctx context.Context,
+	req *proto.PruneVolumeRequest,
+)(*proto.PruneVolumeResponse, error){
+
+		pruneFilters := volumePruneFiltersFromProto(req)
+
+    report, err := s.docker.PruneVolume(ctx, pruneFilters)
+    if err != nil {
+        return nil, err 
+    }
+
+    return &proto.PruneVolumeResponse{
+        DeletedVolumeIds: report.VolumesDeleted,
+    }, nil
+}
+
+func volumePruneFiltersFromProto(
+    req *proto.PruneVolumeRequest,
+) filters.Args {
+    f := filters.NewArgs()
+
+    for key, value := range req.GetFilters() {
+        f.Add(key, value)
+    }
+
+    return f
 }
