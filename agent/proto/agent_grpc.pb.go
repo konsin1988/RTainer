@@ -1219,9 +1219,11 @@ var NetworkService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	VolumeService_ListVolumes_FullMethodName  = "/agent.VolumeService/ListVolumes"
-	VolumeService_CreateVolume_FullMethodName = "/agent.VolumeService/CreateVolume"
-	VolumeService_RemoveVolume_FullMethodName = "/agent.VolumeService/RemoveVolume"
+	VolumeService_ListVolumes_FullMethodName   = "/agent.VolumeService/ListVolumes"
+	VolumeService_InspectVolume_FullMethodName = "/agent.VolumeService/InspectVolume"
+	VolumeService_CreateVolume_FullMethodName  = "/agent.VolumeService/CreateVolume"
+	VolumeService_RemoveVolume_FullMethodName  = "/agent.VolumeService/RemoveVolume"
+	VolumeService_PruneVolume_FullMethodName   = "/agent.VolumeService/PruneVolume"
 )
 
 // VolumeServiceClient is the client API for VolumeService service.
@@ -1229,9 +1231,10 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type VolumeServiceClient interface {
 	ListVolumes(ctx context.Context, in *ListVolumesRequest, opts ...grpc.CallOption) (*ListVolumesResponse, error)
-	// rpc InspectVolume(...)
+	InspectVolume(ctx context.Context, in *InspectVolumeRequest, opts ...grpc.CallOption) (*InspectVolumeResponse, error)
 	CreateVolume(ctx context.Context, in *CreateVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error)
 	RemoveVolume(ctx context.Context, in *RemoveVolumeRequest, opts ...grpc.CallOption) (*VolumeResponse, error)
+	PruneVolume(ctx context.Context, in *PruneVolumeRequest, opts ...grpc.CallOption) (*PruneVolumeResponse, error)
 }
 
 type volumeServiceClient struct {
@@ -1246,6 +1249,16 @@ func (c *volumeServiceClient) ListVolumes(ctx context.Context, in *ListVolumesRe
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListVolumesResponse)
 	err := c.cc.Invoke(ctx, VolumeService_ListVolumes_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *volumeServiceClient) InspectVolume(ctx context.Context, in *InspectVolumeRequest, opts ...grpc.CallOption) (*InspectVolumeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(InspectVolumeResponse)
+	err := c.cc.Invoke(ctx, VolumeService_InspectVolume_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1272,14 +1285,25 @@ func (c *volumeServiceClient) RemoveVolume(ctx context.Context, in *RemoveVolume
 	return out, nil
 }
 
+func (c *volumeServiceClient) PruneVolume(ctx context.Context, in *PruneVolumeRequest, opts ...grpc.CallOption) (*PruneVolumeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PruneVolumeResponse)
+	err := c.cc.Invoke(ctx, VolumeService_PruneVolume_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // VolumeServiceServer is the server API for VolumeService service.
 // All implementations must embed UnimplementedVolumeServiceServer
 // for forward compatibility.
 type VolumeServiceServer interface {
 	ListVolumes(context.Context, *ListVolumesRequest) (*ListVolumesResponse, error)
-	// rpc InspectVolume(...)
+	InspectVolume(context.Context, *InspectVolumeRequest) (*InspectVolumeResponse, error)
 	CreateVolume(context.Context, *CreateVolumeRequest) (*VolumeResponse, error)
 	RemoveVolume(context.Context, *RemoveVolumeRequest) (*VolumeResponse, error)
+	PruneVolume(context.Context, *PruneVolumeRequest) (*PruneVolumeResponse, error)
 	mustEmbedUnimplementedVolumeServiceServer()
 }
 
@@ -1293,11 +1317,17 @@ type UnimplementedVolumeServiceServer struct{}
 func (UnimplementedVolumeServiceServer) ListVolumes(context.Context, *ListVolumesRequest) (*ListVolumesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListVolumes not implemented")
 }
+func (UnimplementedVolumeServiceServer) InspectVolume(context.Context, *InspectVolumeRequest) (*InspectVolumeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method InspectVolume not implemented")
+}
 func (UnimplementedVolumeServiceServer) CreateVolume(context.Context, *CreateVolumeRequest) (*VolumeResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateVolume not implemented")
 }
 func (UnimplementedVolumeServiceServer) RemoveVolume(context.Context, *RemoveVolumeRequest) (*VolumeResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RemoveVolume not implemented")
+}
+func (UnimplementedVolumeServiceServer) PruneVolume(context.Context, *PruneVolumeRequest) (*PruneVolumeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method PruneVolume not implemented")
 }
 func (UnimplementedVolumeServiceServer) mustEmbedUnimplementedVolumeServiceServer() {}
 func (UnimplementedVolumeServiceServer) testEmbeddedByValue()                       {}
@@ -1338,6 +1368,24 @@ func _VolumeService_ListVolumes_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _VolumeService_InspectVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InspectVolumeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VolumeServiceServer).InspectVolume(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VolumeService_InspectVolume_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VolumeServiceServer).InspectVolume(ctx, req.(*InspectVolumeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _VolumeService_CreateVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateVolumeRequest)
 	if err := dec(in); err != nil {
@@ -1374,6 +1422,24 @@ func _VolumeService_RemoveVolume_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _VolumeService_PruneVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PruneVolumeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VolumeServiceServer).PruneVolume(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VolumeService_PruneVolume_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VolumeServiceServer).PruneVolume(ctx, req.(*PruneVolumeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // VolumeService_ServiceDesc is the grpc.ServiceDesc for VolumeService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1386,12 +1452,20 @@ var VolumeService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _VolumeService_ListVolumes_Handler,
 		},
 		{
+			MethodName: "InspectVolume",
+			Handler:    _VolumeService_InspectVolume_Handler,
+		},
+		{
 			MethodName: "CreateVolume",
 			Handler:    _VolumeService_CreateVolume_Handler,
 		},
 		{
 			MethodName: "RemoveVolume",
 			Handler:    _VolumeService_RemoveVolume_Handler,
+		},
+		{
+			MethodName: "PruneVolume",
+			Handler:    _VolumeService_PruneVolume_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/docker/docker/api/types/volume"
+	"github.com/docker/docker/api/types/filters"
 )
 
 type Volume struct {
@@ -50,6 +51,14 @@ func (c *Client) ListVolumes(
     return result, nil
 }
 
+// ------------------------------------------ INSPECT VOLUME
+func (c *Client) InspectVolume(
+		ctx context.Context,
+		name string,
+) (volume.Volume, error) {
+		return c.cli.VolumeInspect(ctx, name)
+}
+
 
 // ------------------------------------------ CREATE VOLUME 
 func (c *Client) CreateVolume(
@@ -85,4 +94,12 @@ func (c *Client) RemoveVolume(
         name,
         force,
     )
+}
+
+// ------------------------------------------------------ PRUNE VOLUMES 
+func (c *Client) PruneVolume(
+	ctx context.Context,
+	filters filters.Args,
+) (volume.PruneReport, error) {
+	return c.cli.VolumesPrune(ctx, filters)
 }

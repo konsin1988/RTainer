@@ -29,9 +29,46 @@ func NewNetworkService(
 // ------------------------------------------------------ LIST NETWORKS
 func (s *NetworkService) ListNetworks(
     ctx context.Context,
-) ([]docker.Network, error) {
+) (*proto.ListNetworksResponse, error) {
 
-    return s.docker.ListNetworks(ctx)
+	networks, err := s.docker.ListNetworks(ctx)
+	if err != nil {
+		return nil, err
+	}
+  resp := &proto.ListNetworksResponse{}
+
+  for _, n := range networks {
+			inspect, err := s.docker.InspectNetwork(
+      		ctx,
+      		n.ID,
+  		)
+  		if err != nil {
+  		    return nil, err
+  		}
+
+      item := &proto.NetworkListItem{
+          Id:     n.ID,
+          Name:   n.Name,
+          Driver: n.Driver,
+          Scope:  n.Scope,
+      }
+
+			for _, endpoint := range inspect.Containers {
+			
+			    item.Containers = append(
+			        item.Containers,
+              &proto.NetContainer{
+                  Id:          endpoint.ID,
+                  Name:        endpoint.Name,
+                  Ipv4Address: endpoint.IPv4Address,
+              },
+			    )
+			}
+
+      resp.Networks = append(resp.Networks, item)
+  }
+
+	return resp, nil
 }
 
 
