@@ -26,29 +26,16 @@ type CreateVolumeRequest struct {
 // ---------------------------------------- LIST VOLUMES 
 func (c *Client) ListVolumes(
     ctx context.Context,
-) ([]Volume, error) {
+) ([]*volume.Volume, error) {
 
-    resp, err := c.cli.VolumeList(
-        ctx,
-        volume.ListOptions{},
-    )
-    if err != nil {
-        return nil, err
-    }
-
-    result := make([]Volume, 0, len(resp.Volumes))
-
-    for _, v := range resp.Volumes {
-        result = append(result, Volume{
-            Name:       v.Name,
-            Driver:     v.Driver,
-            Mountpoint: v.Mountpoint,
-            Labels:     v.Labels,
-            Scope:      v.Scope,
-        })
-    }
-
-    return result, nil
+		resp, err := c.cli.VolumeList(
+				ctx,
+				volume.ListOptions{},
+		)
+		if err != nil{
+			return nil, err
+		}
+		return resp.Volumes, nil
 }
 
 // ------------------------------------------ INSPECT VOLUME

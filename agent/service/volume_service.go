@@ -22,9 +22,26 @@ func NewVolumeService(d *docker.Client) *VolumeService {
 // ------------------------------------------ LIST VOLUMES
 func (s *VolumeService) ListVolumes(
     ctx context.Context,
-) ([]docker.Volume, error) {
+) (*proto.ListVolumesResponse, error) {
 
-    return s.docker.ListVolumes(ctx)
+		volumes, err := s.docker.ListVolumes(ctx)
+		if err != nil{
+			return nil, err
+		}
+
+    resp := &proto.ListVolumesResponse{}
+
+    for _, v := range volumes {
+        resp.Volumes = append(resp.Volumes, &proto.Volume{
+            Name:       v.Name,
+            Driver:     v.Driver,
+            Mountpoint: v.Mountpoint,
+            Labels:     v.Labels,
+            Scope:      v.Scope,
+        })
+    }
+
+    return resp, nil
 }
 
 // -------------------------------------------- INSPECT VOLUME

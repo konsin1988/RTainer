@@ -51,6 +51,7 @@ func (s *NetworkService) ListNetworks(
           Name:   n.Name,
           Driver: n.Driver,
           Scope:  n.Scope,
+					Labels: n.Labels,
       }
 
 			for _, endpoint := range inspect.Containers {

@@ -318,6 +318,7 @@ message NetworkListItem {
   string driver = 3;
   string scope = 4;
 
+  map<string, string> labels = 10;
   repeated NetContainer containers = 5;
 }
 

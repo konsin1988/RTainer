@@ -15,24 +15,7 @@ func (s *Server) ListVolumes(
     req *pb.ListVolumesRequest,
 ) (*pb.ListVolumesResponse, error) {
 
-    volumes, err := s.volumeSvc.ListVolumes(ctx)
-    if err != nil {
-        return nil, err
-    }
-
-    resp := &pb.ListVolumesResponse{}
-
-    for _, v := range volumes {
-        resp.Volumes = append(resp.Volumes, &pb.Volume{
-            Name:       v.Name,
-            Driver:     v.Driver,
-            Mountpoint: v.Mountpoint,
-            Labels:     v.Labels,
-            Scope:      v.Scope,
-        })
-    }
-
-    return resp, nil
+    return s.volumeSvc.ListVolumes(ctx)
 }
 
 // ------------------------------------------------- CREATE VOLUME
