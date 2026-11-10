@@ -202,3 +202,17 @@ func calculateStackStatus(
         return "partial"
     }
 } 
+
+// -------------------------------------------------- GET STACK
+//func (s *StackService) GetStack(
+//    ctx context.Context,
+//		id string,
+//) (*proto.GetStackResponse, error) {
+//		stacks, err := s.ListStacks(ctx)	
+//		if err != nil{
+//			return nil, err
+//		}
+//		return &proto.GetStackResponse{
+//			
+//		}, nil
+//}

@@ -1,111 +1,130 @@
 package grpcserver
 
 import (
-    "context"
-		"strings"
+	"context"
+	"strings"
 
-		"konsin1988/agent/docker"
-    pb "konsin1988/agent/proto"
+	"konsin1988/agent/docker"
+	pb "konsin1988/agent/proto"
 )
 
-
-// -----------------------------------
-// LIST IMAGES
-// ------------------------------------
+// ---------------------------------------------- LIST IMAGES
 func (s *Server) ListImages(
-		ctx context.Context,
-		req *pb.ListImagesRequest,
+	ctx context.Context,
+	req *pb.ListImagesRequest,
 ) (*pb.ListImagesResponse, error) {
-    images, err := s.imageSvc.ListImages(ctx)
-    if err != nil {
-        return nil, err
-    }
+	images, err := s.imageSvc.ListImages(ctx)
+	if err != nil {
+		return nil, err
+	}
 
-    resp := &pb.ListImagesResponse{}
+	resp := &pb.ListImagesResponse{}
 
-    for _, c := range images {
-        resp.Images = append(resp.Images, &pb.Image{
-            Id:     	c.ID,
-						RepoTags: strings.Join(c.RepoTags, ","), 
-						Size:			c.Size,     
-						Created: 	c.Created,   
-        })
-    }
+	for _, c := range images {
+		resp.Images = append(resp.Images, &pb.Image{
+			Id:       c.ID,
+			RepoTags: strings.Join(c.RepoTags, ","),
+			Size:     c.Size,
+			Created:  c.Created,
+		})
+	}
 
-    return resp, nil
+	return resp, nil
 }
 
-
-// ------------------------------------------------------------
-// REMOVE IMAGE 
-// -------------------------------------------------------------
+// --------------------------------------------------------------- REMOVE IMAGE
 func (s *Server) RemoveImage(
-    ctx context.Context,
-    req *pb.RemoveImageRequest,
+	ctx context.Context,
+	req *pb.RemoveImageRequest,
 ) (*pb.RemoveImageResponse, error) {
 
-    err := s.imageSvc.RemoveImage(
-        ctx,
-        req,
-    )
-    if err != nil {
-        return nil, err
-    }
+	err := s.imageSvc.RemoveImage(
+		ctx,
+		req,
+	)
+	if err != nil {
+		return nil, err
+	}
 
-    return &pb.RemoveImageResponse{}, nil
+	return &pb.RemoveImageResponse{}, nil
 }
 
-// ------------------------------------------------------
-// INSPECT IMAGE 
-// ------------------------------------------------------
+// ------------------------------------------------------------- INSPECT IMAGE
 func (s *Server) InspectImage(
-    ctx context.Context,
-    req *pb.ImageRequest,
+	ctx context.Context,
+	req *pb.ImageRequest,
 ) (*pb.InspectImageResponse, error) {
 
-    img, err := s.imageSvc.InspectImage(
-        ctx,
-        req.Id,
-    )
-    if err != nil {
-        return nil, err
-    }
+	img, err := s.imageSvc.InspectImage(
+		ctx,
+		req.Id,
+	)
+	if err != nil {
+		return nil, err
+	}
 
-    return &pb.InspectImageResponse {
-        Id:            img.ID,
-        RepoTags:      img.RepoTags,
-        RepoDigests:   img.RepoDigests,
-        Size:          img.Size,
-        Created:       img.Created,
-        Os:            img.OS,
-        Architecture:  img.Architecture,
-        Env:           img.Env,
-        Cmd:           img.Cmd,
-        Entrypoint:    img.Entrypoint,
-        Labels:        img.Labels,
-        ExposedPorts:  img.ExposedPorts,
-    }, nil
+	return &pb.InspectImageResponse{
+		Id:           img.ID,
+		RepoTags:     img.RepoTags,
+		RepoDigests:  img.RepoDigests,
+		Size:         img.Size,
+		Created:      img.Created,
+		Os:           img.OS,
+		Architecture: img.Architecture,
+		Env:          img.Env,
+		Cmd:          img.Cmd,
+		Entrypoint:   img.Entrypoint,
+		Labels:       img.Labels,
+		ExposedPorts: img.ExposedPorts,
+	}, nil
 }
 
-
-// --------------------------------------------- PULL IMAGE
+// ------------------------------------------------------------- PULL IMAGE
 func (s *Server) PullImage(
-    req *pb.PullImageRequest,
-    stream pb.ImageService_PullImageServer,
+	req *pb.PullImageRequest,
+	stream pb.ImageService_PullImageServer,
 ) error {
 
-    return s.imageSvc.PullImage(
-        stream.Context(),
-        req,
-        func(p docker.PullProgress) error {
+	return s.imageSvc.PullImage(
+		stream.Context(),
+		req,
+		func(p docker.PullProgress) error {
 
-            return stream.Send(&pb.PullImageMessage{
-                Status:  p.Status,
-                Id:      p.ID,
-                Current: p.Current,
-                Total:   p.Total,
-                Error:   p.Error,
-            })
-        },
-    )
+			return stream.Send(&pb.PullImageMessage{
+				Status:  p.Status,
+				Id:      p.ID,
+				Current: p.Current,
+				Total:   p.Total,
+				Error:   p.Error,
+			})
+		},
+	)
+}
+
+// ------------------------------------------------------- TAG IMAGE
+func (s *Server) TagImage(
+	ctx context.Context,
+	req *pb.TagImageRequest,
+) (*pb.TagImageResponse, error) {
+	resp, err := s.imageSvc.TagImage(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+
+}
+
+// ---------------------------------------------------------------- BUILD IMAGE
+func (s *Server) BuildImage(
+	req *pb.BuildImageRequest,
+	stream pb.ImageService_BuildImageServer,
+) error {
+	return s.imageSvc.BuildImage(
+		stream.Context(),
+		req,
+		func(event *pb.BuildImageEvent) error {
+			return stream.Send(event)
+		},
+	)
 }

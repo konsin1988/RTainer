@@ -8,6 +8,7 @@ package proto
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -22,6 +23,8 @@ const (
 	ImageService_ListImages_FullMethodName   = "/agent.ImageService/ListImages"
 	ImageService_InspectImage_FullMethodName = "/agent.ImageService/InspectImage"
 	ImageService_PullImage_FullMethodName    = "/agent.ImageService/PullImage"
+	ImageService_BuildImage_FullMethodName   = "/agent.ImageService/BuildImage"
+	ImageService_TagImage_FullMethodName     = "/agent.ImageService/TagImage"
 	ImageService_RemoveImage_FullMethodName  = "/agent.ImageService/RemoveImage"
 )
 
@@ -33,8 +36,8 @@ type ImageServiceClient interface {
 	InspectImage(ctx context.Context, in *ImageRequest, opts ...grpc.CallOption) (*InspectImageResponse, error)
 	PullImage(ctx context.Context, in *PullImageRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[PullImageMessage], error)
 	// rpc PushImage(...)
-	// rpc BuildImage(...)
-	// rpc TagImage(...)
+	BuildImage(ctx context.Context, in *BuildImageRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[BuildImageEvent], error)
+	TagImage(ctx context.Context, in *TagImageRequest, opts ...grpc.CallOption) (*TagImageResponse, error)
 	RemoveImage(ctx context.Context, in *RemoveImageRequest, opts ...grpc.CallOption) (*RemoveImageResponse, error)
 }
 
@@ -85,6 +88,35 @@ func (c *imageServiceClient) PullImage(ctx context.Context, in *PullImageRequest
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ImageService_PullImageClient = grpc.ServerStreamingClient[PullImageMessage]
 
+func (c *imageServiceClient) BuildImage(ctx context.Context, in *BuildImageRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[BuildImageEvent], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &ImageService_ServiceDesc.Streams[1], ImageService_BuildImage_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[BuildImageRequest, BuildImageEvent]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ImageService_BuildImageClient = grpc.ServerStreamingClient[BuildImageEvent]
+
+func (c *imageServiceClient) TagImage(ctx context.Context, in *TagImageRequest, opts ...grpc.CallOption) (*TagImageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TagImageResponse)
+	err := c.cc.Invoke(ctx, ImageService_TagImage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *imageServiceClient) RemoveImage(ctx context.Context, in *RemoveImageRequest, opts ...grpc.CallOption) (*RemoveImageResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(RemoveImageResponse)
@@ -103,8 +135,8 @@ type ImageServiceServer interface {
 	InspectImage(context.Context, *ImageRequest) (*InspectImageResponse, error)
 	PullImage(*PullImageRequest, grpc.ServerStreamingServer[PullImageMessage]) error
 	// rpc PushImage(...)
-	// rpc BuildImage(...)
-	// rpc TagImage(...)
+	BuildImage(*BuildImageRequest, grpc.ServerStreamingServer[BuildImageEvent]) error
+	TagImage(context.Context, *TagImageRequest) (*TagImageResponse, error)
 	RemoveImage(context.Context, *RemoveImageRequest) (*RemoveImageResponse, error)
 	mustEmbedUnimplementedImageServiceServer()
 }
@@ -124,6 +156,12 @@ func (UnimplementedImageServiceServer) InspectImage(context.Context, *ImageReque
 }
 func (UnimplementedImageServiceServer) PullImage(*PullImageRequest, grpc.ServerStreamingServer[PullImageMessage]) error {
 	return status.Error(codes.Unimplemented, "method PullImage not implemented")
+}
+func (UnimplementedImageServiceServer) BuildImage(*BuildImageRequest, grpc.ServerStreamingServer[BuildImageEvent]) error {
+	return status.Error(codes.Unimplemented, "method BuildImage not implemented")
+}
+func (UnimplementedImageServiceServer) TagImage(context.Context, *TagImageRequest) (*TagImageResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method TagImage not implemented")
 }
 func (UnimplementedImageServiceServer) RemoveImage(context.Context, *RemoveImageRequest) (*RemoveImageResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RemoveImage not implemented")
@@ -196,6 +234,35 @@ func _ImageService_PullImage_Handler(srv interface{}, stream grpc.ServerStream) 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ImageService_PullImageServer = grpc.ServerStreamingServer[PullImageMessage]
 
+func _ImageService_BuildImage_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(BuildImageRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ImageServiceServer).BuildImage(m, &grpc.GenericServerStream[BuildImageRequest, BuildImageEvent]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ImageService_BuildImageServer = grpc.ServerStreamingServer[BuildImageEvent]
+
+func _ImageService_TagImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TagImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ImageServiceServer).TagImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ImageService_TagImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ImageServiceServer).TagImage(ctx, req.(*TagImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ImageService_RemoveImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RemoveImageRequest)
 	if err := dec(in); err != nil {
@@ -230,6 +297,10 @@ var ImageService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ImageService_InspectImage_Handler,
 		},
 		{
+			MethodName: "TagImage",
+			Handler:    _ImageService_TagImage_Handler,
+		},
+		{
 			MethodName: "RemoveImage",
 			Handler:    _ImageService_RemoveImage_Handler,
 		},
@@ -238,6 +309,11 @@ var ImageService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "PullImage",
 			Handler:       _ImageService_PullImage_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "BuildImage",
+			Handler:       _ImageService_BuildImage_Handler,
 			ServerStreams: true,
 		},
 	},
@@ -1474,6 +1550,7 @@ var VolumeService_ServiceDesc = grpc.ServiceDesc{
 
 const (
 	StackService_ListStacks_FullMethodName = "/agent.StackService/ListStacks"
+	StackService_GetStack_FullMethodName   = "/agent.StackService/GetStack"
 )
 
 // StackServiceClient is the client API for StackService service.
@@ -1481,6 +1558,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type StackServiceClient interface {
 	ListStacks(ctx context.Context, in *ListStackRequest, opts ...grpc.CallOption) (*ListStackResponse, error)
+	GetStack(ctx context.Context, in *GetStackRequest, opts ...grpc.CallOption) (*GetStackResponse, error)
 }
 
 type stackServiceClient struct {
@@ -1501,11 +1579,22 @@ func (c *stackServiceClient) ListStacks(ctx context.Context, in *ListStackReques
 	return out, nil
 }
 
+func (c *stackServiceClient) GetStack(ctx context.Context, in *GetStackRequest, opts ...grpc.CallOption) (*GetStackResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetStackResponse)
+	err := c.cc.Invoke(ctx, StackService_GetStack_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StackServiceServer is the server API for StackService service.
 // All implementations must embed UnimplementedStackServiceServer
 // for forward compatibility.
 type StackServiceServer interface {
 	ListStacks(context.Context, *ListStackRequest) (*ListStackResponse, error)
+	GetStack(context.Context, *GetStackRequest) (*GetStackResponse, error)
 	mustEmbedUnimplementedStackServiceServer()
 }
 
@@ -1518,6 +1607,9 @@ type UnimplementedStackServiceServer struct{}
 
 func (UnimplementedStackServiceServer) ListStacks(context.Context, *ListStackRequest) (*ListStackResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListStacks not implemented")
+}
+func (UnimplementedStackServiceServer) GetStack(context.Context, *GetStackRequest) (*GetStackResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetStack not implemented")
 }
 func (UnimplementedStackServiceServer) mustEmbedUnimplementedStackServiceServer() {}
 func (UnimplementedStackServiceServer) testEmbeddedByValue()                      {}
@@ -1558,6 +1650,24 @@ func _StackService_ListStacks_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _StackService_GetStack_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetStackRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StackServiceServer).GetStack(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StackService_GetStack_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StackServiceServer).GetStack(ctx, req.(*GetStackRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // StackService_ServiceDesc is the grpc.ServiceDesc for StackService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1568,6 +1678,10 @@ var StackService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListStacks",
 			Handler:    _StackService_ListStacks_Handler,
+		},
+		{
+			MethodName: "GetStack",
+			Handler:    _StackService_GetStack_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

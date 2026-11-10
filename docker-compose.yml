@@ -50,6 +50,12 @@ services:
         find /backups -mtime +7 -delete;
         sleep 86400;
       done"
+    healthcheck:
+      test: ["CMD-SHELL", "find /backups -name 'backup_*.sql.gz' -mmin -1500 -size +10k | grep -q ."]
+      interval: 5m
+      timeout: 10s
+      retries: 3
+      start_period: 2m
     restart: unless-stopped
     mem_limit: 512M 
     deploy:
@@ -83,10 +89,16 @@ services:
     command: air /app
     profiles:
       - dev
-    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8013/${PROXY_PATH}/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
     mem_limit: 512M 
     deploy:
       resources:

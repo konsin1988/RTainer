@@ -5,9 +5,11 @@ import (
 		"io"
 		"strings"
 
-		"github.com/docker/docker/api/types/container"
     "konsin1988/agent/docker"
 		"konsin1988/agent/proto"
+
+		"github.com/docker/docker/api/types/container"
+		"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type ContainerService struct {
@@ -233,12 +235,14 @@ func (s *ContainerService) InspectContainer(
 		}
 
 
+
     resp := &proto.ContainerInfo{
         Id:     result.ID,
         Name:   result.Name,
         Image:  result.Image,
         Status: result.Status,
         Env:    result.Env,
+				CreatedAt: timestamppb.New(result.CreatedAt),
     }
 
     for _, p := range result.Ports {

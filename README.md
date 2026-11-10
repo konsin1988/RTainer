@@ -69,7 +69,7 @@ Migrations run automatically on startup.
 grpcurl -plaintext localhost:50051 list   
 
 ##### list
-> grpcurl -plaintext -d '{}' localhost:50051 agent.AgentService/ListContainers
+> grpcurl -plaintext -d '{}' localhost:50051 agent.ContainerService/ListContainers
 
 ##### start / stop / restart
 > grpcurl -plaintext -d '{"id":"<container_id>"}' localhost:50051 agent.AgentService/StartContainer
@@ -263,6 +263,9 @@ grpcurl -plaintext -d '{ "reference":"nginx:latest" }' localhost:50051 agent.Age
 }
 ...
 ```
+
+##### tag image
+> grpcurl -plaintext -d '{"image_id": "sha256:a97d82f709e2e0ef35e48a697aec860e12cbf2a0ffbfd95d7701976e81d470ed", "repository": "nginx", "tag": "test" }' localhost:50051 agent.ImageService/TagImage
 
 #### NETWORKS 
 

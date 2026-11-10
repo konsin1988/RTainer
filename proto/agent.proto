@@ -3,6 +3,7 @@ syntax = "proto3";
 package agent;
 
 import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto"; 
 
 option go_package = "/agent/proto";
 
@@ -11,10 +12,9 @@ service ImageService{
   rpc InspectImage(ImageRequest) returns (InspectImageResponse);
   rpc PullImage(PullImageRequest) returns (stream PullImageMessage);
   //rpc PushImage(...)
-  //rpc BuildImage(...)
-  //rpc TagImage(...)
+  rpc BuildImage(BuildImageRequest) returns (stream BuildImageEvent);
+  rpc TagImage(TagImageRequest) returns (TagImageResponse);
   rpc RemoveImage(RemoveImageRequest) returns (RemoveImageResponse);
-  //rpc PruneImage(...)
 }
 
 service ContainerService{
@@ -55,7 +55,7 @@ service VolumeService {
 
 service StackService {
   rpc ListStacks(ListStackRequest) returns (ListStackResponse);
-//  rpc Get(...)
+  rpc GetStack(GetStackRequest) returns (GetStackResponse);
 //  rpc Deploy(...)
 //  rpc Update(...)
 //  rpc Stop(...)
@@ -153,6 +153,36 @@ message PullImageMessage {
     string error = 5;
 }
 
+message TagImageRequest {
+    string image_id = 1;
+    string repository = 2;
+    string tag = 3;
+}
+
+message TagImageResponse {
+    string image_id = 1;
+    string repository = 2;
+    string tag = 3;
+}
+
+message BuildImageRequest {
+    bytes context_tar = 1;
+    string dockerfile = 2;
+    string image_name = 3;
+    repeated string tags = 4;
+    bool no_cache = 5;
+    bool pull = 6;
+    map<string, string> build_args = 7;
+}
+
+message BuildImageEvent {
+    string stream = 1;
+    string error = 2;
+    string image_id = 3;
+    repeated string tags = 4;
+    bool done = 5;
+}
+
 // ------------------------------------------------------------------ CONTAINERS 
 message ListContainersRequest {}
 
@@ -168,12 +198,13 @@ message ContainerInfo {
     string name = 2;
     string image = 3;
     string status = 4;
+    google.protobuf.Timestamp created_at = 5;
 
-    repeated PortBinding ports = 5;
-    repeated VolumeBinding mounts = 6;
-    repeated string env = 7;
+    repeated PortBinding ports = 6;
+    repeated VolumeBinding mounts = 7;
+    repeated string env = 8;
 
-    HealthStatus health = 8;
+    HealthStatus health = 9;
 }
 
 message ListContainersResponse {
@@ -522,8 +553,29 @@ message Stack {
     string id = 1;
     string name = 2;
     string status = 3;
+    google.protobuf.Timestamp created_at = 4;
 
-    repeated Container containers = 4;
-    repeated NetworkListItem networks = 5;
-    repeated Volume volumes = 6;
+    repeated Container containers = 5;
+    repeated NetworkListItem networks = 6;
+    repeated Volume volumes = 7;
+}
+
+message StackInfo {
+    string id = 1;
+    string name = 2;
+    string type = 3;
+    string config_content = 4;
+    string status = 5;
+
+    repeated Container containers = 7;
+    repeated NetworkListItem networks = 8;
+    repeated Volume volumes = 9;
+}
+
+message GetStackRequest {
+    string id = 1;
+}
+
+message GetStackResponse {
+    Stack stack = 1;
 }

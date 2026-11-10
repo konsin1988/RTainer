@@ -3,6 +3,8 @@ package docker
 import (
     "context"
 		"strings"
+		"time"
+		"log"
 
 		"github.com/docker/docker/api/types/container"
 		"github.com/docker/go-connections/nat"
@@ -46,13 +48,17 @@ func (c *Client) InspectContainer(
         return ContainerInspect{}, err
     }
 
+		dockerTime, err := time.Parse(time.RFC3339Nano, result.Created)
+		log.Println(result.Created)
+		log.Println(dockerTime)
 
     info := ContainerInspect{
-        ID:     result.ID,
-        Name:   result.Name,
-        Image:  result.Config.Image,
-        Status: result.State.Status,
-        Env:    result.Config.Env,
+        ID:     		result.ID,
+        Name:   		result.Name,
+        Image:  		result.Config.Image,
+        Status: 		result.State.Status,
+        Env:    		result.Config.Env,
+				CreatedAt: 	dockerTime,
     }
 
     // Ports

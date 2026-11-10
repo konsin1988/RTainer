@@ -4,6 +4,7 @@ import (
     "context"
 		"io"
 		"strconv"
+		"time"
 
 		"github.com/docker/docker/api/types/container"
 )
@@ -20,14 +21,15 @@ type VolumeBinding struct {
 }
 
 type ContainerInspect struct {
-    ID     string
-    Name   string
-    Image  string
-    Status string
+    ID     			string
+    Name   			string
+    Image  			string
+    Status 			string
+		CreatedAt 	time.Time
 
-    Ports  []PortBinding
-    Mounts []VolumeBinding
-    Env    []string
+    Ports  			[]PortBinding
+    Mounts 			[]VolumeBinding
+    Env    			[]string
 
     Health *HealthStatus
 }
